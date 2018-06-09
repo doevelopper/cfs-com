@@ -1,0 +1,27 @@
+#ifdef CFS_OPENDDS_DDS
+    #pragma DCPS_DATA_TYPE "cfs::com::anExample"
+    #pragma DCPS_DATA_KEY "cfs::com::AType aType"
+#endif
+
+#ifdef CFS_COREDX_DDS
+    #define DDS_KEY __dds_key
+#else
+    #define DDS_KEY
+#endif
+
+module
+{
+    const long MAX_NUM_JOINTS = 32;
+    typedef sequence<float, MAX_NUM_JOINTS> aTypeSeq;
+
+    struct anExample
+    {
+      DDS_KEY long  aType; //@key
+      aTypeSeq aTseq;
+    };
+
+    #ifdef CFS_OPENSPLICE
+        #pragma keylist AType aType
+    #endif
+};
+
