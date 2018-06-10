@@ -1,5 +1,7 @@
 # DDS Abstraction Library 
-
+Each DDS implementation can do everything we ask for (and even more), but it will not show you how to achieve that. 
+DDS AL Library sits on top of common DDS implementation and do initializes the runtime environment, 
+loads the classes, creates the domain participants...
 ## Introduction
 
 There are a number of different DDS implementations available.
@@ -176,5 +178,10 @@ It aims to use
 ### Data Callback Listener
 
 ### Data Callback Data Reader
+
+#Disclaimer
+Of course, as it is only an abstraction (and we're not stating that we would've created a better solution 
+for the problem than Vortex itself) it can do way less than what the OpenSplice DDS is capable of, 
+but for what we need it, it is perfect.
 
 

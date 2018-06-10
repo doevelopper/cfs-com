@@ -20,8 +20,11 @@ module
       aTypeSeq aTseq;
     };
 
-    #ifdef CFS_OPENSPLICE
+    #ifdef CFS_OPENSPLICE_DDS
         #pragma keylist AType aType
     #endif
 };
+
+
+
 

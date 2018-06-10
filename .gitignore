@@ -30,3 +30,98 @@
 *.exe
 *.out
 *.app
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+target/
+AMD64.*/
+build-wrapper-linux-x86-32
+build-wrapper-win-x86-32.exe
+build-wrapper-linux-x86-64
+build-wrapper-win-x86-64.exe
+libinterceptor-*
+build-wrapper-linux-x86/
+build-wrapper-win-x86/
+sonar-scanner-3.0.3.778-linux/
+sonar-scanner-3.0.3.778-windows
+
+# Add any directories, files, or patterns you don't want to be tracked by version control
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+#### Qt.gitignore
+# Qt-es
+
+object_script.*.Release
+object_script.*.Debug
+*_plugin_import.cpp
+/.qmake.cache
+/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+Makefile*
+*build-*
+
+
+# Qt unit tests
+target_wrapper.*
+
+
+# QtCreator
+
+*.autosave
+
+# QtCtreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
+# QtCtreator CMake
+CMakeLists.txt.user*
+
+# *.config
+# *.creator
+# *.files
+
+# temprary work to exlude
+osgi/src/test/cpp/levitics/arkhe/gcs/osgi/core/workflow/

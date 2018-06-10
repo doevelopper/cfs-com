@@ -1,0 +1,5 @@
+
+#ifndef CFS_COM_TYPETRAITS_HPP
+#define CFS_COM_TYPETRAITS_HPP
+
+#endif

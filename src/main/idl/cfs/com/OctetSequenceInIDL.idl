@@ -1,0 +1,14 @@
+
+
+module cfscom
+{
+    const long MaxManipulatorMessageLength = 2048; // 2 KB
+    typedef sequence<octet, MaxManipulatorMessageLength> ManipulatorMessageOctetSeq;
+
+    struct ManipulatorMessage
+    {
+        long manipulatorId; //@key
+        ManipulatorMessageOctetSeq message;
+        boolean messageIsCompressed;
+    };
+};

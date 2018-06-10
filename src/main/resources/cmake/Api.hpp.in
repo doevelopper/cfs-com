@@ -1,0 +1,197 @@
+#ifndef @NAMESPACE@_LIBRARIES_POLICIES_API_HPP
+#define @NAMESPACE@_LIBRARIES_POLICIES_API_HPP
+
+#include <QtGlobal>
+
+#if defined(_MSC_VER) || defined(__declspec)
+#   define @NAMESPACE@_DLLEXPORT __declspec(dllexport)
+#   define @NAMESPACE@_DLLIMPORT __declspec(dllimport)
+#else
+    #if __GNUC__ >= 4
+        #define @NAMESPACE@_EXPORT      __attribute__ ((visibility ("default")))
+        #define @NAMESPACE@_IMPORT      __attribute__ ((visibility ("default")))
+        #define @NAMESPACE@_DLL_PUBLIC  __attribute__ ((visibility("default")))
+        #define @NAMESPACE@_DLL_LOCAL   __attribute__ ((visibility("hidden")))
+    #else
+        #define @NAMESPACE@_EXPORT
+        #define @NAMESPACE@_IMPORT
+        #define @NAMESPACE@_DLL_PUBLIC
+        #define @NAMESPACE@_DLL_LOCAL
+    #endif
+#endif
+
+#ifdef __cplusplus
+    #include <algorithm>
+
+    #if !defined(@NAMESPACE@_NAMESPACE)
+
+        # define @NAMESPACE@_PREPEND_NAMESPACE(name) ::name
+        # define @NAMESPACE@_USE_NAMESPACE
+        # define @NAMESPACE@_BEGIN_NAMESPACE
+        # define @NAMESPACE@_END_NAMESPACE
+        # define @NAMESPACE@_BEGIN_INCLUDE_NAMESPACE
+        # define @NAMESPACE@_END_INCLUDE_NAMESPACE
+
+        #ifndef @NAMESPACE@_BEGIN_MOC_NAMESPACE
+
+            # define @NAMESPACE@_BEGIN_MOC_NAMESPACE
+
+        #endif
+
+        #ifndef @NAMESPACE@_END_MOC_NAMESPACE
+
+            # define @NAMESPACE@_END_MOC_NAMESPACE
+
+        #endif
+
+        # define @NAMESPACE@_FORWARD_DECLARE_CLASS(name) class name;
+        # define @NAMESPACE@_FORWARD_DECLARE_STRUCT(name) struct name;
+        # define @NAMESPACE@_MANGLE_NAMESPACE(name) name
+
+    #else /* user namespace */
+
+        # define @NAMESPACE@_PREPEND_NAMESPACE(name) ::@NAMESPACE@_NAMESPACE::name
+        # define @NAMESPACE@_USE_NAMESPACE using namespace ::@NAMESPACE@_NAMESPACE;
+        # define @NAMESPACE@_BEGIN_NAMESPACE namespace @NAMESPACE@_NAMESPACE {
+        # define @NAMESPACE@_END_NAMESPACE }
+        # define @NAMESPACE@_BEGIN_INCLUDE_NAMESPACE }
+        # define @NAMESPACE@_END_INCLUDE_NAMESPACE namespace @NAMESPACE@_NAMESPACE {
+
+        #ifndef @NAMESPACE@_BEGIN_MOC_NAMESPACE
+            # define @NAMESPACE@_BEGIN_MOC_NAMESPACE @NAMESPACE@_USE_NAMESPACE
+        #endif
+
+        #ifndef @NAMESPACE@_END_MOC_NAMESPACE
+            # define @NAMESPACE@_END_MOC_NAMESPACE
+        #endif
+
+        # define @NAMESPACE@_FORWARD_DECLARE_CLASS(name) \
+            @NAMESPACE@_BEGIN_NAMESPACE class name; @NAMESPACE@_END_NAMESPACE \
+            using @NAMESPACE@_PREPEND_NAMESPACE(name);
+
+        # define @NAMESPACE@_FORWARD_DECLARE_STRUCT(name) \
+            @NAMESPACE@_BEGIN_NAMESPACE struct name; @NAMESPACE@_END_NAMESPACE \
+            using @NAMESPACE@_PREPEND_NAMESPACE(name);
+
+        # define @NAMESPACE@_MANGLE_NAMESPACE0(x) x
+        # define @NAMESPACE@_MANGLE_NAMESPACE1(a, b) a##_##b
+        # define @NAMESPACE@_MANGLE_NAMESPACE2(a, b) @NAMESPACE@_MANGLE_NAMESPACE1(a,b)
+        # define @NAMESPACE@_MANGLE_NAMESPACE(name) @NAMESPACE@_MANGLE_NAMESPACE2( \
+            @NAMESPACE@_MANGLE_NAMESPACE0(name), @NAMESPACE@_MANGLE_NAMESPACE0(@NAMESPACE@_NAMESPACE))
+
+        namespace @NAMESPACE@_NAMESPACE {}
+
+        # ifndef @NAMESPACE@_BOOTSTRAPPED
+            # ifndef @NAMESPACE@_NO_USING_NAMESPACE
+               /*
+                This expands to a "using @NAMESPACE@_NAMESPACE" also in _header files_.
+                It is the only way the feature can be used without too much
+                pain, but if people _really_ do not want it they can add
+                DEFINES += @NAMESPACE@_NO_USING_NAMESPACE to their .pro files.
+                */
+               @NAMESPACE@_USE_NAMESPACE
+            # endif
+        # endif
+
+    #endif /* user namespace */
+
+#else /* __cplusplus */
+
+    # define @NAMESPACE@_BEGIN_NAMESPACE
+    # define @NAMESPACE@_END_NAMESPACE
+    # define @NAMESPACE@_USE_NAMESPACE
+    # define @NAMESPACE@_BEGIN_INCLUDE_NAMESPACE
+    # define @NAMESPACE@_END_INCLUDE_NAMESPACE
+
+#endif /* __cplusplus */
+
+
+@NAMESPACE@_BEGIN_NAMESPACE
+
+#if defined(@NAMESPACE@_SHARED) || !defined(@NAMESPACE@_STATIC)
+
+    #  ifdef @NAMESPACE@_STATIC
+        #    error "Both @NAMESPACE@_SHARED and @NAMESPACE@_STATIC defined, please make up your mind"
+    #  endif
+
+    #  ifndef @NAMESPACE@_SHARED
+        #    define @NAMESPACE@_SHARED
+    #  endif
+
+    #  if defined(@NAMESPACE@_BUILD_CORE_LIB)
+        #    define @NAMESPACE@_CORE_EXPORT @NAMESPACE@_DECL_EXPORT
+    #  else
+        #    define @NAMESPACE@_CORE_EXPORT @NAMESPACE@_DECL_IMPORT
+    #  endif
+#else
+    #  define @NAMESPACE@_CORE_EXPORT
+#endif
+
+/* Declaring private class in public class*/
+#define @NAMESPACE@_DECLARE_PRIVATE(Class) \
+    protected: \
+    Class(Class##Private& dd, QObject *parent); \
+    Class(Class##Private& dd, const Class& other); \
+    inline Class##Private* d_func(void) \
+    { \
+        return reinterpret_cast<Class##Private *>(AbstractObject::d_func()); \
+    } \
+    inline const Class##Private* d_func(void) const \
+    { \
+         return reinterpret_cast<const Class##Private *>(AbstractObject::d_func()); \
+    } \
+    private: \
+    friend class Class##Private;
+
+/* Implementing inline constructor of public class*/
+#define @NAMESPACE@_IMPLEMENT_PRIVATE(Class, Parent) \
+    inline Class::Class(Class##Private& dd, QObject *p) : Parent(dd, p) { }  \
+    inline Class::Class(Class##Private& dd, const Class& o) : Parent(dd, o) { }
+
+/*declaring public class in private one*/
+#define @NAMESPACE@_DECLARE_PUBLIC(Class) \
+    inline Class* q_func() \
+    { \
+        return reinterpret_cast<Class *>(q_ptr); \
+    } \
+    inline const Class* q_func() const \
+    { \
+        return reinterpret_cast<const Class *>(q_ptr); \
+    } \
+    friend class Class;
+
+/* Retieving either d-pointer or q-pointer in the right type*/
+#define @NAMESPACE@_D(Class) Class##Private *const d = d_func()
+#define @NAMESPACE@_Q(Class) Class *const q = q_func()
+
+// template <typename T> static inline T *qGetPtrHelper(T *ptr) { return ptr; }
+// template <typename Wrapper> static inline typename Wrapper::pointer qGetPtrHelper(const Wrapper &p) { return p.data(); }
+
+// #define @NAMESPACE@_DECLARE_PRIVATE(Class) \
+    // inline Class##Private* d_func() { return reinterpret_cast<Class##Private *>(qGetPtrHelper(d_ptr)); } \
+    // inline const Class##Private* d_func() const { return reinterpret_cast<const Class##Private *>(qGetPtrHelper(d_ptr)); } \
+    // friend class Class##Private;
+
+// #define @NAMESPACE@_DECLARE_PRIVATE_D(Dptr, Class) \
+    // inline Class##Private* d_func() { return reinterpret_cast<Class##Private *>(Dptr); } \
+    // inline const Class##Private* d_func() const { return reinterpret_cast<const Class##Private *>(Dptr); } \
+    // friend class Class##Private;
+
+// #define @NAMESPACE@_DECLARE_PUBLIC(Class)                                    \
+    // inline Class* q_func() { return static_cast<Class *>(q_ptr); } \
+    // inline const Class* q_func() const { return static_cast<const Class *>(q_ptr); } \
+    // friend class Class;
+
+// #define @NAMESPACE@_D(Class) Class##Private * const d = d_func()
+// #define @NAMESPACE@_Q(Class) Class * const q = q_func()
+
+// #define DISABLE_COPY(Class) \
+    // Class(const Class &) DECL_EQ_DELETE; \
+    // Class &operator=(const Class &) DECL_EQ_DELETE;
+
+
+#define NS_UNUSED(x) (void)(x)
+#define NOOP(x) do {} while(0) //((void)0)
+
+#endif
+

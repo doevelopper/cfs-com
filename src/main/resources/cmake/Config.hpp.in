@@ -1,0 +1,206 @@
+
+/*!
+ * @file Export.hpp
+ *
+ * This header defines several compiler-independent macros which are used
+ * throughout project. Most of these macros make use of GCC extensions; on other
+ * compilers, they don't have any effect.
+ */
+
+#ifndef @NAMESPACE@CONFIG_HPP
+#define @NAMESPACE@CONFIG_HPP
+
+#include <QtCore>
+#include <QHash>
+#include <QStringList>
+#include <QVariant>
+#include <QtGlobal>
+#include <QtCore/QtGlobal>
+
+#include <complex>
+#include <deque>
+#include <functional>
+#include <list>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
+
+//EXPORT_COMPONENT_API is used for the public API symbols. It either DLL imports or DLL exports (or does nothing for static build)
+// EXPORT_API_LOCAL is used for non-api symbols.
+// @see https://gcc.gnu.org/wiki/Visibility
+
+
+#ifdef MAKE_DLL_LIBRARY                  // defined if is compiled as a DLL
+  # ifdef DLL_EXPORTS                    // defined if we are building the DLL (instead of using it)
+    #  define EXPORT_API Q_DECL_EXPORT
+  # else
+    #  define EXPORT_API Q_DECL_IMPORT   // We are using this library
+  # endif
+  # define HIDE_EXPORT_API Q_DECL_HIDDEN
+#else                                    // MAKE_DLL_LIBRARY is not defined: this means it is a static lib.
+  # define EXPORT_API
+  # define HIDE_EXPORT_API
+#endif
+namespace levitics
+{
+
+template<typename T>
+inline bool isinf(T value)
+{
+    return (value == std::numeric_limits<T>::infinity()
+            || (-1*value) == std::numeric_limits<T>::infinity())
+            && std::numeric_limits<T>::has_infinity;
+}
+
+template<typename T>
+struct IsObjectSerializable
+{
+    enum
+    {
+        Value = false
+    };
+};
+
+template<>
+struct IsObjectSerializable<void *>
+{
+    enum
+    {
+        Value = false
+    };
+};
+
+class ObjectSerializable;
+
+template<>
+struct IsObjectSerializable<ObjectSerializable *>
+{
+    enum
+    {
+        Value = true
+    };
+};
+
+template<typename T>
+struct IsObjectSerializable<T *>
+{
+
+    using yes = qint8;
+    using no = qint64;
+
+    static yes checkType(ObjectSerializable *);
+    static no checkType(...);
+
+public:
+    enum
+    {
+        Value = sizeof(checkType(static_cast<T *>(0))) == sizeof(yes)
+    };
+};
+
+template <typename T>
+inline void hash(T& seed, T value)
+{
+    seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+template < typename T >
+inline void hashCombine(std::size_t& seed, const T& v)
+{
+    std::hash<T> hasher;
+    hash(seed, hasher(v));
+}
+
+template < typename I >
+inline std::size_t hashRange(I first, I last)
+{
+    std::size_t seed = 0;
+
+    for (; first != last; ++first)
+    {
+        hash(seed, *first);
+    }
+
+    return seed;
+}
+
+struct GcsHash
+{
+public:
+    template < typename T, typename U > std::size_t operator()(const std::pair<T, U>& c) const;
+    template < typename T, typename A > std::size_t operator()(const std::vector<T, A>& c) const;
+    template < typename T, typename A > std::size_t operator()(const std::list<T, A>& c) const;
+    template < typename T, typename A > std::size_t operator()(const std::deque<T, A>& c) const;
+    template < typename K, typename C, typename A > std::size_t operator()(const std::set<K, C, A>& c) const;
+    template < typename K, typename C, typename A > std::size_t operator()(const std::multiset<K, C, A>& c) const;
+    template < typename K, typename T, typename C, typename A > std::size_t operator()(const std::map<K, T, C, A>& c) const;
+    template < typename K, typename T, typename C, typename A > std::size_t operator()(const std::multimap<K, T, C, A>& c) const;
+    template < typename T > std::size_t operator()(const std::complex<T>& c) const;
+};
+
+
+template < typename T, typename U >
+inline std::size_t GcsHash::operator()(const std::pair<T, U>& c) const
+{
+    std::size_t seed = 0;
+    levitics::hash(seed, c.first);
+    levitics::hash(seed, c.second);
+    return seed;
+}
+
+template < typename T, typename A >
+inline std::size_t GcsHash::operator()(const std::vector<T, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename T, typename A >
+inline std::size_t GcsHash::operator()(const std::list<T, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename T, typename A >
+inline std::size_t GcsHash::operator()(const std::deque<T, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename K, typename C, typename A >
+inline std::size_t GcsHash::operator()(const std::set<K, C, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename K, typename C, typename A >
+inline std::size_t GcsHash::operator()(const std::multiset<K, C, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename K, typename T, typename C, typename A>
+inline std::size_t GcsHash::operator()(const std::map<K, T, C, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename K, typename T, typename C, typename A >
+inline std::size_t GcsHash::operator()(const std::multimap<K, T, C, A>& c) const
+{
+    return hashRange(c.begin(), c.end());
+}
+
+template < typename T >
+inline std::size_t GcsHash::operator()(const std::complex<T>& c) const
+{
+    std::size_t seed = 0;
+    levitics::hash(seed, c.imag());
+    levitics::hash(seed, c.real());
+    return seed;
+}
+
+using GcsProperties = QHash<QString, QVariant> ;
+using GcsDictionary = GcsProperties ;
+}
+#endif
