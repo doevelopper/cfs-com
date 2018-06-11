@@ -125,3 +125,11 @@ CMakeLists.txt.user*
 
 # temprary work to exlude
 osgi/src/test/cpp/levitics/arkhe/gcs/osgi/core/workflow/
+src/main/idl/DistributedSimulationV2.idl
+src/main/idl/RoIS_Common.idl
+src/main/idl/RoIS_HRI.idl
+src/main/idl/dds-xtypes_discovery.idl
+src/main/idl/dds-xtypes_typeobject.idl
+src/main/idl/dds_security_plugins_spis.idl
+src/main/idl/dds_xrce_types.idl
+

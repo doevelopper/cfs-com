@@ -17,6 +17,13 @@ It aims to use
 - [ ]  Twin Oaks Computing CoreDX DDS
 - [ ]  eProsima Fast-RTPS
 
+by providing
+
+- Creating Topics in Partitions of the GDS (Global Data Space)
+- Subscribing to these Topics via Listeners (and of course via DataReader instances)
+- Publishing Events to these Topics via a DataWriter instance
+- Handling QoS
+
 ## Requirements
 
 ### Dependencies
