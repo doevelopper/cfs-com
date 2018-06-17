@@ -17,7 +17,9 @@ namespace cfs::com
     using std::shared_ptr<DDS::ReadCondition> ReadConditionPtr;
     using std::shared_ptr<DDS::WaitSet> WaitSetPtr;
     using std::shared_ptr<DDS::DataReaderListener> ListenerPtr
- 
+/*!
+ * @brief Interface for getting the domain participant factory.
+ */  
     class ParticipantFactory
     {
 
@@ -25,6 +27,8 @@ namespace cfs::com
 
         ParticipantFactory();
         ~ParticipantFactory();
+
+	DomainParticipantFactoryPtr participantFactory();
 
     protected:
 

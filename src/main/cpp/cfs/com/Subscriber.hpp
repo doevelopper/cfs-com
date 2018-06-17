@@ -1,0 +1,5 @@
+
+#ifndef CFS_COM_SUBSCRIBER_HPP
+#define CFS_COM_SUBSCRIBER_HPP
+
+#endif

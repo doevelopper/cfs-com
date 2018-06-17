@@ -1,0 +1,5 @@
+
+#ifndef CFS_COM_PUBLISHER_HPP
+#define CFS_COM_PUBLISHER_HPP
+
+#endif

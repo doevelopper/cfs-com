@@ -1,0 +1,6 @@
+
+#ifndef CFS_COM_DATAWRITER_HPP
+#define CFS_COM_DATAWRITER_HPP
+
+
+#endif
