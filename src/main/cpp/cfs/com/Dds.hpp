@@ -21,6 +21,8 @@
     # error No DDS vendor -define was provided. No DDS header files included.  Compilation will fail
     # error Please configure the makefile to define one for the following variables: RTI_CONNEXT_DDS, TWINOAKS_COREDX, or PRISMTECH_OPENSPLICE
 
+
+
 #endif
 
 

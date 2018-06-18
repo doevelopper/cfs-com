@@ -16,10 +16,12 @@ namespace cfs::com
     using std::shared_ptr<DDS::DataReader> DataReaderPtr;
     using std::shared_ptr<DDS::ReadCondition> ReadConditionPtr;
     using std::shared_ptr<DDS::WaitSet> WaitSetPtr;
-    using std::shared_ptr<DDS::DataReaderListener> ListenerPtr
-/*!
- * @brief Interface for getting the domain participant factory.
- */  
+    using std::shared_ptr<DDS::DataReaderListener> ListenerPtr;
+
+    /*!
+    * @brief Interface for getting the domain participant factory.
+    */
+ 
     class ParticipantFactory
     {
 
