@@ -224,10 +224,20 @@ macro(info msg)
     message(STATUS "Info: ${msg}")
 endmacro()
 
+function(MESSAGE_STATUS msg)
+    message(STATUS "[INFO] ${msg}")
+endfunction(MESSAGE_STATUS)
+
+function(MESSAGE_FATAL msg)
+    message(FATAL_ERROR "[FATAL] ${msg}")
+endfunction(MESSAGE_FATAL)
+
+function(MESSAGE_WARNING msg)
+    message(WARNING "[WARN] ${msg}")
+endfunction(MESSAGE_WARNING)
+
+
 macro(infoValue variableName)
     info("${variableName}=\${${variableName}}")
 endmacro()
 
-macro(SHOWFLAG flag)
-  message(STATUS "${flag} = ${${flag}}")
-endmacro(SHOWFLAG)

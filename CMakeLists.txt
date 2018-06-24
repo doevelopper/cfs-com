@@ -45,19 +45,19 @@ if(NOT COMMON_MODULE_TOOLS)
         "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/macros"
         "${CMAKE_SOURCE_DIR}/src/test/resources/cmake"
     )
-	# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/main/resources/cmakeModule" CACHE STRING "Modules for CMake" FORCE)
+    #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/main/resources/cmakeModule" CACHE STRING "Modules for CMake" FORCE)
 
   if (NOT TARGET  LOG4CXX::LOG4CXX)
-        find_package(Log4cxx REQUIRED)
+      find_package(Log4cxx REQUIRED)
   endif()
 
   if (NOT TARGET GTest::GTest AND NOT TARGET GMock::GMock)
-        find_package(GoogleTestFwk REQUIRED)
+      find_package(GoogleTestFwk REQUIRED)
   endif()
 
   
 else(NOT COMMON_MODULE_TOOLS)
-   massage(STATUS "${PROJECT_NAME} will use modules defined in main parent dir")
+   massage(STATUS "${PROJECT_NAME} will use modules path defined in main parent dir")
 endif(NOT COMMON_MODULE_TOOLS)
 
 include(TestBigEndian)
@@ -70,19 +70,52 @@ endif(IS_BIG_ENDIAN)
 include(ProcessorCount)
 ProcessorCount(N)
 
-#include(Rules)
 include(CompilerOption)
+
+include(DefinePlatformSpecfic)
+
+get_property(cxx_known_features GLOBAL PROPERTY CMAKE_CXX_KNOWN_FEATURES)
+get_property(c_known_features GLOBAL PROPERTY CMAKE_C_KNOWN_FEATURES)
+
+include(WriteCompilerDetectionHeader)
+write_compiler_detection_header(
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/cfs/com/CompilerDetection.hpp
+    PREFIX CFS_COM
+    #    [OUTPUT_FILES_VAR <output_files_var> OUTPUT_DIR <output_dir>]
+    COMPILERS GNU 
+    FEATURES ${cxx_known_features}
+    VERSION "${CMAKE_VERSION}"
+    PROLOG "//<prolog>"
+    EPILOG "//<epilog>"
+#   [ALLOW_UNKNOWN_COMPILERS]
+#   [ALLOW_UNKNOWN_COMPILER_VERSIONS]
+)
+
+
+configure_file("${PROJECT_SOURCE_DIR}/src/main/resources/cmake/Config.hpp.in"
+	       "${CMAKE_CURRENT_BINARY_DIR}/cfs/com/Config.hpp"
+               @ONLY)
+
+configure_file("${PROJECT_SOURCE_DIR}/src/main/resources/cmake/GitRevision.hpp.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/cfs/com/GitRevision.hpp"
+               @ONLY)
+
 
 if (NOT TARGET XercesC::XercesC)
     find_package(XercesC REQUIRED)
 endif(NOT TARGET XercesC::XercesC)
 
-find_package(OpenDDS REQUIRED)
-#find_package(VortexDDS REQUIRED)
+find_package(Doxygen  
+	#   REQUIRED  dot
+   OPTIONAL_COMPONENTS mscgen dia
+)
+
+find_package( OpenDDS REQUIRED)
+find_package( OpenSpliceVortexDDS REQUIRED)
 #find_package(FastRTPSDDS REQUIRED)
 
 
-# add_subdirectory (src/main/cpp)
+add_subdirectory (src/main/cpp)
 # add_subdirectory (src/test/cpp)
 # add_subdirectory (src/it)
 
