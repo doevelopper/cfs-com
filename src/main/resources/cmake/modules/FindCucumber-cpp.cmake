@@ -28,15 +28,15 @@ set(CUCUMBER_BOOST_LIBBRARIES
     regex
     date_time
     program_options
-    asio
-    assign
+    #asio
+    #assign
     filesystem
-    multi_array
+    #multi_array
     signals
 )
 
-find_package(boost COMPONENTS ${CUCUMBER_BOOST_LIBBRARIES} REQUIRED
-    HINTS
+find_package(Boost COMPONENTS ${CUCUMBER_BOOST_LIBBRARIES} REQUIRED
+#    HINTS
 )
 
 if(Boost_FOUND)

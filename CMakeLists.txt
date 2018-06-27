@@ -49,12 +49,15 @@ if(NOT COMMON_MODULE_TOOLS)
 
   if (NOT TARGET  LOG4CXX::LOG4CXX)
       find_package(Log4cxx REQUIRED)
-  endif()
+  endif(NOT TARGET  LOG4CXX::LOG4CXX)
 
   if (NOT TARGET GTest::GTest AND NOT TARGET GMock::GMock)
       find_package(GoogleTestFwk REQUIRED)
-  endif()
+  endif(NOT TARGET GTest::GTest AND NOT TARGET GMock::GMock)
 
+  if (NOT TARGET CUCUMBER-CPP::CUCUMBER-CPP)
+	  find_package(Cucumber-cpp)
+  endif(NOT TARGET CUCUMBER-CPP::CUCUMBER-CPP)
   
 else(NOT COMMON_MODULE_TOOLS)
    massage(STATUS "${PROJECT_NAME} will use modules path defined in main parent dir")
@@ -106,16 +109,21 @@ if (NOT TARGET XercesC::XercesC)
 endif(NOT TARGET XercesC::XercesC)
 
 find_package(Doxygen  
-	#   REQUIRED  dot
-   OPTIONAL_COMPONENTS mscgen dia
+   REQUIRED  
+       dot
+   OPTIONAL_COMPONENTS 
+       mscgen dia
 )
 
 find_package( OpenDDS REQUIRED)
 find_package( OpenSpliceVortexDDS REQUIRED)
-#find_package(FastRTPSDDS REQUIRED)
+#find_package( GoogleTestFwk)
+#find_package(RTIConnexDDS REQUIRED)
+include(GoogleTest) #gtest_discover_tests
+include(CTest)
 
 
 add_subdirectory (src/main/cpp)
-# add_subdirectory (src/test/cpp)
-# add_subdirectory (src/it)
+add_subdirectory (src/test/cpp)
+add_subdirectory (src/it)
 
