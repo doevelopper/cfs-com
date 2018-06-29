@@ -1,7 +1,8 @@
 
 
 add_library(cfs.com.test
-    cfs/com/ErrorTest
+    cfs/com/unitTest
+    cfs/com/Test
 )
 
 target_include_directories(cfs.com.test
@@ -35,7 +36,7 @@ generate_export_header(cfs.com.main
 )
 
 add_executable(cfs.com.test.bin
-    cfs/com/unitTest
+    cfs/com/ErrorTest
 )
 
 target_link_libraries (cfs.com.test.bin
@@ -52,7 +53,7 @@ gtest_discover_tests(cfs.com.test.bin
     EXTRA_ARGS --iterration 1 --outputpath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} --module cfs.com.test
 )
 
-
+#add_test(NAME cfs.com.test.exe COMMAND cfs.com.test.bin)
 
 
 

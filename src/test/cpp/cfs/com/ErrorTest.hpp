@@ -22,7 +22,8 @@ namespace cfs::com::test
 
         void SetUp() override;
 	void TearDown() override;
-
+        
+	Error * error;
     private:
 
 

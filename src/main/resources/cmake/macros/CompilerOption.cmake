@@ -1,4 +1,4 @@
-#       levitics-arkhe-gcs/src/main/resources/config/macros/CompilerOption.cmake
+#       CompilerOption.cmake
 #
 #               Copyright (c) 2014-2018  A.H.L
 #
@@ -75,7 +75,7 @@ set ( CMAKE_SHARED_LINKER_FLAGS_PROFILE "-pg" CACHE STRING
     "Flags used by the shared libraries linker during profile builds." FORCE 
 )
 
-  set ( CMAKE_CXX_FLAGS_COVERAGE "--coverage -O3 -DNDEBUG" CACHE STRING
+set ( CMAKE_CXX_FLAGS_COVERAGE "--coverage -O3 -DNDEBUG" CACHE STRING
     "Flags used by the C++ compiler during coverage builds." FORCE 
 )
 

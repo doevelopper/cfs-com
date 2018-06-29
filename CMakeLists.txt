@@ -84,14 +84,14 @@ include(WriteCompilerDetectionHeader)
 write_compiler_detection_header(
     FILE ${CMAKE_CURRENT_BINARY_DIR}/cfs/com/CompilerDetection.hpp
     PREFIX CFS_COM
-    #    [OUTPUT_FILES_VAR <output_files_var> OUTPUT_DIR <output_dir>]
+#   OUTPUT_FILES_VAR <output_files_var> OUTPUT_DIR <output_dir>
     COMPILERS GNU 
     FEATURES ${cxx_known_features}
     VERSION "${CMAKE_VERSION}"
     PROLOG "//<prolog>"
     EPILOG "//<epilog>"
-#   [ALLOW_UNKNOWN_COMPILERS]
-#   [ALLOW_UNKNOWN_COMPILER_VERSIONS]
+#   ALLOW_UNKNOWN_COMPILERS
+#   ALLOW_UNKNOWN_COMPILER_VERSIONS
 )
 
 
@@ -121,6 +121,7 @@ find_package( OpenSpliceVortexDDS REQUIRED)
 #find_package(RTIConnexDDS REQUIRED)
 include(GoogleTest) #gtest_discover_tests
 include(CTest)
+enable_testing()
 
 
 add_subdirectory (src/main/cpp)

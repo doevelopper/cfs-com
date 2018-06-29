@@ -13,6 +13,24 @@ namespace cfs::com
     enum class DdsErrs 
     {
         None, /* ... */ 
+	ACCESS_DENIED,/*permission denied*/
+	ALREADY_EXISTS,
+	BAD_UNIT, /*no such device*/
+	BUSY,  /*device or resource busy*/
+	CANTOPEN,/*io error*/
+	CANTREAD,
+	DEV_NOT_EXIST,/*no such device*/
+	DEVICE_IN_USE, /*device or resource busy*/
+	DISK_FULL,/*no space on device*/
+	FILE_NOT_FOUND,/*no such file or directory*/
+	INVALID_ACCESS, 
+	LOCK_VIOLATION, /*no lock available*/
+	LOCKED, /*no lock available*/
+	NOT_ENOUGH_MEMORY,/*not enough memory*/
+	NOT_READY,/*resource unavailable try againresource unavailable try again*/
+	OPERATION_ABORTED, /*operation canceled*/
+
+
     };
 
     enum class SubsystemError
