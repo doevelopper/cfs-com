@@ -53,7 +53,7 @@ gtest_discover_tests(cfs.com.test.bin
     EXTRA_ARGS --iterration 1 --outputpath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} --module cfs.com.test
 )
 
-#add_test(NAME cfs.com.test.exe COMMAND cfs.com.test.bin)
+#ADD_CPPCHECK_ANALYSIS( cfs.com.test ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 

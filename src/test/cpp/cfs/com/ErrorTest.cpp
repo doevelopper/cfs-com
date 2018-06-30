@@ -6,7 +6,7 @@
 using namespace cfs::com::test;
 
 ErrorTest::ErrorTest()
- : error()
+        : error()
 {
 
 }
@@ -17,17 +17,17 @@ ErrorTest::~ErrorTest()
 
 void ErrorTest::SetUp ()
 {
-    error = new Error();
+        error = new Error();
 }
 
 void ErrorTest::TearDown ()
 {
-    delete error;
+        delete error;
 }
 
 TEST_F(ErrorTest, testTrue)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    EXPECT_TRUE(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        EXPECT_TRUE(true);
 }
 

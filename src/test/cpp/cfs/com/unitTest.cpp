@@ -5,10 +5,10 @@
 
 int main(int argc, char * argv[])
 {
-    cfs::com::test::Test cfscomTest;
-    cfscomTest.run(argc,argv);
+        cfs::com::test::Test cfscomTest;
+        cfscomTest.run(argc,argv);
 
-    return ( EXIT_SUCCESS );
+        return ( EXIT_SUCCESS );
 
 }
 

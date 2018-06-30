@@ -1,27 +1,23 @@
-set (UNCRUSTIFY_CONFIG "${PROJECT_SOURCE_DIR}/src/main/resources/config/gcs.style")
+
+set (UNCRUSTIFY_CONFIG "${PROJECT_SOURCE_DIR}/src/main/resources/config/code-beautifier.cfg")
 set(UNCRUSTIFY_FLAGS -q --if-changed --no-backup -l CPP  -c ${UNCRUSTIFY_CONFIG})
 
-if(ENABLE_FORMATING_STYLE)
-    find_program(UNCRUSTIFY uncrustify)
-    if(UNCRUSTIFY)
-        execute_process(
-            COMMAND ${UNCRUSTIFY} --version 
-            OUTPUT_VARIABLE UNCRUSTIFY_VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        string(REGEX REPLACE ".+([0-9]+\\.[0-9]+)" "\\1" UNCRUSTIFY_VERSION ${UNCRUSTIFY_VERSION})
-#        message(STATUS "${UNCRUSTIFY} : ${UNCRUSTIFY_VERSION}")
-        mark_as_advanced(UNCRUSTIFY)
+find_program(UNCRUSTIFY uncrustify
+)
 
-    endif(UNCRUSTIFY)
-
-else(ENABLE_FORMATING_STYLE)
-
-    message(STATUS "Formating style Skipped!")
-
-endif(ENABLE_FORMATING_STYLE)
+if(UNCRUSTIFY)
+    execute_process(
+        COMMAND ${UNCRUSTIFY} --version 
+        OUTPUT_VARIABLE UNCRUSTIFY_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX REPLACE ".+([0-9]+\\.[0-9]+)" "\\1" UNCRUSTIFY_VERSION ${UNCRUSTIFY_VERSION})
+#   message(STATUS "${UNCRUSTIFY} : ${UNCRUSTIFY_VERSION}")
+    mark_as_advanced(UNCRUSTIFY UNCRUSTIFY_VERSION)
+endif(UNCRUSTIFY)
 
 function(apply_style_targets STYLE_TARGET BASE_DIRECTORY)
+
     if(UNCRUSTIFY)
 
         if(NOT TARGET ${STYLE_TARGET}-style) 
@@ -30,10 +26,10 @@ function(apply_style_targets STYLE_TARGET BASE_DIRECTORY)
 
             add_custom_target(${STYLE_TARGET}-style
                 COMMENT "[STYLE-Target:${STYLE_TARGET}] ${BASE_DIRECTORY}"
-#                COMMENT "Beautifying ${STYLE_TARGET} source code with uncrustify ${BASE_DIRECTORY}"
                 COMMAND "${UNCRUSTIFY}"  ${UNCRUSTIFY_FLAGS} ${SRC}
                 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
             )
+
         endif()
 
     else(UNCRUSTIFY)
@@ -42,12 +38,6 @@ function(apply_style_targets STYLE_TARGET BASE_DIRECTORY)
 
     endif(UNCRUSTIFY)
 
-    if(NOT TARGET style)
-        add_custom_target(style
-            COMMENT "Prettying source code with uncrustify"
-        )
-    endif()
-
-    add_dependencies(style ${STYLE_TARGET}-style)
+    add_dependencies(validate ${STYLE_TARGET}-style)
 
 endfunction()

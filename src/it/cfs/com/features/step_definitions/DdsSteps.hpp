@@ -7,12 +7,13 @@
 #include <cucumber-cpp/autodetect.hpp>
 #include <cstdint>
 
-//#include <cfs/com/LoggingService.hpp>
-
+namespace cfs::com::it::dds
+{
 struct Context
 {
-    std::uint32_t e;
+        std::uint32_t e;
 };
+}
 
 #endif
 

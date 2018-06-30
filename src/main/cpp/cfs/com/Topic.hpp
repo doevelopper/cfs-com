@@ -4,10 +4,10 @@
 
 namespace cfs::com
 {
-    class Topic
-    {
-    
-    };
+class Topic
+{
+
+};
 
 }
 #endif

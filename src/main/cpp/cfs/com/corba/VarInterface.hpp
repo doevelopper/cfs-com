@@ -4,29 +4,29 @@
 
 namespace cfs::com::corba
 {
-    /*!
-     * @brief  _var interface for local objects.
-     */ 
-    template <class T>
-    class VarInterface
-    {
-    public:
-        VarInterface();
-	~VarInterface();
-	VarInterface(const VarInterface<T> &)
-	VarInterface<T>& operator = (T*t);
-	VarInterface<T>& operator = (VarInterface<T> & t);
-	T * operator ->();
-	operator T*&();
-        T * in();
+/*!
+ * @brief  _var interface for local objects.
+ */
+template <class T>
+class VarInterface
+{
+public:
+VarInterface();
+~VarInterface();
+VarInterface(const VarInterface<T> &)
+VarInterface<T>&operator = (T*t);
+VarInterface<T>& operator = (VarInterface<T> & t);
+T * operator ->();
+operator T*&();
+T * in();
 
-    protected:
+protected:
 
-       T * get();
- 
-    private:
-       T * m_pointee;
-        
-    }; 
+T * get();
+
+private:
+T * m_pointee;
+
+};
 }
 #endif

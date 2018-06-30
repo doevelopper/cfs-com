@@ -9,14 +9,15 @@
 #include <cfs/com/Error.hpp>
 
 // using namespace Allow step definition in multiple source files.
-namespace cfs::com::it::e 
+namespace cfs::com::it::e
 {
-  struct ErrorContext
-  {
-    cfs::com::Error error;
-    std::uint32_t errorCode;
+struct ErrorContext
+{
+        cfs::com::Error error;
+        std::uint32_t errorCode;
+        std::string message;
 
-  };
+};
 }
 #endif
 
