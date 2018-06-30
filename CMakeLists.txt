@@ -121,8 +121,8 @@ find_package( OpenSpliceVortexDDS REQUIRED)
 #find_package(RTIConnexDDS REQUIRED)
 include(GoogleTest) #gtest_discover_tests
 include(CTest)
-enable_testing()
-
+include(goals)
+include(CPPCheck)
 
 add_subdirectory (src/main/cpp)
 add_subdirectory (src/test/cpp)

@@ -27,7 +27,7 @@ void ErrorTest::TearDown ()
 
 TEST_F(ErrorTest, testTrue)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     EXPECT_TRUE(true);
 }
 

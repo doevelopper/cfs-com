@@ -1,4 +1,4 @@
-#       levitics-arkhe-gcs/src/main/resources/config/macros/goals.cmake
+#       goals.cmake
 #
 #               Copyright (c) 2014-2018  A.H.L
 #
@@ -25,87 +25,6 @@
 # Build goals added hire are an adaptation for maven build licyle
 # https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
 # common default goals name between maven and make 
-
-if(NOT TARGET style)
-    add_custom_target(style
-        COMMENT "Prettying source code with uncrustify"
-    )
-endif()
-
-if(NOT TARGET cyclomatic)
-    add_custom_target(cyclomatic
-        COMMENT "Cyclomatic Complexity Analyzer."
-    )
-endif()
-
-if(NOT TARGET cppcheck)
-    add_custom_target(cppcheck
-        COMMENT "Static code analysis."
-    )
-endif()
-
-if(NOT TARGET lint)
-    add_custom_target(lint
-        COMMENT "Check the C++ source code to analyze it for syntax errors and other faults."
-    )
-endif()
-
-if(NOT TARGET gnu-coverage)
-    add_custom_target(gnu-coverage
-        COMMENT "Running code coverage analysis and statement-by-statement profiling."
-    )
-endif()
-
-if(ENABLE_SANITY_CHECK)
-    if(NOT TARGET sanity-check)
-        ADD_CUSTOM_TARGET(sanity-check
-            COMMENT "Software quality assurance: Style -> CPPCheck -> Cyclomatic -> CPPlint -> Coverage"
-        )
-        add_dependencies(sanity-check coverage style cppcheck cyclomatic lint)
-    endif(NOT TARGET sanity-check)
-else(ENABLE_SANITY_CHECK)
-    add_custom_target(sanity-check 
-        COMMAND ${CMAKE_COMMAND} -E echo "Software quality assurance disabled"
-    )
-endif(ENABLE_SANITY_CHECK)
-
-if(ENABLE_QA_CHECK)
-    if(NOT TARGET qa-check)
-        ADD_CUSTOM_TARGET(qa-check
-            COMMENT "Software quality assurance: Style -> CPPCheck -> Cyclomatic -> CPPlint -> Coverage"
-        )
-        add_dependencies(qa-check coverage style cppcheck cyclomatic lint)
-    endif(NOT TARGET qa-check)
-else(ENABLE_QA_CHECK)
-    add_custom_target(qa-check 
-        COMMAND ${CMAKE_COMMAND} -E echo "Software quality assurance disabled"
-    )
-endif(ENABLE_QA_CHECK)
-
-set(dot_files *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
-
-add_custom_target(rmdotdiles
-    COMMAND ${CMAKE_COMMAND} -E remove ${dot_files}
-    COMMENT "Removing dot files"
-)
-
-add_custom_target (distclean
-    # COMMAND rm -vf ${CMAKE_SOURCE_DIR}/*.log
-    # COMMAND rm -vf ${CMAKE_SOURCE_DIR}/Makefile
-    # COMMAND rm -vf ${CMAKE_SOURCE_DIR}/install_manifest.txt
-    # COMMAND rm -vf ${CMAKE_SOURCE_DIR}/cmake_install.cmake
-    # COMMAND find ${CMAKE_SOURCE_DIR} -type f -name CMakeCache.txt | xargs -r rm -vf
-    # COMMAND find ${CMAKE_SOURCE_DIR} -type d -name CMakeFiles | xargs -r rm -rvf
-    # COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -vf
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target rmdotdiles
-    COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
-	COMMAND ${CMAKE_COMMAND} -E remove CMakeCache.txt cmake_install.cmake Makefile
-	COMMENT "Cleaning target"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
-
-
 
 if(NOT TARGET pre-clean)
     add_custom_target(pre-clean
@@ -158,21 +77,21 @@ endif()
 if(NOT TARGET validate)
     add_custom_target(validate
         COMMENT "Validate the project is correct and all necessary information is available."
-		DEPENDS style
+        #DEPENDS style
     )
 endif()
 
 if(NOT TARGET initialize)
     add_custom_target(initialize
         COMMENT "Initialize build state, e.g. set properties or create directories."
-        DEPENDS validate cppcheck lint
+        DEPENDS validate #cppcheck lint
     )
 endif()
 
 if(NOT TARGET generate-sources)
     add_custom_target(generate-sources
         COMMENT "Generate any source code for inclusion in compilation."
-        DEPENDS initialize cyclomatic
+        DEPENDS initialize #cyclomatic
     )
 endif()
 
@@ -256,7 +175,7 @@ endif()
 if(NOT TARGET m-test)
     add_custom_target(m-test
         COMMENT "Run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed."
-        DEPENDS process-test-classes
+        DEPENDS process-test-classes 
     )
 endif()
 
@@ -316,32 +235,111 @@ if(NOT TARGET deploy)
     )
 endif()
 
-if(NOT TARGET ${PROJECT_NAME}-debug)
-	add_custom_target(${PROJECT_NAME}-debug
-		COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE} #${PROJECT_SOURCE_DIR} vs ${CMAKE_SOURCE_DIR}
-		COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
-		COMMENT "Switch CMAKE_BUILD_TYPE to Debug. Building debug application"
-	)
-endif()
+# if(NOT TARGET ${PROJECT_NAME}-debug)
+    # add_custom_target(${PROJECT_NAME}-debug
+		# COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
+        # COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE} #${PROJECT_SOURCE_DIR} vs ${CMAKE_SOURCE_DIR}
+        # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
+        # DEPENDS verify
+        # COMMENT "Switch CMAKE_BUILD_TYPE to Debug. Building debug application"
+  # )
+# endif()
 
-if(NOT TARGET coverage-debug)
-    add_custom_target(coverage-debug
-        COMMENT "Running cod ecoverage in debug mode."
-        DEPENDS${PROJECT_NAME}-debug
-    )
-endif()
+# if(NOT TARGET coverage-debug)
+    # add_custom_target(coverage-debug
+        # COMMENT "Running cod ecoverage in debug mode."
+        # DEPENDS ${PROJECT_NAME}-debug
+    # )
+# endif()
 
-if(NOT TARGET ${PROJECT_NAME}-release)
-	add_custom_target(${PROJECT_NAME}-release
-		COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
-		COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
-		COMMENT "Switch CMAKE_BUILD_TYPE to Release. Building  Release application"
-	)
-endif()
+# if(NOT TARGET ${PROJECT_NAME}-release)
+    # add_custom_target(${PROJECT_NAME}-release
+        # COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
+        # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/build-${CMAKE_BUILD_TYPE}
+        # DEPENDS verify
+        # COMMENT "Switch CMAKE_BUILD_TYPE to Release. Building  Release application"
+  # )
+# endif()
 
-if(NOT TARGET coverage-release)
-    add_custom_target(coverage-release
-        COMMENT "Running cod ecoverage in debug mode."
-        DEPENDS${PROJECT_NAME}-release
-    )
-endif()
+# if(NOT TARGET coverage-release)
+    # add_custom_target(coverage-release
+        # COMMENT "Running cod ecoverage in debug mode."
+        # DEPENDS ${PROJECT_NAME}-release
+    # )
+# endif()
+
+
+# if(NOT TARGET style)
+    # add_custom_target(style
+        # COMMENT "Prettying source code with uncrustify"
+    # )
+# endif()
+
+# if(NOT TARGET cyclomatic)
+    # add_custom_target(cyclomatic
+        # COMMENT "Cyclomatic Complexity Analyzer."
+    # )
+# endif()
+
+# if(NOT TARGET cppcheck)
+    # add_custom_target(cppcheck
+        # COMMENT "Static code analysis."
+    # )
+# endif()
+
+# if(NOT TARGET lint)
+    # add_custom_target(lint
+        # COMMENT "Check the C++ source code to analyze it for syntax errors and other faults."
+    # )
+# endif()
+
+# if(NOT TARGET gnu-coverage)
+    # add_custom_target(gnu-coverage
+        # COMMENT "Running code coverage analysis and statement-by-statement profiling."
+    # )
+# endif()
+
+# if(ENABLE_SANITY_CHECK)
+    # if(NOT TARGET sanity-check)
+        # ADD_CUSTOM_TARGET(sanity-check
+            # COMMENT "Software quality assurance: Style -> CPPCheck -> Cyclomatic -> CPPlint -> Coverage"
+        # )
+        # add_dependencies(sanity-check coverage style cppcheck cyclomatic lint)
+    # endif(NOT TARGET sanity-check)
+# else(ENABLE_SANITY_CHECK)
+    # add_custom_target(sanity-check 
+        # COMMAND ${CMAKE_COMMAND} -E echo "Software quality assurance disabled"
+    # )
+# endif(ENABLE_SANITY_CHECK)
+
+# if(ENABLE_QA_CHECK)
+    # if(NOT TARGET qa-check)
+        # ADD_CUSTOM_TARGET(qa-check
+            # COMMENT "Software quality assurance: Style -> CPPCheck -> Cyclomatic -> CPPlint -> Coverage"
+        # )
+        # add_dependencies(qa-check coverage style cppcheck cyclomatic lint)
+    # endif(NOT TARGET qa-check)
+# else(ENABLE_QA_CHECK)
+    # add_custom_target(qa-check 
+        # COMMAND ${CMAKE_COMMAND} -E echo "Software quality assurance disabled"
+    # )
+# endif(ENABLE_QA_CHECK)
+
+set(dot_files *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.vtk *.ucd *.d2)
+# add_custom_target (distclean
+		# COMMAND rm -vf ${CMAKE_SOURCE_DIR}/*.log
+		# COMMAND rm -vf ${CMAKE_SOURCE_DIR}/Makefile
+		# COMMAND rm -vf ${CMAKE_SOURCE_DIR}/install_manifest.txt
+		# COMMAND rm -vf ${CMAKE_SOURCE_DIR}/cmake_install.cmake
+		# COMMAND find ${CMAKE_SOURCE_DIR} -type f -name CMakeCache.txt | xargs -r rm -vf
+		# COMMAND find ${CMAKE_SOURCE_DIR} -type d -name CMakeFiles | xargs -r rm -rvf
+		# COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -vf
+    # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
+    # COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target rmdotdiles
+    # COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
+	# COMMAND ${CMAKE_COMMAND} -E remove CMakeCache.txt cmake_install.cmake Makefile
+	# COMMAND ${CMAKE_COMMAND} -E remove ${dot_files}
+	# COMMENT "Cleaning target"
+    # WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+# )
+
