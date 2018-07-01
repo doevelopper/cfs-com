@@ -4,29 +4,33 @@
 
 namespace cfs::com::corba
 {
-class VarStringInterface
-{
-public:
 
-VarStringInterface ();
-VarStringInterface (std::string & p);
-VarStringInterface (const VarStringInterface & s);
-VarStringInterface & operator = (std::string & p);
-virtual ~VarStringInterface ();
-VarStringInterface & operator = (const VarStringInterface & s);
+    class VarStringInterface
+    {
+    public:
 
-char* stringallocate(ULong len);
-char* stringDup(const char* s);
-void stringFree(char* s);
-operator char * ();
-char & operator [] (ULong index);
-char operator [] (ULong index) const;
+        VarStringInterface ();
+        VarStringInterface (std::string & p);
+        VarStringInterface (const VarStringInterface & s);
+        VarStringInterface & operator = (std::string & p);
+        virtual
+        ~VarStringInterface ();
+        VarStringInterface & operator = (const VarStringInterface & s);
 
-protected:
-private:
-std::string & m_ptr;
+        char* stringallocate(ULong len);
+        char* stringDup(const char* s);
+        void stringFree(char* s);
+        operator char * ();
+        char & operator [] (ULong index);
+        char operator [] (ULong index) const;
 
-};
+    protected:
+
+    private:
+
+        std::string & m_ptr;
+
+    };
+
 }
 #endif
-

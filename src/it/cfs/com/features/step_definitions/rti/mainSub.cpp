@@ -1,3 +1,4 @@
+
 /*******************************************************************************
    (c) 2005-2015 Copyright, Real-Time Innovations, Inc.  All rights reserved.
    RTI grants Licensee a license to use, modify, compile, and create derivative
@@ -10,37 +11,37 @@
  ******************************************************************************/
 
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-        int domain_id = 0;
-        int sample_count = 0; // Infinite loop
+    int domain_id = 0;
+    int sample_count = 0;     // Infinite loop
 
-        if (argc >= 2)
-        {
-                domain_id = atoi(argv[1]);
-        }
+    if (argc >= 2)
+    {
+        domain_id = atoi(argv[1]);
+    }
 
-        if (argc >= 3)
-        {
-                sample_count = atoi(argv[2]);
-        }
+    if (argc >= 3)
+    {
+        sample_count = atoi(argv[2]);
+    }
 
-        // To turn on additional logging, include <rti/config/Logger.hpp> and
-        // uncomment the following line:
-        // rti::config::Logger::instance().verbosity(rti::config::Verbosity::STATUS_ALL);
+    // To turn on additional logging, include <rti/config/Logger.hpp> and
+    // uncomment the following line:
+    // rti::config::Logger::instance().verbosity(rti::config::Verbosity::STATUS_ALL);
 
-        try
-        {
-                subscriber_main(domain_id, sample_count);
-        }
-        catch (const std::exception& ex)
-        {
-                // This will catch DDS exceptions
-                std::cerr << "Exception in subscriber_main: " << ex.what() << std::endl;
-                return -1;
-        }
+    try
+    {
+        subscriber_main(domain_id, sample_count);
+    }
+    catch (const std::exception& ex)
+    {
+        // This will catch DDS exceptions
+        std::cerr << "Exception in subscriber_main: " << ex.what() << std::endl;
 
-        return 0;
+        return -1;
+    }
+
+    return 0;
 }
-

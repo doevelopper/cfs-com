@@ -1,5 +1,4 @@
 
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,10 +18,8 @@
 #else
     # error No DDS AL should get a define to know the tye of DDS.
     # error No DDS vendor -define was provided. No DDS header files included.  Compilation will fail
-    # error Please configure the makefile to define one for the following variables: RTI_CONNEXT_DDS, TWINOAKS_COREDX, or PRISMTECH_OPENSPLICE
-
+    # error \
+    Please configure the makefile to define one for the following variables: RTI_CONNEXT_DDS, TWINOAKS_COREDX, or PRISMTECH_OPENSPLICE
 
 
 #endif
-
-

@@ -5,25 +5,25 @@ using cucumber::ScenarioScope;
 
 namespace cfs::com::it::dds
 {
-GIVEN("^I execute this dummy$")
-{
+    GIVEN("^I execute this dummy$")
+    {
         EXPECT_TRUE(true);
-}
+    }
 
-GIVEN("^I press fab$")
-{
+    GIVEN("^I press fab$")
+    {
         EXPECT_TRUE(true);
-}
+    }
 
-THEN("^I should see some output$")
-{
+    THEN("^I should see some output$")
+    {
         EXPECT_TRUE(true);
-}
+    }
 
-THEN("^Success$")
-{
+    THEN("^Success$")
+    {
         EXPECT_TRUE(true);
-}
+    }
 }
 /*
    BEFORE_ALL()

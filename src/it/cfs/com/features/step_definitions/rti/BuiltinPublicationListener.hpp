@@ -4,18 +4,21 @@
 
 namespace cfs::com::rti
 {
-class BuiltinPublicationListener : public NoOpDataReaderListener<PublicationBuiltinTopicData>
-{
 
-public:
-void on_data_available(DataReader<PublicationBuiltinTopicData>& reader);
+    class BuiltinPublicationListener : public NoOpDataReaderListener<PublicationBuiltinTopicData>
+    {
 
-protected:
+    public:
 
+        void on_data_available(DataReader<PublicationBuiltinTopicData>& reader);
 
-private:
-static log4cxx::LoggerPtr logger;
+    protected:
 
-};
+    private:
+
+        static log4cxx::LoggerPtr logger;
+
+    };
+
 }
 #endif

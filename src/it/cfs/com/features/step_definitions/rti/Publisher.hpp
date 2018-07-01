@@ -1,3 +1,4 @@
+
 /*******************************************************************************
    (c) 2005-2015 Copyright, Real-Time Innovations, Inc.  All rights reserved.
    RTI grants Licensee a license to use, modify, compile, and create derivative
@@ -20,20 +21,20 @@
 
 namespace cfs::com::rti
 {
-class Publisher
-{
+    class Publisher
+    {
 
-public:
+    public:
 
-Publisher();
-~Publisher();
-Publisher(int domainId, int sampleCount);
+        Publisher();
+        ~Publisher();
+        Publisher(int domainId, int sampleCount);
 
-protected:
+    protected:
 
-private:
+    private:
 
-};
+    };
 
 }
 #endif

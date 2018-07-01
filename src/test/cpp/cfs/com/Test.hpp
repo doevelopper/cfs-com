@@ -7,24 +7,27 @@
 
 namespace cfs::com::test
 {
-class Test
-{
+    class Test
+    {
 
-public:
-Test();
-Test(std::string & suite, unsigned int iteration = 1);
-Test(const Test & orig) = default;
-virtual ~Test();
+    public:
 
-int run (int argc = 0, char * argv[] = NULL);
-static void showUsage(std::string name);
+        Test();
+        Test(std::string & suite, unsigned int iteration = 1);
+        Test(const Test & orig) = default;
+        virtual
+        ~Test();
 
-protected:
+        int run (int argc = 0, char * argv[] = NULL);
+        static void showUsage(std::string name);
 
-private:
-std::string m_testSuites;
-unsigned int m_numberOfTestIteration;
-};
+    protected:
+
+    private:
+
+        std::string m_testSuites;
+        unsigned int m_numberOfTestIteration;
+    };
 
 }
 #endif

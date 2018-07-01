@@ -24,23 +24,21 @@
 
 namespace cfs::com::rti
 {
-class Subscriber
-{
+    class Subscriber
+    {
 
-public:
-Subscriber();
-~Subscriber();
-Subscriber(int domainId, int sampleCount);
+    public:
 
-private:
+        Subscriber();
+        ~Subscriber();
+        Subscriber(int domainId, int sampleCount);
 
+    private:
 
-protected:
+    protected:
 
-
-};
+    };
 
 }
 
 #endif
-

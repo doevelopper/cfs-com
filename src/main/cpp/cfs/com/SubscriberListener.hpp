@@ -3,4 +3,3 @@
 #define CFS_COM_SUBSCRIBERLISTENER_HPP
 
 #endif
-

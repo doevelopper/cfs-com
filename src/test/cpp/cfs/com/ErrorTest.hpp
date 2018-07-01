@@ -10,26 +10,25 @@
 
 namespace cfs::com::test
 {
-class ErrorTest : public ::testing::Test
-{
+    class ErrorTest : public ::testing::Test
+    {
 
-public:
+    public:
 
-ErrorTest();
-~ErrorTest();
+        ErrorTest();
+        ~ErrorTest();
 
-protected:
+    protected:
 
-void SetUp() override;
-void TearDown() override;
+        void SetUp() override;
+        void TearDown() override;
 
-Error * error;
-private:
+        Error * error;
 
+    private:
 
-};
+    };
 
 }
 
 #endif
-

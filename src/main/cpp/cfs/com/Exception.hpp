@@ -7,39 +7,44 @@
 
 namespace cfs::com
 {
-class Exception : public std::exception
-{
 
-public:
-Exception(void);
-Exception(const Exception& other);
-Exception(Exception&& other);
-Exception& operator=(Exception& rhs);
-Exception& operator=(Exception&& rhs);
+    class Exception : public std::exception
+    {
+
+    public:
+
+        Exception(void);
+        Exception(const Exception& other);
+        Exception(Exception&& other);
+        Exception& operator=(Exception& rhs);
+        Exception& operator=(Exception&& rhs);
 /*!
  * @cond
  */
-virtual ~Exception(void) throw();
+        virtual
+        ~Exception(void) throw();
 /*!
  * @endcond
  */
 
-Exception(std::uint32_t);
-Exception( std::uint32_t, std::string & );
-protected:
-virtual const char * what() const throw();
-std::uint32_t code() const;
-void code( std::uint32_t );
-const std::string & reason() const;
-void reason( const std::string & );
+        Exception(std::uint32_t);
+        Exception( std::uint32_t, std::string & );
 
-private:
+    protected:
 
-void swap( Exception & other) noexcept;
+        virtual const char * what() const throw();
+        std::uint32_t code() const;
+        void code( std::uint32_t );
+        const std::string & reason() const;
+        void reason( const std::string & );
 
-std::uint32_t m_code;
-std::string m_reason;
-};
+    private:
+
+        void swap( Exception & other) noexcept;
+
+        std::uint32_t m_code;
+        std::string m_reason;
+    };
+
 }
 #endif
-
