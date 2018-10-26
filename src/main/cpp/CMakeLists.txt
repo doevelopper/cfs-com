@@ -54,6 +54,42 @@ target_compile_options(cfs.com.main
         $<$<CONFIG:Profile>:-fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer>
 )
 
+add_custom_command(
+    TARGET cfs.com.main
+    PRE_LINK
+    COMMAND 
+        ${CMAKE_COMMAND} -E echo  pre-linked to actual target
+#    COMMAND 
+#        ${CMAKE_COMMAND} -P prelink-cript.cmake
+    COMMENT 
+        "Running PRE_LINK action "
+)
+
+add_custom_command(
+    TARGET cfs.com.main
+    PRE_BUILD
+    COMMAND 
+        ${CMAKE_COMMAND} -E echo   pre-built to actual target
+#    COMMAND
+#        ${CMAKE_COMMAND} -P pre-build-cript.cmake
+
+    COMMENT 
+        "Running PRE_BUILD action"
+)
+
+add_custom_command(
+    TARGET cfs.com.main
+    POST_BUILD
+    COMMAND 
+        ${CMAKE_COMMAND} -E echo  post-build to actual target
+#    COMMAND
+#        ${CMAKE_COMMAND} -P post-build-cript.cmake
+
+    COMMENT 
+        "Running POST_BUILD action "
+)
+
+
 set_target_properties(cfs.com.main PROPERTIES
     COMPILE_FLAGS "-I${CMAKE_BINARY_DIR}"
 )
