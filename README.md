@@ -46,7 +46,7 @@ by providing
 
 ```sh
     >$ export CMAKE_PREFIX_PATH=/opt/Qt5.11.0/5.11.0/gcc_64:$CMAKE_PREFIX_PATH
-    >$ export QTDIR=/opt/Qt5.11.0/5.11.0/gcc_64
+    >$ export QTDIR=/opt/Qt5.12.0/5.11.0/gcc_64
 ```
 
 #### Wireshark for using Opendds Dissector 
@@ -92,6 +92,23 @@ by providing
     >$ cp -a <OpenDDS_DIR>/ACE_wrappers/MPC /usr/local/share/ace/MPC
 ```
 
+##### Specific to Opendds \[3.13.x,...\] using latest ACE/TAO/MPC from GitHub
+```sh
+./configure --prefix=/opt/dds/opendds-dev/ -std=c++11 --ipv6 \
+    --ace=${HOME}/Downloads/ACE_TAO/ACE \
+	--tao=${HOME}/Downloads/ACE_TAO/TAO --mpc=${HOME}/Downloads/MPC \
+	--openssl --xerces3=${HOME}/dds_install --rapidjson --glib --boost \
+    --security --safety-profile=base --gtest=${HOME}/dds_install \
+	--qt=/opt/Qt5.11.2/5.11.2/gcc_64
+```
+Or simply
+```sh
+./configure --prefix=/opt/dds/opendds-dev/ -std=c++11 --ipv6 \
+	--openssl --xerces3=${HOME}/dds_install --rapidjson --glib --boost \
+    --security --safety-profile=base --gtest=${HOME}/dds_install \
+    --qt=/opt/Qt5.11.2/5.11.2/gcc_64 --no-tests 
+    --ace-github-latest
+```
 #### Prismtech OpenSPlice DDS 
 ```text
    Defaul openFusion ORB is used by OpenSPlice SPLICE_ORB=DDS_OpenFusion_1_6_1
@@ -121,9 +138,9 @@ by providing
 
 ```text
     Necessary will be available in
-    1. Vortex/OpenSplice/src/dir>/install/HDE/x86_64.linux/   (containg all components for the Host Development Hnvironment),
-    2. Vortex/OpenSplice/src/dir>/install/RTS/x86_64.linux/   (containing all components for the Runtime System)
-    3. Vortex/OpenSplice/src/dir>/install/VC/x86_64.linux/    (representing Virtual Carriers with installation support)
+    1. Vortex/OpenSplice/src/dir>/install/HDE/x86_64.linux/ (All components for the Host Development Hnvironment)
+    2. Vortex/OpenSplice/src/dir>/install/RTS/x86_64.linux/ (All components for the Runtime System)
+    3. Vortex/OpenSplice/src/dir>/install/VC/x86_64.linux/  (Virtual Carriers with installation support)
 ```
 
 ## Interactive Data Language
