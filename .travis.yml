@@ -1,0 +1,107 @@
+language: cpp
+
+dist: trusty
+sudo: required
+
+matrix:
+    include:
+
+    - os: linux
+      compiler: gcc
+      env: COMPILER=g++-7
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['cmake', 'g++-7']
+
+    - os: linux
+      compiler: gcc
+      env:
+          COMPILER=g++-7
+          CMAKE_CXX_FLAGS=-std=c++17
+      addons:
+          apt:
+              sources: ['ubuntu-toolchain-r-test']
+              packages: ['cmake', 'g++-7']
+
+    - os: linux
+      compiler: clang
+      env: COMPILER=clang++-6.0
+      addons:
+          apt:
+              sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0']
+              packages: ['cmake', 'clang-6.0', 'g++-6']
+
+global:
+    - ACE_TAO_ROOT=$TRAVIS_BUILD_DIR/ACE_TAO
+    - ACE_ROOT=$TRAVIS_BUILD_DIR/$ACE_TAO_ROOT/ACE
+    - TAO_ROOT=$TRAVIS_BUILD_DIR/$ACE_TAO_ROOT/TAO
+    - CIAO_ROOT=$TRAVIS_BUILD_DIR/CIAO
+    - DANCE_ROOT=$TRAVIS_BUILD_DIR/DAnCE
+    - MPC_ROOT=$TRAVIS_BUILD_DIR/MPC
+    - QTDIR=$TRAVIS_BUILD_DIR/Qt5.11.2/5.11.2/gcc_64
+    - LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH
+
+addons:
+    apt:
+        packages:
+            - libssl-dev
+            - libxerces-c-dev
+
+branches:
+    only:
+        - master
+
+before_install:
+    - date -u
+    - uname -a
+    - if [[ "${SYSTEM_BOOST_PACKAGE}" != "" ]]; thensudo add-apt-repository ppa:boost-latest/ppa  && sudo apt-get update -qq; fi
+    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/MPC.git
+    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/ACE_TAO.git
+    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/CIAO.git
+    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/DAnCE.git
+    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/ACE_TAO.git
+    - git clone --depth=1 --recurse-submodules https://github.com/objectcomputing/OpenDDS.git
+
+install:
+    - if [[ "${SYSTEM_BOOST_PACKAGE}" != "" ]]; then sudo apt-get install libboost-all-dev; fi
+
+before_script:
+    - export
+    - echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h
+  - if [ "$CXX" == "g++" ]; then echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; fi
+  - if [ "$CXX" == "clang++" ]; then echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux_clang.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; fi
+  - cat $TRAVIS_BUILD_DIR/travis.mwc
+  - cat $ACE_ROOT/bin/MakeProjectCreator/config/default.features
+  - cat $ACE_ROOT/ace/config.h
+  - cat $ACE_ROOT/include/makeinclude/platform_macros.GNU
+
+script:
+    - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+    - if [[ "${BUILD_CONFIG}" == "" ]]; then export BUILD_CONFIG="Release"; fi
+    - |
+        $TRAVIS_BUILD_DIR/OpenDDS/configure -std=c++11 --ipv6 \
+            --openssl --xerces3 --rapidjson --glib --boost \
+            --qt=$TRAVIS_BUILD_DIR/Qt5.11.2/5.11.2/gcc_64 \
+            --no-tests \
+            --ace=$ACE_ROOT --tao=$TAO_ROOT --mpc=$MPC_ROOT  
+    - uname -a
+    - $CXX --version
+    - cmake --version
+    - cmake -E make_directory build
+    - cmake -E chdir build cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_INSTALL_PREFIX=/opt/dds ..
+    - cmake --build build --target all --clean-first
+    - cmake --build build --target test 
+    - cmake --build build --target feature-test
+    - cmake --build build --target coverage
+ 
+after_success:
+    # Creating report
+  - echo "Uploading code coverate report"
+  - cd build
+  - lcov --directory . --capture --output-file coverage.info # capture coverage info
+  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
+  - lcov --list coverage.info #debug info
+  # Uploading report to CodeCov
+  - bash <(curl -s https://codecov.io/bash) -t "225d6d7a-2b71-4dbe-bf87-fbf75eb7c119" || echo "Codecov did not collect coverage reports"
+  - fi

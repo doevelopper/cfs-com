@@ -23,6 +23,9 @@ by providing
 - Subscribing to these Topics via Listeners (and of course via DataReader instances)
 - Publishing Events to these Topics via a DataWriter instance
 - Handling QoS
+- Handling Security
+- Single host DDS communication 
+- Multi host DDS communication
 
 ## Requirements
 
