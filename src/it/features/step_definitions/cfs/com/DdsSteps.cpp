@@ -1,7 +1,30 @@
 
-#include <cfs/com/features/step_definitions/Steps.hpp>
+#include <features/step_definitions/cfs/com/DdsSteps.hpp>
 
 using cucumber::ScenarioScope;
+
+namespace cfs::com::it::dds
+{
+    GIVEN("^I execute this dummy$")
+    {
+        EXPECT_TRUE(true);
+    }
+
+    GIVEN("^I press fab$")
+    {
+        EXPECT_TRUE(true);
+    }
+
+    THEN("^I should see some output$")
+    {
+        EXPECT_TRUE(true);
+    }
+
+    THEN("^Success$")
+    {
+        EXPECT_TRUE(true);
+    }
+}
 /*
    BEFORE_ALL()
    {
@@ -17,6 +40,13 @@ using cucumber::ScenarioScope;
    {
     std::cout << "-------------------- (Before any scenario)" << std::endl;
    }
+
+   AFTER()
+   {
+    std::cout << "-------------------- (After any scenarios)" << std::endl;
+   }
+
+
 
    BEFORE("@foo,@bar","@baz")
    {
@@ -49,8 +79,29 @@ using cucumber::ScenarioScope;
    GIVEN("^I have crated a logger and set (\\d+)ms as file watch period$")
    {
     REGEX_PARAM(double, n);
-    //ScenarioScope<Steps> context;
+    //ScenarioScope<LoggingContext> context;
     //context->context.;
     EXPECT_TRUE(true);
    }
+
+   GIVEN("^I execute this dummy$")
+   {
+    EXPECT_TRUE(true);
+   }
+
+   GIVEN("^I press fab$")
+   {
+    EXPECT_TRUE(true);
+   }
+
+   THEN("^I should see some output$")
+   {
+    EXPECT_TRUE(true);
+   }
+
+   THEN("^Success$")
+   {
+    EXPECT_TRUE(true);
+   }
+
    //*/

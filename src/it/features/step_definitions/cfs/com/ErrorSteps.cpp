@@ -1,5 +1,5 @@
 
-#include <cfs/com/features/step_definitions/ErrorSteps.hpp>
+#include <features/step_definitions/cfs/com/ErrorSteps.hpp>
 namespace cfs::com::it::e
 {
     GIVEN("^I have raised error code (\\d+)")
