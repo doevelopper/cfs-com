@@ -39,6 +39,7 @@ add_custom_command(TARGET cfs.com.integration-test
     COMMAND
         fuser -k -n  tcp 3902 # kill -9 l101.it-test.steps which is using port 3902
         # iptables -I INPUT -p tcp --dport 3902 -j DROP ;# need to be root for this command
+        # pkill -f ddspublisher #kill Publisher executable by name.
     COMMENT
         // check pro opened lsof -i -P -n | grep LISTEN 
         "Killing process to close cucumber wire port. (bind: Address already in use)"
