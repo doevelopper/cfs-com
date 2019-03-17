@@ -17,7 +17,7 @@ ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
 
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
-        git xz-utils unzip wget curl openssh-server  openssh-client  automake \
+        git xz-utils unzip wget curl openssh-server  openssh-client  automake texinfo texi2html \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
         perl-base perl-modules zlib1g-dev \
@@ -338,7 +338,7 @@ RUN cd /tmp \
 RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/google/breakpad.git \
 	&& cd breakpad \
-	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss
+	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
 	&& ./configure --prefix=/usr/local \
 	&& make -j `nproc` \
 	&& make install \
