@@ -34,7 +34,20 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
     && rm -rf /usr/share/man/
 
-RUN curl -L -O -k https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz \
+
+RUN cd /tmp \
+    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.2.tar.gz \
+    && tar -xvvf gdb-8.2.tar.gz \
+    && cd gdb-8.2 \
+    && ./configure \
+    && make \
+    && make install \
+    && cd /tmp \
+    && rm -rf gdb-8.2.tar.gz gdb-8.2
+
+
+RUN cd /tmp \
+    && curl -L -O -k https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz \
     && tar -xvf cmake-3.14.0-Linux-x86_64.tar.gz > /dev/null \
     && rm -v cmake-3.14.0-Linux-x86_64.tar.gz \
     && mv -v cmake-3.14.0-Linux-x86_64 /opt/cmake
@@ -234,7 +247,7 @@ RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
     && cd openssl \
     && ./config --prefix=/usr shared  \
-    && make  -j `nproc` \
+    && make -j `nproc` \
     && make install \
     && cd /tmp \
     && rm -rvf openssl
@@ -263,43 +276,43 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
 
-RUN cd /home \
+RUN cd /tmp \
     && curl -L -O -k https://www-us.apache.org/dist/apr/apr-1.6.5.tar.gz  \
     && tar -xvzf apr-1.6.5.tar.gz > /dev/null  \
     && cd apr-1.6.5 \
     && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
     && make clean && make && make install  \
-    && cd /home \
+    && cd /tmp \
     && rm -rvf apr-1.6.5.tar.gz apr-1.6.5
 
-RUN cd /home \
+RUN cd /tmp \
     && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
     && cd libexpat/expat  \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
     && cmake --build build --target all --clean-first  \
     && cmake --build build --target install \
-    && cd /home \
+    && cd /tmp \
     && rm -rvf libexpat
 
-RUN cd /home \
+RUN cd /tmp \
     && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-1.6.1.tar.gz  \
     && tar -xvzf apr-util-1.6.1.tar.gz > /dev/null  \
     && cd apr-util-1.6.1 \
     && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
-    && make clean && make && make install  \
-    && cd /home \
+    && make clean && make && make install \
+    && cd /tmp \
     && rm -rvf apr-util-1.6.1.tar.gz apr-util-1.6.1
 
-RUN cd /home \
+RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
     && cd logging-log4cxx \
     && ./autogen.sh \
     && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
     && make clean && make && make install  \
-    && cd /home \
+    && cd /tmp \
     && rm -rvf logging-log4cxx
 
 RUN cd /tmp \
@@ -312,15 +325,15 @@ RUN cd /tmp \
 	&& cd /tmp \
 	&& rm -Rf Catch2
 
-RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/cpp-testing/GUnit.git \
-	&& cd GUnit \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake ..-DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first \
-	&& cmake --build build --target install || true \
-	&& cd /tmp \
-	&& rm -Rf GUnit
+#RUN cd /tmp \
+#	&& git clone --depth=1 https://github.com/cpp-testing/GUnit.git \
+#	&& cd GUnit \
+#	&& cmake -E make_directory build \
+#	&& cmake -E chdir build cmake ..-DCMAKE_INSTALL_PREFIX=/usr/local \
+#	&& cmake --build build --target all --clean-first \
+#	&& cmake --build build --target install || true \
+#	&& cd /tmp \
+#	&& rm -Rf GUnit
 
 RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/google/breakpad.git \

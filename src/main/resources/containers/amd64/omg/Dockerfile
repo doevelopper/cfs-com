@@ -4,13 +4,13 @@ FROM doevelopper/foss-dds-dev:latest
 
 USER root
 
-ENV ACE_TAO_ROOT=/tmp/ACE_TAO
-ENV ACE_ROOT=$ACE_TAO_ROOT/ACE
-ENV TAO_ROOT=$ACE_TAO_ROOT/TAO
-ENV CIAO_ROOT=/tmp/CIAO
-ENV DANCE_ROOT=/tmp/DAnCE
-ENV MPC_ROOT=/tmp/MPC
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ACE_ROOT/lib:$LD_LIBRARY_PATH
+#ENV ACE_TAO_ROOT=/tmp/ACE_TAO
+#ENV ACE_ROOT=$ACE_TAO_ROOT/ACE
+#ENV TAO_ROOT=$ACE_TAO_ROOT/TAO
+#ENV CIAO_ROOT=/tmp/CIAO
+#ENV DANCE_ROOT=/tmp/DAnCE
+#ENV MPC_ROOT=/tmp/MPC
+#ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ACE_ROOT/lib:$LD_LIBRARY_PATH
 
 # RUN cd /tmp \
     # && git clone --depth=1 https://github.com/DOCGroup/MPC.git \
@@ -75,10 +75,22 @@ RUN cd /tmp \
     && make -j `nproc` \
     && make install
 
-ENV ACE_ROOT=/usr/local/share/ace \
-    TAO_ROOT=/usr/local/share/tao \
-    DDS_ROOT=/usr/local/share/dds \
-    PATH=".:/usr/local/share/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#ENV ACE_ROOT=/usr/local/share/ace \
+#    TAO_ROOT=/usr/local/share/tao \
+#    DDS_ROOT=/usr/local/share/dds \
+#    LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
+#    PATH=".:${PATH}:/usr/local/share/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+
+#RUN cd /tmp \
+#    &&  git clone  --depth=1 --recurse-submodules https://github.com/omg-dds/dds-security.git \
+#    && cd dds-security
+
+
+#RUN cd /tmp \
+#    && git clone  --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-rtps.git
+#    && git clone  --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-xtypes.git
+
 
 #RUN cd /tmp \
 #    &&  git clone  --depth=1 --recurse-submodules ${GET_DDS_REPO} \
@@ -126,7 +138,7 @@ ENV ACE_ROOT=/usr/local/share/ace \
 #    TAO_ROOT=/usr/local/share/tao \
 #    DDS_ROOT=/usr/local/share/dds \
 #    LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
-#    PATH=".:/usr/local/share/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#    PATH=".:${PATH}:/usr/local/share/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 #RUN cd /root \
 #    && git clone https://github.com/objectcomputing/liquibook.git \
@@ -152,6 +164,37 @@ ENV ACE_ROOT=/usr/local/share/ace \
 #    && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 6 travis.mwc \
 #    && make -j `nproc`
 
+# RUN cd /opt \
+	# && git clone --depth=1 https://github.com/DOCGroup/ACE_TAO.git \
+	# && cd ACE_TAO \
+	# && export ACE_ROOT=/opt/ACE_wrappers \
+	# && export TAO_ROOT=$ACE_ROOT/TAO \
+	# && export PATH=$PATH:$ACE_ROOT/bin \
+	# && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ACE_ROOT/lib \
+	# && echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h; \
+	# && echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h
+	# && echo -e "corba_e_micro=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU
+	# && echo -e "corba_e_micro=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features
+	# && echo -e "corba_e_compact=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+	# && echo -e "corba_e_compact=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features;
+	# && echo -e "ace_for_tao=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+	# && echo -e "ace_for_tao=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features
+	# && echo -e "ccm_lw=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features
+	# && echo -e "ccm_noevent=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features;
+	# && echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features;
+	# && echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features;
+	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+	# && echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU
+	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features;
+	# && echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+	# && echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU;
+	# && cd $ACE_ROOT/ace \
+	# && make \
+	# && cd $ACE_ROOT/apps/gperf/src \
+	# && make \
+	# && cd $TAO_ROOT \
+	# && make \
+	# && cd ..
 
 ARG ACCOUNT
 ENV ACCOUNT ${ACCOUNT:-happyman}
