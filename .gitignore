@@ -133,3 +133,5 @@ src/main/idl/dds-xtypes_typeobject.idl
 src/main/idl/dds_security_plugins_spis.idl
 src/main/idl/dds_xrce_types.idl
 
+base-build.sh
+

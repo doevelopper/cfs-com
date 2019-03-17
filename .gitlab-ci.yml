@@ -1,9 +1,8 @@
 .dedicated-runner: &dedicated-runner
     retry: 1
     tags:
-#        - dev-platform
-        - dds 
-
+        - dds
+	
 stages:
     - dependencies
     - configure
@@ -259,7 +258,7 @@ validate:
         paths:
             - $BUILD_DIRECTORY
 
-initialize:
+.initialize:
     <<: *dedicated-runner
     variables:
         JOB_DATE: "date +%Y-%m-%d-%H:%M:%S"
@@ -297,18 +296,11 @@ initialize:
         paths:
             - $BUILD_DIRECTORY
 
-compile:
+.compile:
     <<: *dedicated-runner
     stage: compile
     variables:
-        ACE_TAO_ROOT: $CI_PROJECT_NAMESPACE/ACE_TAO
-        ACE_ROOT: $CI_PROJECT_NAMESPACE/$ACE_TAO_ROOT/ACE
-        TAO_ROOT: $CI_PROJECT_NAMESPACE/$ACE_TAO_ROOT/TAO
-        CIAO_ROOT: $CI_PROJECT_NAMESPACE/CIAO
-        DANCE_ROOT: $CI_PROJECT_NAMESPACE/DAnCE
-        MPC_ROOT: $CI_PROJECT_NAMESPACE/MPC
         QTDIR: $CI_PROJECT_NAMESPACE/Qt5.11.2/5.11.2/gcc_64
-        LD_LIBRARY_PATH: $ACE_ROOT/lib:$LD_LIBRARY_PATH
         CMAKE_INSTALL_PREFIX: $CI_PROJECT_NAMESPACE/dds
 
     before_script:
@@ -316,17 +308,6 @@ compile:
 
     script:
         - echo " Build Options ${BUILD_OPTIONS}"
-        - >
-          if [ ! -d "${BUILD_DIRECTORY}" ]; then
-              cmake -E make_directory ${BUILD_DIRECTORY}
-          fi
-     
-        - cmake -E chdir $BUILD_DIRECTORY cmake -G "${BUILD_GENERATOR}"
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-            -DCMAKE_INSTALL_PREFIX=${BUILD_INSTALL_DIRECTORY}/ ..
-
-        - cmake --build $BUILD_DIRECTORY --target compile --clean-first
 
     after_script:
         - echo " Build Options ${BUILD_OPTIONS}"
@@ -349,12 +330,6 @@ compile:
     stage: unit-test
     variables: &unit-test-variable
         DDS_TYPE: OPENDDS
-        ACE_TAO_ROOT: $CI_PROJECT_NAMESPACE/ACE_TAO
-        ACE_ROOT: $CI_PROJECT_NAMESPACE/$ACE_TAO_ROOT/ACE
-        TAO_ROOT: $CI_PROJECT_NAMESPACE/$ACE_TAO_ROOT/TAO
-        CIAO_ROOT: $CI_PROJECT_NAMESPACE/CIAO
-        DANCE_ROOT: $CI_PROJECT_NAMESPACE/DAnCE
-        MPC_ROOT: $CI_PROJECT_NAMESPACE/MPC
 
     before_script:
         - echo ${DDS_TYPE} $BUILD_OPTIONS
@@ -368,25 +343,25 @@ compile:
         - master
         - tags
 
-unit-test:adlinktech:
+.unit-test:adlinktech:
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: vortex-opensplice
 
-unit-test:objectcomputing:
+.unit-test:objectcomputing:
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: opendds
 
-unit-test:eProsima:
+.unit-test:eProsima:
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: fast-RTPS
 
-unit-test:real-time-innovation:
+.unit-test:real-time-innovation:
     <<: *unit-test
     variables:
         <<: *unit-test-variable
