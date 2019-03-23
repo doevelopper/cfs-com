@@ -1,0 +1,42 @@
+# helm-template
+
+## Container Hierarchy ##
+
+ - dev-base
+   - dev-amd64
+     - prod-amd64
+   - dev-aarch64
+     - prod-aarch64
+
+## Requirements
+
+* Kubectl (deploy only) : Needed on Deployment side only
+* Helm (local and deploy): Used to package, and for deployments of package
+* Docker (local only) : Needed to sync images from DTR to DTR
+* Git (local only) : Clone repos for packaging
+* Git Secret (local only) : Decodes the secrets in this repo
+* GNU Bash (and GNU Make if you are using it)
+
+## `helm --set` overrides
+An example would be:
+
+``` bash
+>$  helm upgrade --install ... \
+    --set global.dtr.host=${params.DOCKER_SERVER} \
+    --set dtr.tag=${params.DOCKER_VERSION} \
+    --set appdynamics.controller.secretsName=eventhub-secrets \
+    --set appdynamics.controller.host=${APPD_CONTROLLER_HOST} \
+    --set appdynamics.controller.port=${APPD_CONTROLLER_PORT} \
+    --set appdynamics.controller.sslEnabled=${APPD_CONTROLLER_SSL} \
+    --set appdynamics.applicationName=${APPD_APPLICATION_NAME} \
+    --set appdynamics.tierName=${APPD_TIER_NAME} \
+    --set appdynamics.nodeName=${APPD_NODE_NAME} \
+    --set appdynamics.uniqueHostName=${APPD_HOST_NAME} \
+    --set appdynamics.monitors.kafka.monitoredHosts.replicas=${KAFKA_HOSTS_COUNT} \
+    --set appdynamics.monitors.kafka.monitoredHosts.hostnamePrefix=${KAFKA_HOSTNAME_PREFIX} \
+    --set appdynamics.monitors.kafka.monitoredHosts.subdomainSuffix=${KAFKA_HOSTNAME_SUFFIX} \
+    --set appdynamics.monitors.kafka.monitoredHosts.jmxPassword=${KAFKA_HOSTNAME_JMX_PASSWORD} \
+    --set appdynamics.monitors.kafka.monitoredHosts.useSsl=${KAFKA_HOSTNAME_JMX_SSL} \
+    --set appdynamics.monitors.kafka.monitoredHosts.jmxPort=${KAFKA_HOSTNAME_JMX_PORT} \
+    ${params.RELEASE_NAME}-kafka-metrics ./appd-agent"
+```

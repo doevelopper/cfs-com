@@ -1,0 +1,7 @@
+Acquire::http::proxy "http://100034251:S%40m3.76Life@PITC-Zscaler-EMEA-London3PR.proxy.corporate.ge.com:80/";
+
+Acquire::https::proxy "http://100034251:S%40m3.76Life@PITC-Zscaler-EMEA-London3PR.proxy.corporate.ge.com:80/";
+
+Acquire::ftp::proxy "http://100034251:S%40m3.76Life@PITC-Zscaler-EMEAxy.corporate.ge.com:80/";
+
+Acquire::https::mirror.ufs.ac.za::Verify-Peer=false

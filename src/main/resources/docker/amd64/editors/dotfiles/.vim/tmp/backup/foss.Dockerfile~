@@ -1,0 +1,370 @@
+#docker build -t registry.gear.ge.com/100034251/oss-dds -f amd64/foss.Dockerfile .
+
+# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
+# FROM $BASE_IMAGE
+FROM amd64/ubuntu:18.10
+
+ARG PMC="Adrien H."
+
+MAINTAINER $PMC
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+ARG IMAGE_VERSION
+ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
+
+RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
+        git xz-utils unzip wget curl openssh-server  openssh-client  automake \
+        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
+        python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
+        perl-base perl-modules zlib1g-dev \
+        libxml2-dev libxml2-utils python3-setuptools python-setuptools \
+        libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
+        mesa-common-dev libglu1-mesa-dev libpcap-dev \
+        libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
+        unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
+        libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
+        libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  libswt-gtk-3-java tmux vim-nox \
+    && apt-get clean --assume-yes  \
+    && apt-get --assume-yes --quiet clean \
+    && apt-get --assume-yes --quiet autoremove \
+    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
+    && rm -rf /usr/share/man/
+
+RUN curl -L -O -k https://cmake.org/files/v3.14/cmake-3.14.0-rc4-Linux-x86_64.tar.gz \
+    && tar -xvf cmake-3.14.0-rc4-Linux-x86_64.tar.gz > /dev/null \
+    && rm -v cmake-3.14.0-rc4-Linux-x86_64.tar.gz \
+    && mv -v cmake-3.14.0-rc4-Linux-x86_64 /opt/cmake
+
+RUN  cd /tmp \
+    && wget --no-cookies --no-check-certificate \
+       --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"\
+       "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-x64.tar.gz" \
+    && tar -xvzf jdk-8u202-linux-x64.tar.gz -C /opt/ \
+    && rm -v jdk-8u202-linux-x64.tar.gz
+
+RUN cd /tmp \
+    &&  wget --no-check-certificate https://www-eu.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz \
+    && tar -xvzf apache-maven-3.6.0-bin.tar.gz \
+    && mv apache-maven-3.6.0/ /opt/apache-maven \
+    && rm -v apache-maven-3.6.0-bin.tar.gz
+
+RUN cd /tmp \
+    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-5.2.1-bin.zip \
+    && mkdir -pv /opt/gradle \
+#    && unzip -d /opt/gradle gradle-5.2.1-bin.zip \
+    && unzip gradle-5.2.1-bin.zip \
+    && mv -v gradle-5.2.1  /opt/gradle/ \
+    && rm -vf gradle-5.2.1-bin.zip
+
+ENV JAVA_HOME /opt/jdk1.8.0_202
+ENV JRE_HOME /opt/jdk1.8.0_202/jre
+ENV M2_HOME /opt/apache-maven/
+ENV M2 $M2_HOME/bin
+ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
+        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
+
+ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_202/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
+ENV PATH $PATH:/opt/gradle/gradle-5.2.1/bin
+
+RUN cmake --version \
+    && make --version \
+    && gcc --version \
+    && java -version \
+    && mvn --version \
+    && gradle -v
+
+RUN cd /tmp \
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://github.com/conan-io/conan.git \
+    && cd conan  \
+    && pip3 install --upgrade pip \
+    && pip install -r conans/requirements.txt
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
+    && cd uncrustify \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake --build build --target all --clean-first \
+    && cmake --build build --target install \
+    && cd /tmp \
+    && rm -rvf uncrustify
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/danmar/cppcheck.git \
+    && cd cppcheck \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake --build build --target all --clean-first  \
+    && cmake --build build --target install \
+    && cp --recursive --verbose cfg  /usr/local/bin || true \
+    && cd /tmp \
+    && rm -rvf cppcheck
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/doxygen/doxygen.git  \
+    && cd doxygen \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake --build build --target all --clean-first  \
+    && cmake --build build --target install \
+    && cd /tmp \
+    && rm -rvf doxygen
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/google/googletest.git \
+    && cd googletest \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake --build build --target all --clean-first  \
+    && cmake --build build --target install \
+    && cd /tmp \
+    && rm -rvf googletest
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/google/benchmark.git \
+    && cd benchmark \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake --build build --target all --clean-first  \
+    && cmake --build build --target install \
+    && cd /tmp \
+    && rm -rvf benchmark
+
+RUN pip install cmakedoc
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/jeaye/stdman.git \
+    && cd stdman \
+    && ./configure --prefix=/usr \
+    && make install \
+    && cd /tmp \
+    && rm -Rvf stdman
+
+ENV MANPATH=/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
+
+RUN cd /tmp \
+    && curl -L -O -k https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz \
+    && tar xfz boost_1_69_0.tar.gz > /dev/null \
+    && cd boost_1_69_0 \
+    && ./bootstrap.sh --prefix=/usr/ \
+    && ./b2 --help \
+    && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
+    && ./b2 install \
+    && cd /tmp \
+    && rm -rvf boost_1_69_0 boost_1_69_0.tar.gz
+
+#sml requires GCC >= 6.0.0
+#RUN if [ "$(gcc --version | head -n1 | cut -d" " -f4)" -lt 6.0.0 ]; then  \
+#	echo "SML Not installed GCC Less than 5.0.0"; else \
+#	echo "Greater than 5.0.0"; fi
+#    && git clone --depth=1 https://github.com/boost-experimental/sml.git \
+#    && cd sml \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#    && cmake --build build --target all --clean-first  \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rvf sml
+
+RUN cd /tmp \
+   && git clone --depth=1 --recurse-submodules https://github.com/cucumber/cucumber-cpp.git \
+   && cd cucumber-cpp \
+   && gem install bundler -v 1.17.3 \
+   && bundle install \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf cucumber-cpp
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/double-conversion.git \
+   && cd double-conversion \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first -- -j `nproc` \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf double-conversion
+
+#RUN cd /tmp \
+#   && git clone --depth=1 https://github.com/google/cctz.git \
+#   && cd cctz \
+#   && cmake -E make_directory build \
+#   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local \
+#   && cmake --build build --target all --config Release --clean-first \
+#   && ctest \
+#   && cmake --build build --config Release --target install \
+#   && cd /tmp \
+#   && rm -rvf cctz
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/capture-thread.git \
+   && cd capture-thread \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf capture-thread
+
+ARG BAZEL_VERSION
+ENV BAZEL_VERSION ${BAZEL_VERSION:-0.23.2}
+RUN cd /tmp \
+    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
+    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+    && bazel version
+
+#UN cd /tmp \
+#   && git clone --depth=1 https://github.com/google/statechart.git \
+#   && cd statechart \
+#   && bazel build //statechart/... \
+#   && bazel test //statechart/... \
+#   && bazel run //statechart/example:microwave_example_main -- --alsologtostderr \
+#   && cd /tmp \
+#   && rm -rvf statechart
+
+#ARG BASE_USER
+#ARG MAINTAINER
+#FROM ${BASE_USER}/debian:stable
+#MAINTAINER $MAINTAINER
+# Install Java IDEs
+#RUN apt-get update \
+#   && apt-get install -y eclipse eclipse-jdt netbeans \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*
+#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> eclipse
+#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> netbeans
+
+#Installation of clang
+# see http://apt.llvm.org/
+#RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add - \
+#   && apt-get update \
+#   && apt-get install --assume-yes  clang-8 lldb-8 lld-8  clang-8 clang-tools-8 clang-8-doc libclang-common-8-dev libclang-8-dev libclang1-8 clang-format-8 python-clang-8 \
+#      libfuzzer-8-dev libc++-8-dev libc++abi-8-dev  libomp-8-dev\
+#   && apt-get clean \
+
+#COPY ./dev-entrypoint.sh /
+#ENTRYPOINT ["/dev-entrypoint.sh"]
+
+#RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add - \
+#    sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+
+RUN cd /tmp \
+#    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
+    && cd openssl \
+#    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
+#    && ./config --prefix=/usr  \
+    && ./config --prefix=/usr shared  \
+    && make  -j `nproc` \
+    && make install \
+    && cd /tmp \
+    && rm -rvf openssl
+
+ARG GSOAP_MAJOR_VERSION
+ARG GSOAP_VERSION
+ENV GSOAP_MAJOR_VERSION ${GSOAP_MAJOR_VERSION:-2.8}
+ENV GSOAP_VERSION ${GSOAP_VERSION:-2.8.75}
+
+#RUN cd /tmp \
+#    && curl -L -O -k https://freefr.dl.sourceforge.net/project/gsoap2/gsoap-${GSOAP_MAJOR_VERSION}/gsoap_${GSOAP_VERSION}.zip  \
+#    && unzip gsoap_${GSOAP_VERSION}.zip \
+#    && cd gsoap-${GSOAP_MAJOR_VERSION} \
+#    && ./configure --prefix=/usr/ \
+#    && make clean && make -j `nproc` && make install \
+#    && cd /tmp \
+#    && rm -rf  gsoap-${GSOAP_MAJOR_VERSION} gsoap_${GSOAP_VERSION}.zip
+
+ENV PROTOBUF_HOME /usr
+
+RUN cd /tmp \
+    o& ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
+    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
+    && cd protobuf \
+    && ./autogen.sh \
+    && ./configure --prefix=/usr/ \
+    && make clean && make -j `nproc` && make install \
+    && cd /tmp \
+    && rm -rf protobuf
+
+RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/xerces-c-3.2.2.tar.gz \
+   && tar -xvzf xerces-c-3.2.2.tar.gz  > /dev/null \
+   && cd xerces-c-3.2.2/ \
+   && ./configure --prefix=/usr/local \
+           --enable-static --enable-shared --enable-netaccessor-socket \
+           --enable-transcoder-gnuiconv --enable-transcoder-iconv \
+           --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t \
+   && make clean && make -j `nproc` && make install \
+   && cd /tmp \
+   && rm xerces-c-3.2.2.tar.gz \
+   && rm -rf xerces-c-3.2.2/
+
+RUN cd /tmp \
+    && wget --no-check-certificate https://www.jacorb.org/releases/2.3.1/jacorb-2.3.1-bin.zip \
+    && unzip jacorb-2.3.1-bin.zip \
+    && mv -v jacorb-2.3.1 /opt/
+
+ENV JACORB_HOME /opt/jacorb-2.3.1
+
+RUN cd /home \
+    && curl -L -O -k https://www-us.apache.org/dist/apr/apr-1.6.5.tar.gz  \
+    && tar -xvzf apr-1.6.5.tar.gz > /dev/null  \
+    && cd apr-1.6.5 \
+    && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
+        --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
+    && make clean && make && make install  \
+    && cd /home \
+    && rm -rvf apr-1.6.5.tar.gz apr-1.6.5
+
+RUN cd /home \
+    && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
+    && cd libexpat/expat  \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+    && cmake --build build --target all --clean-first  \
+    && cmake --build build --target install \
+    && cd /home \
+    && rm -rvf libexpat
+
+RUN cd /home \
+    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-1.6.1.tar.gz  \
+    && tar -xvzf apr-util-1.6.1.tar.gz > /dev/null  \
+    && cd apr-util-1.6.1 \
+    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
+    && make clean && make && make install  \
+    && cd /home \
+    && rm -rvf apr-util-1.6.1.tar.gz apr-util-1.6.1
+
+RUN cd /home \
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
+    && cd logging-log4cxx  \
+    && ./autogen.sh \
+    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
+        --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
+    && make clean && make && make install  \
+    && cd /home \
+    && rm -rvf logging-log4cxx
+
+#Qt Dependencies
+#i RUN sudo apt-get install libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync-dev '^libxcb.*-dev'
+#ENV QT_ROOT=$HOME/opt/qt5.x.x
+#RUN wget http://download.qt.io/official_releases/qt/5.12/5.12.2/single/qt-everywhere-src-5.12.2.tar.xz
+#RUN ./configure -prefix "$QT_ROOT" -opensource -nomake tests
+#RUN make -j `nproc`
+#RUN make install
+
+ARG ACCOUNT=happyman
+RUN useradd -ms /bin/bash $ACCOUNT
+RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
+USER $ACCOUNT
+WORKDIR /home/$ACCOUNT
+CMD ["/bin/bash"]
+# docker run --rm -ti -e HOST_PERMS="$(id -u):$(id -g)" --volume "${HOME}/.conan:/home/happyman/.conan" --volume ${HOME}/.vimrc:/home/happyman/.vim --volume ${HOME}/.vimrc:/home/happyman/.vimrc --volume ${HOME}/.bashrc:/home/happyman/.bashrc  registry.gear.ge.com/100034251/rti-dds:latest --volume "$PWD:/home/happyman/workspace"

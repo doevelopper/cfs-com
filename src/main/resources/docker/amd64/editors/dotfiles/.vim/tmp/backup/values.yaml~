@@ -1,0 +1,73 @@
+# Default values for rti-shapes-demo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+registry:
+  url: registry.gear.ge.com/100034251
+  pullPolicy: IfNotPresent
+  pullSecret: regcred
+
+cloudDiscoveryService:
+  image:
+    name: rti-cloud-discovery-service
+    tag: 0.0.1
+  cfgName: rti-cloud-discovery-service
+  verbosity: 3
+  resources:
+    requests:
+      cpu: 50m
+      memory: 30Mi
+    limits:
+      cpu: 100m
+      memory: 50Mi
+
+routingService:
+  image:
+    name: rti-routing-service
+    tag: 0.0.1
+  cfgName: dds-examples-routing-static
+  verbosity: 3
+  port: 7650
+  service:
+    type: ExternalIP
+    ip: 172.30.0.11
+    port: 7400
+  resources:
+    requests:
+      cpu: 100m
+      memory: 80Mi
+    limits:
+      cpu: 150m
+      memory: 120Mi
+
+ddsExamples:
+  image:
+    name: rti-dds-java-exemple
+    tag: 0.0.5
+  publisher:
+    configurations:
+      - shapeKind: SQUARE
+        shapeColor: BLUE
+      - shapeKind: CIRCLE
+        shapeColor: RED
+      - shapeKind: TRIANGLE
+        shapeColor: GREEN
+    resources:
+      requests:
+        cpu: 100m
+        memory: 150Mi
+      limits:
+        cpu: 150m
+        memory: 200Mi
+  subscriber:
+    configurations:
+      - shapeKind: SQUARE
+      - shapeKind: CIRCLE
+      - shapeKind: TRIANGLE
+    resources:
+      requests:
+        cpu: 100m
+        memory: 130Mi
+      limits:
+        cpu: 150m
+        memory: 180Mi

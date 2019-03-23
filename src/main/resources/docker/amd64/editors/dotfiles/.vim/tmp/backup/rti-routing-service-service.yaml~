@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rti-routing-service
+  annotations:
+      service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
+spec:
+  type: ClusterIP
+  externalIPs:
+    - 172.30.0.11
+  ports:
+  - port: 7400
+    protocol: TCP
+    targetPort: 7650
+  selector:
+    app: rti-routing-service
+

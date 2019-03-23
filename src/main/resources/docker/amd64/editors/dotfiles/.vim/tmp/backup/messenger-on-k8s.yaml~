@@ -1,0 +1,82 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: info-repo
+spec:
+  type: ClusterIP
+  selector:
+    app: info-repo
+  ports:
+    - protocol: TCP
+      port: 3897
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: info-repo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: info-repo
+    spec:
+      containers:
+        - name: info-repo
+          image: registry.gear.ge.com/100034251/opendds
+          command:
+            - DCPSInfoRepo
+            - "-ORBListenEndpoints"
+            - "iiop://:3897/hostname_in_ior=info-repo"
+            - "-DCPSDebugLevel"
+            - "10"
+            - "-ORBDebugLevel"
+            - "10"
+            - "-DCPSTransportDebugLevel"
+            - "6"
+          ports:
+            - containerPort: 3897
+---
+#  SUBSCRIBER
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: subscriber
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: subscriber
+    spec:
+      containers:
+        - name: subscriber
+          image: registry.gear.ge.com/100034251/foss-dds
+          command: ["bash", "-c", "make-config.sh && subscriber -DCPSInfoRepo info-repo:3897 -DCPSConfigFile config.ini"]
+          ports:
+            - containerPort: 3898
+            - containerPort: 3899
+---
+# PUBLISHER
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: publisher
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: publisher
+    spec:
+      containers:
+        - name: publisher
+          image: registry.gear.ge.com/100034251/foss-dds
+          command: ["bash", "-c", "make-config.sh && publisher -DCPSInfoRepo info-repo:3897 -DCPSConfigFile config.ini"]
+          ports:
+            - containerPort: 3898
+            - containerPort: 3899
+
+# kubectl logs deploy/publisher
+# kubectl logs deploy/subscriber

@@ -1,0 +1,63 @@
+
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+
+#include <ndds/ndds_cpp.h>
+
+namespace rti
+{
+    namespace demo101
+    {
+        class DataReader101 : public DDSDataReaderListener
+        {
+        public:
+            DataReader101();
+            DataReader101(const DataReader101&) = default;
+            DataReader101(DataReader101&&) = default;
+            DataReader101& operator=(const DataReader101&) = default;
+            DataReader101& operator=(DataReader101&&) = default;
+            ~DataReader101();
+
+            void on_requested_deadline_missed(
+                DDSDataReader * reader ,
+                const DDS_RequestedDeadlineMissedStatus& status) override
+            {}
+
+            void on_requested_incompatible_qos(
+                DDSDataReader * reader,
+                const DDS_RequestedIncompatibleQosStatus& status) override
+            {}
+
+            void on_sample_rejected(
+                DDSDataReader * reader,
+                const DDS_SampleRejectedStatus& status) override
+            {}
+
+            void on_liveliness_changed(
+                DDSDataReader * reader,
+                const DDS_LivelinessChangedStatus & status) override
+            {}
+
+            void on_sample_lost(
+                DDSDataReader * reader,
+                const DDS_SampleLostStatus & status) override
+            {}
+
+            void on_subscription_matched(
+                DDSDataReader * reader,
+                const DDS_SubscriptionMatchedStatus & status) override
+            {}
+
+            void on_data_available(DDSDataReader* reader) override;
+
+        private:
+
+            DDSDomainParticipant * m_participant;
+            DDSDynamicDataReader * m_reader;
+            DDS_Boolean m_on;
+
+        };
+    }
+}
+

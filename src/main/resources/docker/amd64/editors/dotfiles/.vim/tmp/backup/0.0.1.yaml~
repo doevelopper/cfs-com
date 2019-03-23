@@ -1,0 +1,727 @@
+---
+# Source: rti-shapes-demo/templates/rti-cloud-discovery-service-configmap.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: murmillo-helmet-rti-cloud-discovery-service
+data:
+  USER_CLOUD_DISCOVERY_SERVICE.xml: |
+    <?xml version="1.0"?>
+    <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://community.rti.com/schema/5.3.1/rti_cloud_discovery_service.xsd">
+    
+      <cloud_discovery_service name="rti-cloud-discovery-service">
+        <transport>
+          <element>
+            <alias>udpv4</alias>
+            <receive_port>7400</receive_port>
+          </element>
+        </transport>
+      </cloud_discovery_service>
+    
+    </dds>
+    
+
+---
+# Source: rti-shapes-demo/templates/rti-routing-service-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: murmillo-helmet-rti-routing-service
+data:
+  USER_QOS_PROFILES.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://community.rti.com/schema/5.3.1/rti_dds_profiles.xsd">
+    
+      <!-- QoS Profiles -->
+      <qos_library name="QosLibrary">
+        <qos_profile name="Base" base_name="BuiltinQosLib::Baseline.5.3.0" is_default_qos="true">
+          <participant_qos>
+            <event>
+              <thread>
+                <priority>THREAD_PRIORITY_HIGH</priority>
+              </thread>
+            </event>
+            <property>
+              <value>
+                <element>
+                  <name>dds.transport.UDPv4.builtin.recv_socket_buffer_size</name>
+                  <value>2097152</value>
+                </element>
+                <element>
+                  <name>dds.transport.UDPv6.builtin.recv_socket_buffer_size</name>
+                  <value>2097152</value>
+                </element>
+                <element>
+                  <name>dds.transport.UDPv4.builtin.send_socket_buffer_size</name>
+                  <value>1048576</value>
+                </element>
+                <element>
+                  <name>dds.transport.UDPv6.builtin.send_socket_buffer_size</name>
+                  <value>1048576</value>
+                </element>
+              </value>
+            </property>
+            <wire_protocol>
+              <rtps_auto_id_kind>RTPS_AUTO_ID_FROM_UUID</rtps_auto_id_kind>
+            </wire_protocol>
+          </participant_qos>
+    
+          <datawriter_qos>
+            <writer_data_lifecycle>
+              <autodispose_unregistered_instances>false</autodispose_unregistered_instances>
+            </writer_data_lifecycle>
+            <writer_resource_limits>
+              <instance_replacement>DISPOSED_INSTANCE_REPLACEMENT</instance_replacement>
+            </writer_resource_limits>
+            <property>
+              <value>
+                <element>
+                  <name>dds.data_writer.history.memory_manager.fast_pool.pool_buffer_max_size</name>
+                  <value>4096</value>
+                </element>
+                <element>
+                  <name>dds.data_writer.history.memory_manager.java_stream.min_size</name>
+                  <value>4096</value>
+                </element>
+                <element>
+                  <name>dds.data_writer.history.memory_manager.java_stream.trim_to_size</name>
+                  <value>true</value>
+                </element>
+              </value>
+            </property>
+          </datawriter_qos>
+    
+          <datareader_qos>
+            <protocol>
+              <propagate_dispose_of_unregistered_instances>true</propagate_dispose_of_unregistered_instances>
+            </protocol>
+            <property>
+              <value>
+                <element>
+                  <name>dds.data_reader.history.memory_manager.fast_pool.pool_buffer_max_size</name>
+                  <value>4096</value>
+                </element>
+                <element>
+                  <name>dds.data_reader.history.memory_manager.java_stream.min_size</name>
+                  <value>4096</value>
+                </element>
+                <element>
+                  <name>dds.data_reader.history.memory_manager.java_stream.trim_to_size</name>
+                  <value>true</value>
+                </element>
+              </value>
+            </property>
+          </datareader_qos>
+        </qos_profile>
+      </qos_library>
+    
+    </dds>
+    
+  USER_ROUTING_SERVICE.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://community.rti.com/schema/5.3.1/rti_routing_service.xsd">
+    
+      <routing_service name="dds-examples-routing-static" group_name="dds-examples-routing-static">
+    
+        <administration>
+          <domain_id>0</domain_id>
+          <distributed_logger>
+            <enabled>true</enabled>
+            <echo_to_stdout>true</echo_to_stdout>
+          </distributed_logger>
+          <participant_qos base_name="QosLibrary::Base"/>
+        </administration>
+    
+        <monitoring>
+          <enabled>true</enabled>
+          <domain_id>0</domain_id>
+          <ignore_initialization_failure>true</ignore_initialization_failure>
+          <participant_qos base_name="QosLibrary::Base"/>
+        </monitoring>
+    
+        <domain_route name="Default">
+          <participant_1>
+            <domain_id>0</domain_id>
+            <participant_qos base_name="QosLibrary::Base"/>
+          </participant_1>
+          <participant_2>
+            <domain_id>1</domain_id>
+            <participant_qos base_name="QosLibrary::Base">
+              <transport_builtin>
+                <mask>MASK_NONE</mask>
+              </transport_builtin>
+              <property>
+                <value>
+                  <element>
+                    <name>dds.transport.load_plugins</name>
+                    <value>dds.transport.TCPv4.tcp1</value>
+                  </element>
+                  <element>
+                    <name>dds.transport.TCPv4.tcp1.library</name>
+                    <value>nddstransporttcp</value>
+                  </element>
+                  <element>
+                    <name>dds.transport.TCPv4.tcp1.create_function</name>
+                    <value>NDDS_Transport_TCPv4_create</value>
+                  </element>
+                  <element>
+                    <name>dds.transport.TCPv4.tcp1.parent.classid</name>
+                    <value>NDDS_TRANSPORT_CLASSID_TCPV4_WAN</value>
+                  </element>
+                  <element>
+                    <name>dds.transport.TCPv4.tcp1.public_address</name>
+                    <value>$(NDDS_TCP_PUBLIC_ADDRESS)</value>
+                  </element>
+                  <element>
+                    <name>dds.transport.TCPv4.tcp1.server_bind_port</name>
+                    <value>$(NDDS_TCP_SERVER_BIND_PORT)</value>
+                  </element>
+                </value>
+              </property>
+            </participant_qos>
+          </participant_2>
+    
+          <session name="DefaultShapes">
+            <auto_topic_route name="Square-Out">
+              <input participant="1">
+                <allow_topic_name_filter>Square</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Square</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+            <auto_topic_route name="Square-In">
+              <input participant="2">
+                <allow_topic_name_filter>Square</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Square</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+            <auto_topic_route name="Circle-Out">
+              <input participant="1">
+                <allow_topic_name_filter>Circle</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Circle</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+            <auto_topic_route name="Circle-In">
+              <input participant="2">
+                <allow_topic_name_filter>Circle</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Circle</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+            <auto_topic_route name="Triangle-Out">
+              <input participant="1">
+                <allow_topic_name_filter>Triangle</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Triangle</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+            <auto_topic_route name="Triangle-In">
+              <input participant="2">
+                <allow_topic_name_filter>Triangle</allow_topic_name_filter>
+                <datareader_qos base_name="QosLibrary::Base">
+                </datareader_qos>
+              </input>
+              <output>
+                <allow_topic_name_filter>Triangle</allow_topic_name_filter>
+                <datawriter_qos base_name="QosLibrary::Base">
+                </datawriter_qos>
+              </output>
+            </auto_topic_route>
+          </session>
+        </domain_route>
+    
+      </routing_service>
+    
+    </dds>
+    
+
+---
+# Source: rti-shapes-demo/templates/rti-cloud-discovery-service-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rti-cloud-discovery-service
+  release: murmillo-helmet
+spec:
+  ports:
+  - port: 7400
+    protocol: UDP
+    targetPort: 7400
+  selector:
+    app: rti-cloud-discovery-service
+    release: murmillo-helmet
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+# Source: rti-shapes-demo/templates/rti-routing-service-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rti-routing-service
+  release: murmillo-helmet
+spec:
+  type: ClusterIP
+  externalIPs:
+    - 172.30.0.11
+  ports:
+  - port: 7400
+    protocol: TCP
+    targetPort: 7650
+  selector:
+    app: rti-routing-service
+    release: murmillo-helmet
+
+---
+# Source: rti-shapes-demo/templates/rti-cloud-discovery-service-pod.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-rti-cloud-discovery-service
+  labels:
+    app: rti-cloud-discovery-service
+    release: murmillo-helmet
+spec:
+  containers:
+    - name: murmillo-helmet-rti-cloud-discovery-service
+      image: registry.gear.ge.com/100034251/rti-cloud-discovery-service:0.0.1
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "30Mi"
+        limits:
+          cpu: "100m"
+          memory: "50Mi"
+      args:
+        - "-cfgName"
+        - "rti-cloud-discovery-service"
+        - "-verbosity"
+        - "3"
+      volumeMounts:
+      - name: murmillo-helmet-rti-cloud-discovery-service
+        mountPath: /app
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+  imagePullSecrets:
+    - name: regcred
+  volumes:
+    - name: murmillo-helmet-rti-cloud-discovery-service
+      configMap:
+        name: murmillo-helmet-rti-cloud-discovery-service
+  restartPolicy: Always
+
+---
+# Source: rti-shapes-demo/templates/rti-routing-service-pod.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-rti-routing-service
+  labels:
+    app: rti-routing-service
+    release: murmillo-helmet
+spec:
+  containers:
+    - name: murmillo-helmet-rti-routing-service
+      image: registry.gear.ge.com/100034251/rti-routing-service:0.0.1
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "80Mi"
+        limits:
+          cpu: "150m"
+          memory: "120Mi"
+      args:
+        - "-cfgName"
+        - "dds-examples-routing-static"
+        - "-verbosity"
+        - "3"
+      env:
+        - name: NDDS_TCP_PUBLIC_ADDRESS
+          value: "172.30.0.11:7400"
+        - name: NDDS_TCP_SERVER_BIND_PORT
+          value: "7650"
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      volumeMounts:
+      - name: murmillo-helmet-rti-routing-service
+        mountPath: /app
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+        - containerPort: 7650
+          protocol: "TCP"
+          name: "rtps2-tcp"
+  imagePullSecrets:
+    - name: regcred
+  volumes:
+    - name: murmillo-helmet-rti-routing-service
+      configMap:
+        name: murmillo-helmet-rti-routing-service
+  restartPolicy: Always
+
+---
+# Source: rti-shapes-demo/templates/shape-publishers.yaml
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-publisher-square-blue
+  labels:
+    app: shape-publisher
+    release: murmillo-helmet
+    shapeKind: SQUARE
+    shapeColor: BLUE
+spec:
+  containers:
+    - name: murmillo-helmet-shape-publisher
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: SHAPE_COLOR
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeColor']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapePublisher"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+        - "--color"
+        - "$(SHAPE_COLOR)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-publisher-circle-red
+  labels:
+    app: shape-publisher
+    release: murmillo-helmet
+    shapeKind: CIRCLE
+    shapeColor: RED
+spec:
+  containers:
+    - name: murmillo-helmet-shape-publisher
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: SHAPE_COLOR
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeColor']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapePublisher"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+        - "--color"
+        - "$(SHAPE_COLOR)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-publisher-triangle-green
+  labels:
+    app: shape-publisher
+    release: murmillo-helmet
+    shapeKind: TRIANGLE
+    shapeColor: GREEN
+spec:
+  containers:
+    - name: murmillo-helmet-shape-publisher
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: SHAPE_COLOR
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeColor']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapePublisher"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+        - "--color"
+        - "$(SHAPE_COLOR)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+---
+# Source: rti-shapes-demo/templates/shape-subscribers.yaml
+
+    
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-subscriber-square
+  labels:
+    app: shape-subscriber
+    release: murmillo-helmet
+    shapeKind: SQUARE
+spec:
+  containers:
+    - name: murmillo-helmet-shape-subscriber
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapeSubscriber"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+    
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-subscriber-circle
+  labels:
+    app: shape-subscriber
+    release: murmillo-helmet
+    shapeKind: CIRCLE
+spec:
+  containers:
+    - name: murmillo-helmet-shape-subscriber
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapeSubscriber"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+    
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: murmillo-helmet-shape-subscriber-triangle
+  labels:
+    app: shape-subscriber
+    release: murmillo-helmet
+    shapeKind: TRIANGLE
+spec:
+  containers:
+    - name: murmillo-helmet-shape-subscriber
+      image: registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.6
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "150Mi"
+        limits:
+          cpu: "150m"
+          memory: "200Mi"
+      env:
+        - name: SHAPE_KIND
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['shapeKind']
+        - name: NDDS_DISCOVERY_PEERS
+          value: "rtps@udpv4://$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_HOST):$(RTI_CLOUD_DISCOVERY_SERVICE_SERVICE_PORT)"
+      args:
+        - "com.github.aguther.dds.examples.shape.ShapeSubscriber"
+        - "--shape"
+        - "$(SHAPE_KIND)"
+      ports:
+        - containerPort: 7400
+          protocol: "UDP"
+          name: "rtps2-disc-mult"
+        - containerPort: 7401
+          protocol: "UDP"
+          name: "rtps2-disc-uni"
+        - containerPort: 7410
+          protocol: "UDP"
+          name: "rtps2-data-mult"
+        - containerPort: 7411
+          protocol: "UDP"
+          name: "rtps2-data-uni"
+  imagePullSecrets:
+    - name: regcred
+  restartPolicy: Always
+
+

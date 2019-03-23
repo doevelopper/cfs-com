@@ -1,0 +1,45 @@
+
+#include <rti/demo101/DataReader101.hpp>
+
+using namespace rti::demo101;
+
+DataReader101::DataReader101()
+:  m_participant()
+,  m_reader()
+,  m_on(false)
+
+{
+    m_participant = DDSTheParticipantFactory->create_participant_from_config("Participants::SubscriptionParticipant");
+
+    if(m_participant)
+    {
+        m_reader = DDSDynamicDataReader::narrow(m_participant->lookup_datareader_by_name("Subscribers::bus"));
+
+
+        DDS_ReturnCode_t retCode;
+
+        if(m_reader)
+        {
+            retCode = m_reader->set_listener(this, DDS_DATA_AVAILABLE_STATUS);
+
+            if (retCode != DDS_RETCODE_OK)
+            {
+                //logError
+            }
+        }
+        else
+        {
+            //error lookup datareader by name
+        }
+    }
+    else
+    {
+        //error participant from config file error
+    }
+
+}
+
+DataReader101::~DataReader101()
+{
+}
+

@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+
+project (rti.dds.demo
+    VERSION 0.0.0.0
+    DESCRIPTION "RTI DDS DEMO!"
+    HOMEPAGE_URL "https://exemple.com"
+    LANGUAGES CXX
+)
+
+list(APPEND CMAKE_MODULE_PATH
+    "${NDDSHOME}/resource/cmake"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/modules"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/toolChains"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/macros"
+    "${CMAKE_SOURCE_DIR}/src/test/resources/cmake"
+)
+
+option(BUILD_SHARED_LIBS "If enabled, shared libs will be built by default, otherwise static libs" OFF)
+
+include(TestBigEndian)
+TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+if(IS_BIG_ENDIAN)
+     message(FATAL_ERROR "Big endian isn't supported !!!")
+endif(IS_BIG_ENDIAN)
+
+include(ProcessorCount)
+ProcessorCount(Ncpu)
+
+#find_package(RTIConnextDDS "5.3.1" REQUIRED
+find_package(RTICommunityConnextDDS "5.3.1" REQUIRED
+     COMPONENTS
+         core
+         routing_service
+         #         security_plugins #nedd openSSL installed end OPENSSL_ROOT_DIR  est
+         messaging_api
+         monitoring_libraries
+         distributed_logger
+)
+
+find_package(RTICodeGenerator "2.5.2" REQUIRED
+
+)
+
+message( STATUS "DDS INCLUDE ${CONNEXTDDS_INCLUDE_DIRS}")
+#message( STATUS "DDS CPP2 API ${CONNEXTDDS_CPP2_API_LIBRARIES_RELEASE_STATIC}")
+message( STATUS "DDS DEFINITIONS  ${CONNEXTDDS_DEFINITIONS}")
+message( STATUS "DDS EXTERNAL LINK LIBS ${CONNEXTDDS_EXTERNAL_LIBS}")
+message( STATUS "DDS CPP2 LIB  ${CONNEXTDDS_CPP2_API_LIBRARIES_RELEASE_SHARED}")
+message( STATUS "DDS CONNEXTDDS_DEFINITIONS ${CONNEXTDDS_DEFINITIONS}")
+message( STATUS "DDS CONNEXTDDS_DLL_EXPORT_MACRO ${CONNEXTDDS_DLL_EXPORT_MACRO}")
+#message( STATUS "DDS MESSAGING_CPP2 ${MESSAGING_CPP2_API_LIBRARIES_RELEASE_STATIC}")
+#message( STATUS "DDS ROUTING_SERVICE_API ${ROUTING_SERVICE_API_LIBRARIES_RELEASE_STATIC}")
+#message( STATUS "DDS SECURITY_PLUGINS ${SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC}")
+#message( STATUS "DDS MONITORING_LIBRARIES ${MONITORING_LIBRARIES_RELEASE_STATIC}")
+message ( STATUS "RTI DDS IDL GEN  ${RTICODEGEN}")
+find_package(Threads REQUIRED)
+find_package(Log4cxx)
+
+include (ConnextDdsCodegen)
+include (Rules)
+
+#add_subdirectory (src/main/cpp)
+#add_subdirectory (src/test/cpp)
+#add_subdirectory (src/it)
+

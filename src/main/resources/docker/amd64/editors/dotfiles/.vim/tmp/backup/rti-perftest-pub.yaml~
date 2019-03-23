@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "rti-perftest-pub"
+  labels:
+    app: rti-perftest
+    role: pub
+    id: "1234"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rti-perftest
+      role: pub
+      id: "1234"
+  template:
+    metadata:
+      labels:
+        app: rti-perftest
+        role: pub
+        id: "1234"
+    spec:
+      containers:
+        - name: "rti-perftest-pub"
+          image: registry.gear.ge.com/100034251/rti-dds-perftest:0.0.0
+          args:
+            - "-domain"
+            - "0"
+            - "-pub"
+            - "-enableTurboMode"
+            - "-dataLen"
+            - "1024"
+            - "-sleep"
+            - "1"
+            - "-verbosity"
+            - "2"
+          ports:
+            - containerPort: 7400
+              protocol: "UDP"
+              name: "rtps2-disc-mult"
+            - containerPort: 7401
+              protocol: "UDP"
+              name: "rtps2-disc-uni"
+            - containerPort: 7410
+              protocol: "UDP"
+              name: "rtps2-data-mult"
+            - containerPort: 7411
+              protocol: "UDP"
+              name: "rtps2-data-uni"
+

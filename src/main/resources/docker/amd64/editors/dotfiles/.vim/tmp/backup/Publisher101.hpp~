@@ -1,0 +1,63 @@
+
+
+#ifndef RTI_DEMO101_PUB_PUBLISHER101_HPP
+#define RTI_DEMO101_PUB_PUBLISHER101_HPP
+
+#include <string>
+
+namespace rti
+{
+    namespace demo101
+    {
+        namespace pub
+        {
+class HelloPublisher {
+public:
+    /**
+     * Creates the DDS entities for the publisher.
+     * @param domain_id the domain ID.
+     * @param verbose the verbose level.
+     */
+    HelloPublisher(int domain_id, const std::string& topic_name, bool verbose);
+
+    /**
+     * Publisher destructor
+     */
+    ~HelloPublisher();
+
+    /**
+     * Start sending the data.
+     * @param data_sise size of the payload buffer to send.
+     * @param sample_count the number of samples.
+     */
+    void publish(int data_size, int sample_count);
+
+private:
+    class HelloPublisherImpl;
+    HelloPublisherImpl *impl;
+};
+
+/*            class Publisher101
+            {
+
+             public:
+                Publisher101() = delete;
+                Publisher101(int domainId, const std::string& topicName, bool verbose);
+                Publisher101(const Publisher101&) = delete;
+                Publisher101(Publisher101&&) = delete;
+                Publisher101& operator=(const Publisher101&) = delete;
+                Publisher101& operator=(Publisher101&&) = delete;
+                virtual ~Publisher101();
+
+                void publish(int data_size, int sample_count);
+            private:
+                class Publisher101Impl;
+                Publisher101Impl *impl;
+            };
+*/
+        }
+    }
+}
+#endif
+
+

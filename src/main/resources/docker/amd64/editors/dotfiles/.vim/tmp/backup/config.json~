@@ -1,0 +1,18 @@
+{
+	"auths": {
+		"registry.gear.ge.com": {
+			"auth": "MTAwMDM0MjUxOg==",
+			"identitytoken": "9309c7a6-7240-48f5-80a8-84523df37872"
+		}
+	},
+	"HttpHeaders": {
+		"User-Agent": "Docker-Client/18.09.1-rc1 (linux)"
+	},
+
+     "proxies": {
+             "default": {
+             "httpProxy": "http://PITC-Zscaler-EMEA-London3PR.proxy.corporate.ge.com:80",
+             "noProxy": "/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*,registry.gear.ge.com"
+        }
+    }
+}

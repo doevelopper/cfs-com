@@ -1,0 +1,31 @@
+#  {{/*
+#        Copyright 2019  GE Healthcare Technologies
+#  */}}
+
+apiVersion: v1
+name: helm-template
+version: 0.0.1
+kubeVersion: ">=1.9"
+description: Custom helm chart template for k8s
+
+keywords:
+    - git
+    - ci
+    - deploy
+
+home: https://github.build.ge.com/100034251/helm-template
+sources:
+    - https://registry.gear.ge.com/repositories/100034251/rti-persistence-service/details
+    - https://docs.github.build.ge.com/helm-template/
+    - git@github.build.ge.com:100034251/helm-template.git
+
+icon: logo.png
+
+maintainers:
+    - name: Adrien H.
+      email: support@vascular.ge.com
+      url: www.tbd.ge.com
+
+appVersion: 0.0.1
+tillerVersion: ">=2.7.2-0"
+engine: gotpl

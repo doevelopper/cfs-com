@@ -1,0 +1,54 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "rti-perftest-sub-0"
+  labels:
+    app: rti-perftest
+    role: sub
+    id: "1234"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rti-perftest
+      role: sub
+      id: "1234"
+  template:
+    metadata:
+      labels:
+        app: rti-perftest
+        role: sub
+        id: "1234"
+    spec:
+      containers:
+        - name: "rti-perftest-sub"
+          image: registry.gear.ge.com/100034251/rti-dds-perftest:0.0.0
+          args:
+            - "-domain"
+            - "0"
+            - "-sub"
+            - "-verbosity"
+            - "2"
+            - "-sidMultiSubTest"
+            - "{{ rti_perftest_id_subscriber }}"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 7400
+              protocol: "UDP"
+              name: "rtps2-disc-mult"
+            - containerPort: 7401
+              protocol: "UDP"
+              name: "rtps2-disc-uni"
+            - containerPort: 7410
+              protocol: "UDP"
+              name: "rtps2-data-mult"
+            - containerPort: 7411
+              protocol: "UDP"
+              name: "rtps2-data-uni"
+

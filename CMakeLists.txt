@@ -21,47 +21,30 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-project (cfs-com CXX)
-
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 
-set(${PROJECT_NAME}_MAJOR_VERSION       "1")
-set(${PROJECT_NAME}_MINOR_VERSION       "0")
-set(${PROJECT_NAME}_MICRO_VERSION       "0")
-set(${PROJECT_NAME}_PATCH_VERSION       "-")
-set(${PROJECT_NAME}_PATCH_LEVEL         "0")
-set(${PROJECT_NAME}_REVISION_VERSION    "0")
-set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_LEVEL}" )
+project (cfs-com
+#<major>.<minor>.<micro>.<patch>[.<tweak>][-rc<n>][-<date>][-<id>]
+    VERSION 0.0.0.0
+    DESCRIPTION "VxWorks Cmake DEMO!"
+    HOMEPAGE_URL "https://exemple.com"
+    LANGUAGES CXX
+)
+
 set("BUILD_SHARED_LIBS" OFF CACHE INTERNAL "If enabled, shared libs will be built by default, otherwise static libs")
 
 add_definitions(-DRELEASE_LEVEL="SNAPSHOOT") # SNAPSHOOT ,ALPHA , BETA , CANDIDATE , FINAL.
 
-if(NOT COMMON_MODULE_TOOLS)
 
-    list(APPEND CMAKE_MODULE_PATH
-        "${CMAKE_SOURCE_DIR}/src/main/resources/cmake"
-        "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/modules"
-        "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/toolChains"
-        "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/macros"
-        "${CMAKE_SOURCE_DIR}/src/test/resources/cmake"
-    )
-    #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/main/resources/cmakeModule" CACHE STRING "Modules for CMake" FORCE)
-
-  if (NOT TARGET  LOG4CXX::LOG4CXX)
-      find_package(Log4cxx REQUIRED)
-  endif(NOT TARGET  LOG4CXX::LOG4CXX)
-
-  if (NOT TARGET GTest::GTest AND NOT TARGET GMock::GMock)
-      find_package(GoogleTestFwk REQUIRED)
-  endif(NOT TARGET GTest::GTest AND NOT TARGET GMock::GMock)
-
-  if (NOT TARGET CUCUMBER-CPP::CUCUMBER-CPP)
-	  find_package(Cucumber-cpp)
-  endif(NOT TARGET CUCUMBER-CPP::CUCUMBER-CPP)
-  
-else(NOT COMMON_MODULE_TOOLS)
-   massage(STATUS "${PROJECT_NAME} will use modules path defined in main parent dir")
-endif(NOT COMMON_MODULE_TOOLS)
+list(APPEND CMAKE_MODULE_PATH
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/modules"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/toolChains"
+    "${CMAKE_SOURCE_DIR}/src/main/resources/cmake/macros"
+    "${CMAKE_SOURCE_DIR}/src/test/resources/cmake"
+    "${CMAKE_SOURCE_DIR}/src/test/resources/scripts"
+)
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/main/resources/cmakeModule" CACHE STRING "Modules for CMake" FORCE)
 
 include(TestBigEndian)
 TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
@@ -85,7 +68,7 @@ write_compiler_detection_header(
     FILE ${CMAKE_CURRENT_BINARY_DIR}/cfs/com/CompilerDetection.hpp
     PREFIX CFS_COM
 #   OUTPUT_FILES_VAR <output_files_var> OUTPUT_DIR <output_dir>
-    COMPILERS GNU 
+    COMPILERS GNU
     FEATURES ${cxx_known_features}
     VERSION "${CMAKE_VERSION}"
     PROLOG "//<prolog>"
@@ -108,10 +91,10 @@ if (NOT TARGET XercesC::XercesC)
     find_package(XercesC REQUIRED)
 endif(NOT TARGET XercesC::XercesC)
 
-find_package(Doxygen  
-   REQUIRED  
+find_package(Doxygen
+   REQUIRED
        dot
-   OPTIONAL_COMPONENTS 
+   OPTIONAL_COMPONENTS
        mscgen dia
 )
 

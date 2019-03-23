@@ -1,0 +1,4 @@
+
+
+docker run --rm -ti -v "$PWD:/home/happyman/workspace" registry.gear.ge.com/100034251/rti-dds-java-exemple:0.0.3
+

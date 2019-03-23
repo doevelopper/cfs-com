@@ -1,0 +1,49 @@
+from conans import ConanFile, CMake, tools
+from conans.errors import ConanException
+import os
+
+class helmTemplateConan(ConanFile):
+    name = "helm-template"
+    version = "0.0.1"
+    license = "License.md"
+    author = "AdrienH. 100034251"
+    url = "www.tbd.com"
+    description = "Description"
+    topics = ("tag", "here", "and", "here")
+    settings = "os", "compiler", "build_type", "arch"
+    options = {
+            "shared": [True, False],
+            "fPIC": [True, False],
+            "force_openssl": [True, False],
+    }
+    default_options = (
+            "shared=False",
+            "fPIC=True"
+    )
+    generators = "cmake"
+    exports_sources = "/.*"
+    exports = ["LICENSE.md"]
+
+    def configure_cmake(self):
+         cmake = CMake(self, set_cmake_flags=True)
+         if self.settings.os != 'Windows':
+            cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = self.options.fPIC
+        cmake.configure(build_folder=self.build_subfolder)
+        return cmake
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure(source_folder="src")
+        cmake.build()
+        cmake = CMake(self.settings)
+        self.run('cmake %s/src/main/cpp %s' % (self.conanfile_directory, cmake.command_line))
+        self.run("cmake --build . %s" % cmake.build_config)
+        self.run("make")
+
+    def package(self):
+        self.copy("*.a", dst="lib", keep_path=False)
+        self.copy("*.so", dst="lib", keep_path=False)
+        self.copy("*.hpp", dst="include/helmtemplate", src="src/main/cpp")
+
+    def package_info(self):
+        self.cpp_info.libs = ["helmtemplate"]
