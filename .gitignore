@@ -132,6 +132,11 @@ src/main/idl/dds-xtypes_discovery.idl
 src/main/idl/dds-xtypes_typeobject.idl
 src/main/idl/dds_security_plugins_spis.idl
 src/main/idl/dds_xrce_types.idl
-
+tmp/
 base-build.sh
 
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

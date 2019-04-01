@@ -45,7 +45,7 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
 
 #RUN apt-get update \
 #    && apt-get install --assume-yes \
-    #  && apt-get install -y curl libgtk2.0-0 libasound2 dbus gpg \
+    #  && apt-get install -y curl dbus  \
     #     run apt-get -y --no-install-recommends install libc6-dev libgtk2.0-0 libgtk-3-0 libpango-1.0-0 \
     #     libcairo2 libfontconfig1 libgconf2-4 libnss3 libasound2 libxtst6 unzip libglib2.0-bin \
     #     libcanberra-gtk-module libgl1-mesa-glx curl build-essential gettext libstdc++6 \
@@ -54,20 +54,10 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     #     sudo vim libxkbfile1
 #  && mkdir /var/run/dbus
 
-ENV ECLIPSE_CPP_DOWNLOAD_URL https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2019-03/R/eclipse-cpp-2019-03-R-linux-gtk-x86_64.tar.gz
-
-#RUN cd /tmp \
-#  && curl -L -O -k "$ECLIPSE_CPP_DOWNLOAD_URL" | tar xz -C /usr/local \
-#  && ln -s /usr/local/eclipse/eclipse /usr/bin/ \
-#  && chown -R eclipse:eclipse /usr/local/eclipse \
-#  && chmod -R 775 /usr/local/eclipse
-
 RUN cd /tmp \
   && curl -o vscode-amd64.deb -L -O -k   https://go.microsoft.com/fwlink/?LinkID=760868 \
   && dpkg -i vscode-amd64.deb \
   &&  rm vscode-amd64.deb
-
-#RUN echo "X11UseLocalhost no" >> /etc/ssh/sshd_config
 
 ARG ACCOUNT=developer
 RUN useradd -ms /bin/bash $ACCOUNT
@@ -158,10 +148,21 @@ RUN cd /tmp \
   && /usr/bin/code --install-extension CT6502.idl
 
 USER root
+
+
+ENV ECLIPSE_CPP_DOWNLOAD_URL https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2019-03/R/eclipse-cpp-2019-03-R-linux-gtk-x86_64.tar.gz
+
+RUN cd /tmp \
+  && curl -L -O -k "https://mirrors.dotsrc.org/eclipse//technology/epp/downloads/release/2019-03/R/eclipse-cpp-2019-03-R-linux-gtk-x86_64.tar.gz" | tar xz -C /opt \
+  && ln -s /opt/eclipse/eclipse /usr/bin/ \
+  && chown -R $ACCOUNT:$ACCOUNT /opt/eclipse \
+  && chmod -R 775 /opt/eclipse
+
 RUN echo "ForwardX11Trusted yes" >> /etc/ssh/sshd_config
 RUN echo "X11UseLocalhost no" >> /etc/ssh/sshd_config
 
-#ENTRYPOINT /usr/bin/code --verbose
+USER $ACCOUNT
+ENTRYPOINT /usr/bin/code --version
 CMD ["/bin/bash"]
 
 

@@ -6,12 +6,13 @@
 #    -p 5000:5000 \
 #    --memory="500m" \
 #    --memory-swap="1g" \
+#    --env DISPLAY=${DISPLAY} \
+#    --net="host" \
 docker run  --rm -ti \
-    --net="host" \
     --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
     --volume ${PWD}/project:/project \
     --volume $XAUTHORITY:/developer/.Xauthority \
-    --env DISPLAY=${DISPLAY} \
+    -e DISPLAY \
     --env XAUTHORITY=/developer/.Xauthority \
     --env SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
     --user $(id -u ${USER}):$(id -g ${USER}) \

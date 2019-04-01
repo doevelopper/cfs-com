@@ -18,16 +18,23 @@ ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake texinfo texi2html \
-        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
-        python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
+        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev \
+        emacs vim tmux vim-nox texinfo \
+        tree locate libxkbfile1 \
+#        python-pip  python-dev python-wheel cython \
+        libnotify4 libnss3 gnupg libsecret-1-0 libsecret-1-dev libxss1 libxss-dev \
+        python3-pip python3-dev cython3 python3-wheel python3-setuptools \
         perl-base perl-modules zlib1g-dev \
-        libxml2-dev libxml2-utils python3-setuptools python-setuptools \
+        libxml2-dev libxml2-utils htop  \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
         mesa-common-dev libglu1-mesa-dev libpcap-dev \
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
-        libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  libswt-gtk-3-java tmux vim-nox \
+        libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  libswt-gtk-3-java  \
+        x11-xserver-utils x11-apps dbus gpg rxvt-unicode-256color iputils-ping \
+        libgtk2.0-0 libcanberra-gtk-module valgrind \
+        mscgen graphviz \
     && apt-get clean --assume-yes  \
     && apt-get --assume-yes --quiet clean \
     && apt-get --assume-yes --quiet autoremove \
@@ -175,7 +182,7 @@ RUN cd /tmp \
     && git clone --depth=1 https://github.com/boost-experimental/sml.git \
     && cd sml \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
     && cmake --build build --target all --clean-first  \
     && cmake --build build --target install \
     && cd /tmp \
@@ -225,7 +232,7 @@ RUN cd /tmp \
    && rm -rvf capture-thread
 
 ARG BAZEL_VERSION
-ENV BAZEL_VERSION ${BAZEL_VERSION:-0.23.2}
+ENV BAZEL_VERSION ${BAZEL_VERSION:-0.24.0}
 RUN cd /tmp \
     && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
     && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
@@ -233,13 +240,13 @@ RUN cd /tmp \
     && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
     && bazel version
 
-RUN cd /tmp \
-   && git clone --depth=1 https://github.com/google/statechart.git \
-#   && cd statechart
+#RUN cd /tmp \
+#   && git clone --depth=1 https://github.com/google/statechart.git \
+#   && cd statechart \
 #   && bazel build //statechart/... \
 #   && bazel test //statechart/... \
 #   && bazel run //statechart/example:microwave_example_main -- --alsologtostderr \
-   && cd /tmp
+#   && cd /tmp
 #   && rm -rvf statechart
 
 RUN cd /tmp \
@@ -345,7 +352,17 @@ RUN cd /tmp \
 	&& cd /tmp \
 	&& rm -Rf breakpad
 
-ARG ACCOUNT=happyman
+RUN cd /tmp \
+  && curl -o vscode-amd64.deb -L -O -k   https://go.microsoft.com/fwlink/?LinkID=760868 \
+  && dpkg -i vscode-amd64.deb \
+  &&  rm vscode-amd64.deb
+
+ADD ./src/main/resources/docker/amd64/vscode-ext.sh /tmp/
+
+RUN cd /tmp \
+  && ./vscode-ext.sh
+
+ARG ACCOUNT=developer
 RUN useradd -ms /bin/bash $ACCOUNT
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT
