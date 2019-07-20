@@ -1,8 +1,7 @@
-#docker build -t doevelopper/foss-dds-dev -f src/main/resources/docker/amd64/foss.Dockerfile .
-
-# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
+# ARG BASE_IMAGE=amd64/ubuntu:16.04
 # FROM $BASE_IMAGE
 FROM amd64/ubuntu:18.10
+LABEL description="Env for developping distributed c++ application"
 
 ARG PMC="Adrien H."
 
@@ -43,59 +42,80 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
 
 
 RUN cd /tmp \
-    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.2.tar.gz \
-    && tar -xvvf gdb-8.2.tar.gz \
-    && cd gdb-8.2 \
+    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+    && tar -xvvf gdb-8.3.tar.gz \
+    && cd gdb-8.3 \
     && ./configure \
     && make \
     && make install \
     && cd /tmp \
-    && rm -rf gdb-8.2.tar.gz gdb-8.2
+    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
+ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
+ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.0}
 
 RUN cd /tmp \
-    && curl -L -O -k https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz \
-    && tar -xvf cmake-3.14.0-Linux-x86_64.tar.gz > /dev/null \
-    && rm -v cmake-3.14.0-Linux-x86_64.tar.gz \
-    && mv -v cmake-3.14.0-Linux-x86_64 /opt/cmake
+    && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+    && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
+    && rm -v cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+    && mv -v cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
+#RUN  cd /tmp \
+#    && wget --no-cookies --no-check-certificate \
+#       --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"\
+#       "https://download.oracle.com/otn-pub/java/jdk/8u212-b10/59066701cf1a433da9770636fbc4c9aa/jdk-8u212-linux-x64.tar.gz" \
+#    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+#    && rm -v jdk-8u212-linux-x64.tar.gz
+
+COPY src/main/resources/docker/jdk-8u212-linux-x64.tar.gz /tmp
 RUN  cd /tmp \
-    && wget --no-cookies --no-check-certificate \
-       --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"\
-       "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-x64.tar.gz" \
-    && tar -xvzf jdk-8u202-linux-x64.tar.gz -C /opt/ \
-    && rm -v jdk-8u202-linux-x64.tar.gz
+    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+    && rm -v jdk-8u212-linux-x64.tar.gz
+
+ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
+RUN cd /tmp \
+    &&  wget --no-check-certificate \
+    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
+    && tar -xvzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
+    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
+
+ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
 
 RUN cd /tmp \
-    &&  wget --no-check-certificate https://www-eu.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz \
-    && tar -xvzf apache-maven-3.6.0-bin.tar.gz \
-    && mv apache-maven-3.6.0/ /opt/apache-maven \
-    && rm -v apache-maven-3.6.0-bin.tar.gz
-
-RUN cd /tmp \
-    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-5.2.1-bin.zip \
+    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
     && mkdir -pv /opt/gradle \
-#    && unzip -d /opt/gradle gradle-5.2.1-bin.zip \
-    && unzip gradle-5.2.1-bin.zip \
-    && mv -v gradle-5.2.1  /opt/gradle/ \
-    && rm -vf gradle-5.2.1-bin.zip
+#    && unzip -d /opt/gradle gradle-${GRADLE_VERSION}-bin.zip \
+    && unzip gradle-${GRADLE_VERSION}-bin.zip \
+    && mv -v gradle-${GRADLE_VERSION}  /opt/gradle/ \
+    && rm -vf gradle-${GRADLE_VERSION}-bin.zip
 
-ENV JAVA_HOME /opt/jdk1.8.0_202
-ENV JRE_HOME /opt/jdk1.8.0_202/jre
+ENV JAVA_HOME /opt/jdk1.8.0_212
+ENV JRE_HOME /opt/jdk1.8.0_212/jre
 ENV M2_HOME /opt/apache-maven/
 ENV M2 $M2_HOME/bin
 ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
         -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
 
-ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_202/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
-ENV PATH $PATH:/opt/gradle/gradle-5.2.1/bin
+ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin:/opt/cmake/bin
+ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
+
+ARG BAZEL_VERSION
+ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
+RUN cd /tmp \
+    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
+    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
+
 
 RUN cmake --version \
     && make --version \
     && gcc --version \
     && java -version \
     && mvn --version \
-    && gradle -v
+    && gradle -v \
+    && bazel version
 
 RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://github.com/conan-io/conan.git \
@@ -148,7 +168,7 @@ RUN cd /tmp \
     && git clone --depth=1 https://github.com/google/benchmark.git \
     && cd benchmark \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
     && cmake --build build --target all --clean-first  \
     && cmake --build build --target install \
     && cd /tmp \
@@ -166,16 +186,23 @@ RUN cd /tmp \
 
 ENV MANPATH=/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
+ARG BOOST_VERSION_MAJ=1
+ARG BOOST_VERSION_MIN=69
+ARG BOOST_VERSION_PATCH=0
+ARG BOOST_VERSION=1.69.0
+ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
+
+
 RUN cd /tmp \
-    && curl -L -O -k https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz \
-    && tar xfz boost_1_69_0.tar.gz > /dev/null \
-    && cd boost_1_69_0 \
-    && ./bootstrap.sh --prefix=/usr/ \
+    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
+    && tar xfz boost_${BOOST_RELEASE}.tar.gz > /dev/null \
+    && cd boost_${BOOST_RELEASE} \
+    && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
     && ./b2 --help \
     && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
-    && ./b2 install \
+    && ./b2 install --prefix=/usr/ \
     && cd /tmp \
-    && rm -rvf boost_1_69_0 boost_1_69_0.tar.gz
+    && rm -rvf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
 #sml requires GCC >= 6.0.0
 RUN cd /tmp \
@@ -230,15 +257,6 @@ RUN cd /tmp \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rvf capture-thread
-
-ARG BAZEL_VERSION
-ENV BAZEL_VERSION ${BAZEL_VERSION:-0.24.0}
-RUN cd /tmp \
-    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
-    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && bazel version
 
 #RUN cd /tmp \
 #   && git clone --depth=1 https://github.com/google/statechart.git \
@@ -357,10 +375,12 @@ RUN cd /tmp \
   && dpkg -i vscode-amd64.deb \
   &&  rm vscode-amd64.deb
 
-ADD ./src/main/resources/docker/amd64/vscode-ext.sh /tmp/
+#ADD ./src/main/resources/docker/amd64/vscode-ext.sh /tmp/
 
-RUN cd /tmp \
-  && ./vscode-ext.sh
+#RUN cd /tmp \
+#    && chmod +x vscode-ext.sh\ 
+#    && ./vscode-ext.sh \ 
+#    && rm -vf vscode-ext.sh
 
 ARG ACCOUNT=developer
 RUN useradd -ms /bin/bash $ACCOUNT

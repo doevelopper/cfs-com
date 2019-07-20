@@ -11,6 +11,9 @@ ENV LANG C.UTF-8
 ARG IMAGE_VERSION
 ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
 
+ARG OSPL_RELEASE 
+ENV OSPL_RELEASE ${OSPL_RELEASE:-6.9} 
+
 RUN git config --global url."https://github.com/".insteadOf "git@github.com:"
 RUN git config --global url."https://".insteadOf git://
 
@@ -38,11 +41,6 @@ RUN cd /tmp \
     && rm -rf  gsoap-${GSOAP_MAJOR_VERSION} gsoap_${GSOAP_VERSION}.zip
 
 ENV GSOAPHOME /usr
-ENV MAVEN_OPTS $MAVEN_OPTS:"-Dhttp_proxyHost=$PROXY_HOST -Dhttp_proxyPort=$PROXY_PORT \
-                           -Dhttps_proxyHost=PROXY_HOST -Dhttps_proxyPort=$PROXY_PORT \
-                           -Dhttp_nonProxyHosts=localhost|127.0.0.1|localaddress|.localdomain.com|3.*|192.168.* \
-                           -Dhttps_nonProxyHosts=localhost|127.0.0.1|localaddress|.localdomain.com|3.*|192.168.* \
-                           -DsocksProxyHost -DsocksProxyPort"
 
 RUN cd /tmp \
     && wget --no-check-certificate https://www.jacorb.org/releases/2.3.1/jacorb-2.3.1-bin.zip \
@@ -67,7 +65,7 @@ RUN cd /tmp \
     && rm -rf opensplice
 
 ARG ACCOUNT
-ENV ACCOUNT ${ACCOUNT:-happyman}
+ENV ACCOUNT ${ACCOUNT:-developer}
 
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT

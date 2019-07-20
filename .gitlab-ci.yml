@@ -1,3 +1,59 @@
+image: "docker:latest"
+services:
+    - docker:dind
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+variables:
+    DOCKER_DRIVER: "overlay2"
+
+stages:
+    - "build"
+
+# Expects $ARCH which should be the architecture passed.
+.base:
+    stage: "build"
+    only:
+        changes:
+        - ".gitlab-ci.yml"
+        - "Dockerfile"
+
+    script:
+    # Lowercase the git commit sha
+    # This is needed because docker tags don't like to be uppercased
+        - export REV="$(echo "${CI_COMMIT_SHA}" | tr A-Z a-z)"
+        - export IMAGE="${CI_REGISTRY_IMAGE}/${ARCH}"
+        - export REF="${IMAGE}:${REV}"
+        - export LATEST="${IMAGE}:latest"
+        - docker build --pull -t ${REF} . --build-arg "ubuntu_arch=${ubuntu_arch}"
+        - docker image tag ${REF} ${LATEST}
+    # Push the images
+    - |
+        if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
+            docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+            docker push ${REF}
+            docker push ${LATEST}
+        fi
+
+
+amd64:
+    tags:
+        - "x86_64"
+    variables:
+        ARCH: "amd64"
+        ubuntu_arch: "amd64"
+
+    extends: .base
+
+aarch64:
+    variables:
+        ARCH: "aarch64"
+        ubuntu_arch: "arm64"
+    tags:
+        - "aarch64"
+    extends: .base
+
+
 .dedicated-runner: &dedicated-runner
     retry: 1
     tags:
@@ -17,6 +73,31 @@ stages:
     - site
     - deploy
     - target-clean
+
+.build_template: &build_definition
+    stage: build
+    script:
+        - apt update && apt install -y meson
+        - meson --werror
+            _build
+        - ninja -v -C _build
+        - meson test
+        - ninja -C _build install
+    artifacts:
+        name: "slg-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+        when: always
+        paths:
+        - "_build/config.h"
+        - "_build/meson-logs"
+
+build_x86_64:
+  <<: *build_definition
+  tags:
+    - x86_64
+build_aarch64:
+  <<: *build_definition
+  tags:
+    - aarch64
 
 # Cache in between builds
 cache:

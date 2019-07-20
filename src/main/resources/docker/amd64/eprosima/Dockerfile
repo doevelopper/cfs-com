@@ -1,6 +1,6 @@
 # ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
 # FROM $BASE_IMAGE
-FROM registry.gear.ge.com/100034251/omg-dds
+
 
 
 
