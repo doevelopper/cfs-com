@@ -33,7 +33,7 @@ RUN apt-get update \
     && rm -rf /usr/share/man/
 
 ARG CMAKE_MAJOR=3.15
-ARG CMAKE_MINOR=0-rc3
+ARG CMAKE_MINOR=1
 
 RUN curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64.tar.gz \
     && tar -xvf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64.tar.gz > /dev/null \
@@ -63,7 +63,7 @@ RUN cd /tmp \
     && mv apache-maven-${MAVEN_VERSION}/ /opt/apache-maven \
     && rm -v apache-maven-${MAVEN_VERSION}-bin.tar.gz
 
-ARG GRADLE_VERSION=5.5
+ARG GRADLE_VERSION=5.5.1
 
 RUN cd /tmp \
     && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
@@ -87,7 +87,7 @@ ENV M2 $M2_HOME/bin
 ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
         -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
 
-ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_202/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
+ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_22/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
 ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
 RUN cmake --version \
@@ -316,7 +316,7 @@ RUN cd /tmp/ \
     && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
     && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
     && rm -rvf /tmp/*.rtipkg
-    
+
 RUN cd /tmp/ \
     # && mkdir -pv /opt/rti_connext_openssl/{target-x64Linux3gcc5.4.0,target-x64Linux4gcc7.3.0,target-armv8Linux4.4gcc5.4.0} \
     && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
@@ -334,11 +334,11 @@ RUN cd /tmp/ \
 
 ENV BULLSEYE_VERSION ${BULLSEYE:-8.15.31}
 RUN cd /tmp/ \
-    && curl -Lk http://www.bullseye.com/download/BullseyeCoverage-$BULLSEYE_VERSION-Linux-x64.tar | tar x -C /opt \ 
-   ##&&  echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 4ChKeY0AX2Et3CDftN2cqkhg0NUEf03o4gQX \ 
-    && echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 2Ct8nh2WOwHc2t4gvl1IYzzX1uGCW82sERqr \ 
+    && curl -Lk http://www.bullseye.com/download/BullseyeCoverage-$BULLSEYE_VERSION-Linux-x64.tar | tar x -C /opt \
+   ##&&  echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 4ChKeY0AX2Et3CDftN2cqkhg0NUEf03o4gQX \
+    && echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 2Ct8nh2WOwHc2t4gvl1IYzzX1uGCW82sERqr \
     && rm -rf /opt/BullseyeCoverage-$BULLSEYE_VERSION*
- 
+
  ENV PATH /opt/BullseyeCoverage/bin:$PATH
 #export COVFILE=$HOME/bullseye.cov && cov01 --on && cov01 --status && make -j12 && cov01 --off
 

@@ -114,7 +114,7 @@ git-status : ## Check for uncommited chqnges
 check: ## Check binaries prerequisities.
 	docker --version  > /dev/null
 	helm  version > /dev/null  || true
-	kubectl version > /dev/null|| true 
+	kubectl version > /dev/null|| true
 	zip --version > /dev/null
 	unzip -v > /dev/null
 
@@ -166,7 +166,7 @@ build: build-image ## Build Docker images base.
 	@echo
 
 .PHONY: build-image
-build-image: git-status 
+build-image: git-status
 	@echo
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
 	# $(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file $(DOCKERFILE) .
@@ -180,8 +180,8 @@ build-image: git-status
 push-image: build-image
 	@echo
 	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
-	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest 
-	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest 
+	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
+	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
 	@echo
 	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
 	# $(DOCKER) push $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH)
@@ -192,8 +192,8 @@ push-image: build-image
 run : run-image ## Run docker image.
 
 .PHONY: run-image
-run-image: build-image
-	@echo
+run-image : build-image
+	@echo "+ $@"
 	@echo "$(BLUE) Running tag  $(BUILDER_FQIN)  $(NO_COLOR) : uses host's conan as package manager"
 	$(DOCKER) run --rm \
     	--volume ${HOME}/.conan:/home/developer/.conan \

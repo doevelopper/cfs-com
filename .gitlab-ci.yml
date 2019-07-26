@@ -1,421 +1,52 @@
-image: "docker:latest"
-services:
-    - docker:dind
+stages:
+    - Build docker image
+    - Test docker image
+    - Push container to DTR
+    - validate    # - validate the project is correct and all necessary information is available
+    - build       # - compile the source code of the project
+    - test        # - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+    - package     # - take the compiled code and package it in its distributable format, such as a JAR.
+    - verify      # - run any checks on results of integration tests to ensure quality criteria are met
+    - install     # - install the package into the local repository, for use as a dependency in other projects locally
+    - deploy      # - done in the build environment, copies the final package to the remote repository for sharing with other developers and 
 
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
 variables:
     DOCKER_DRIVER: "overlay2"
-
-stages:
-    - "build"
-
-# Expects $ARCH which should be the architecture passed.
-.base:
-    stage: "build"
-    only:
-        changes:
-        - ".gitlab-ci.yml"
-        - "Dockerfile"
-
-    script:
-    # Lowercase the git commit sha
-    # This is needed because docker tags don't like to be uppercased
-        - export REV="$(echo "${CI_COMMIT_SHA}" | tr A-Z a-z)"
-        - export IMAGE="${CI_REGISTRY_IMAGE}/${ARCH}"
-        - export REF="${IMAGE}:${REV}"
-        - export LATEST="${IMAGE}:latest"
-        - docker build --pull -t ${REF} . --build-arg "ubuntu_arch=${ubuntu_arch}"
-        - docker image tag ${REF} ${LATEST}
-    # Push the images
-    - |
-        if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
-            docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-            docker push ${REF}
-            docker push ${LATEST}
-        fi
-
-
-amd64:
-    tags:
-        - "x86_64"
-    variables:
-        ARCH: "amd64"
-        ubuntu_arch: "amd64"
-
-    extends: .base
-
-aarch64:
-    variables:
-        ARCH: "aarch64"
-        ubuntu_arch: "arm64"
-    tags:
-        - "aarch64"
-    extends: .base
-
-
-.dedicated-runner: &dedicated-runner
-    retry: 1
-    tags:
-        - dds
-	
-stages:
-    - dependencies
-    - configure
-    - compile
-    - test-compile
-    - unit-test
-    - target-package
-    - feature-test
-    - verify
-    - code-review
-    - target-install
-    - site
-    - deploy
-    - target-clean
-
-.build_template: &build_definition
-    stage: build
-    script:
-        - apt update && apt install -y meson
-        - meson --werror
-            _build
-        - ninja -v -C _build
-        - meson test
-        - ninja -C _build install
-    artifacts:
-        name: "slg-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
-        when: always
-        paths:
-        - "_build/config.h"
-        - "_build/meson-logs"
-
-build_x86_64:
-  <<: *build_definition
-  tags:
-    - x86_64
-build_aarch64:
-  <<: *build_definition
-  tags:
-    - aarch64
-
-# Cache in between builds
-cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-        - compilers
-        - vendor/ruby
-
-install-embedded-dependencies:
-    stage: dependencies
-    before_script:
-        - echo  "Installing build tools for AArch64"
-    script:
-        - date -u
-        - uname -a
-        - mkdir --parents --verbose $CI_PROJECT_NAMESPACE/cmake
-        - |
-            wget -qO- "https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.tar.gz" \
-                | tar --strip-components=1 --extract --gzip -C $CI_PROJECT_NAMESPACE/cmake
-
-        - wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/8.2-2018.08/gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu.tar.xz
-        - tar xfj gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu.tar.xz > /dev/null
-        - mv --verbose gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu $CI_PROJECT_NAMESPACE/compilers
-
-        - wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-i686_aarch64-linux-gnu.tar.xz
-        - tar xfj gcc-linaro-7.3.1-2018.05-i686_aarch64-linux-gnu.tar.xz > /dev/null
-        - mv --verbose gcc-linaro-7.3.1-2018.05-i686_aarch64-linux-gnu $CI_PROJECT_NAMESPACE/compiler
-    only:
-#        variables:
-            - ${AArch64}
-    artifacts:
-        paths:
-        - $CI_PROJECT_NAMESPACE/compilers
-
-install-dependencies:
-    stage: dependencies
-    before_script:
-        - echo  "Installing build tools for Linux AMDx64"
-    script: 
-    - echo "Only when BOOTSTRAP is true"
-    - date -u
-    - uname -a
-
-    - wget http://ftp.gnu.org/pub/gnu/make/make-4.2.1.tar.gz
-    - tar xfj make-4.2.1.tar.gz > /dev/null
-    - cd make-4.2.1
-    - ./configure --prefix=$CI_PROJECT_NAMESPACE/dds
-    - make && make install
-    - PATH=$CI_PROJECT_NAMESPACE/dds/bin:$PATH
-    - cd ..
-
-    - wget https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.tar.gz
-    - tar -xvf cmake-3.12.3-Linux-x86_64.tar.gz > /dev/null
-    - mv cmake-3.12.3-Linux-x86_64 cmake
-    - PATH=$CI_PROJECT_NAMESPACE/dds:$CI_PROJECT_NAMESPACE/cmake:$CI_PROJECT_NAMESPACE/cmake/bin:$PATH
-
-    - git clone --depth=1 https://github.com/uncrustify/uncrustify.git
-    - cd uncrustify
-    - cmake -E make_directory build
-    - cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds
-    - cmake --build build --target all --clean-first
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 https://github.com/danmar/cppcheck.git
-    - cd cppcheck
-    - make SRCDIR=build CFGDIR=cfg HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
-    - cp --verbose cppcheck  $CI_PROJECT_NAMESPACE/dds/bin
-    - cp --recursive --verbose cfg  $CI_PROJECT_NAMESPACE/dds/bin
-    - cd ..
-
-    - git clone --depth=1 https://github.com/doxygen/doxygen.git
-    - cd doxygen
-    - cmake -E make_directory build
-    - cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds
-    - cmake --build build --target all --clean-first
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 https://github.com/uncrustify/uncrustify.git
-    - cd doxygen
-    - cmake -E make_directory build
-    - cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds
-    - cmake --build build --target all --clean-first
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 https://github.com/libexpat/libexpat.git
-    - cd libexpat/expat
-    - cmake -E make_directory build
-    - cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - cmake --build build --target all --clean-first
-    - cmake --build build --target install
-    - cd ..
-
-    - wget http://www-eu.apache.org/dist//apr/apr-1.6.3.tar.gz
-    - tar -xvzf apr-1.6.3.tar.gz > /dev/null
-    - cd   apr-1.6.3
-    - |
-        ./configure --prefix=$CI_PROJECT_NAMESPACE/dds --enable-threads --enable-posix-shm \
-            --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child
-    - make clean && make && make install
-    - cd ..
-
-    - wget http://www-eu.apache.org/dist//apr/apr-util-1.6.1.tar.gz
-    - tar -xvf apr-util-1.6.1.tar.gz > /dev/null
-    - cd apr-util-1.6.1
-    - ./configure --prefix=$CI_PROJECT_NAMESPACE/dds --with-apr=../apr-1.6.3 --with-crypto
-    - make clean && make && make install
-    - cd ..
-
-    - wget http://www-us.apache.org/dist//xerces/c/3/sources/xerces-c-3.2.1.tar.gz
-    - tar -xvzf xerces-c-3.2.1.tar.gz  > /dev/null
-    - cd xerces-c-3.2.1/
-    - | 
-        ./configure --prefix=$CI_PROJECT_NAMESPACE/dds --enable-static --enable-shared --enable-netaccessor-socket \
-                   --enable-transcoder-gnuiconv --enable-transcoder-iconv --enable-msgloader-inmemory \
-                   --enable-xmlch-uint16_t --enable-xmlch-char16_t
-    - make -j2 | tee $CI_PROJECT_NAMESPACE/build-logs/xerces-build.log
-    - make install | tee -a $CI_PROJECT_NAMESPACE/build-logs/xerces-build.log
-    - cd ..
-
-    - git clone --depth=1 --recurse-submodules https://github.com/google/googletest.git
-    - git clone https://github.com/google/googletest.git
-    - cd googletest
-    - cmake -E chdir build cmake -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds/ ..
-    - cmake --build build
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 --recurse-submodules https://github.com/google/benchmark.git
-    - cd benchmark
-    - cmake -E chdir build cmake -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds ..
-    - cmake --build build
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 --recurse-submodules https://code.wireshark.org/review/p/wireshark.git
-    - cd wireshark
-    - cmake -E make_directory build
-    - cmake -E chdir build cmake -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds ..
-    - cmake --build build --target install
-    - cd ..
-
-#    - if [[ "${SYSTEM_BOOST_PACKAGE}" != "" ]]; then sudo add-apt-repository ppa:boost-latest/ppa  && sudo apt-get update -qq; fi
-    - wget https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
-    - tar -xvf boost_1_68_0.tar.gz > /dev/null
-    - cd boost_1_68_0
-    - ./bootstrap.sh [--with-libraries=program_options,filesystem,system,date-time,regex,thread]
-    - ./b2 link=shared threading=multi variant=release --prefix=$CI_PROJECT_NAMESPACE/dds
-    - cd ..
-
-    - git clone --depth=1 --recurse-submodules  https://github.com/cucumber/cucumber-cpp.git
-    - cd cucumber-cpp
-    - sudo apt-get install ruby
-    - ruby --version
-    - sudo apt-get install ruby-dev
-    - sudo gem install bundler
-    - bundle install
-    - cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=on -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds ..
-    - cmake --build build
-    - cmake --build build --target test
-    - cmake --build build --target features
-    - cmake --build build --target install
-    - cd ..
-
-    - git clone --depth=1 https://git-wip-us.apache.org/repos/asf/logging-log4cxx.git
-    - cd logging-log4cxx
-    - ./autogen.sh
-    - |
-        ./configure --with-apr=/opt/dds --with-apr-util=/opt/dds \
-            --with-ODBC=no --with-SMTP=no \
-            --enable-char --enable-wchar_t \
-            --with-charset=utf-8 --with-logchar=utf-8
-    - make && make install
-    - cd ..
-
-    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/MPC.git
-    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/ACE_TAO.git
-    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/CIAO.git
-    - git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/DAnCE.git
-    - git clone --depth=1 --recurse-submodules https://github.com/objectcomputing/OpenDDS.git
-
-    - cd OpenDDS
-    - |
-        ./configure -std=c++11 --ipv6 \
-            --openssl --xerces3 --rapidjson --glib --boost \
-            --no-tests \
-            --ace=$ACE_ROOT --tao=$TAO_ROOT --mpc=$MPC_ROOT \
-            --prefix=$CI_PROJECT_NAMESPACE/dds/opendds-dev
-    - make clean && make && make install
-    - cd ..
-
-    only:
-#        variables:
-            - ${BOOTSTRAP}
-    artifacts:
-        paths:
-        - $CI_PROJECT_NAMESPACE/dds
+    # fill those if you have a proxy in your environment
+    http_proxy: 
+    https_proxy: 
+    no_proxy:
+    STAGING_REGISTRY: "registry.gitlab.com"
+    CONTAINER_DEV_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}_test
+    CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
 
 before_script:
-    - date
-    - export NUM_CORES=$(nproc --all)
-    - export CCACHE_BASEDIR=$CI_PROJECT_DIR
-    - export OS_NAME=$(lsb_release -is)
-    - export OS_VERS_LONG=$(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
-    - export PROJECT_NAME=$CI_PROJECT_NAME
-    - export TAG=$CI_BUILD_REF_NAM
-    - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
-    - export VERSION=`git describe --first-parent`
-    - COVERITY_COVERAGE_FLAG="--all --enable-slow"
+    - docker info
+#     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+#     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
 
 after_script:
-    - date
+    - docker info
+#    - docker logout ${CI_REGISTRY}
 
-validate:
-    <<: *dedicated-runner 
-    variables:
-        JOB_DATE: "date +%Y-%m-%d-%H:%M:%S"
-    stage: configure
-    before_script:
-        - echo "Validate the project is correct and all necessary information is available."
-    script:
-       - > 
-           if [ ! -d "${BUILD_DIRECTORY}" ]; then
-              cmake -E make_directory ${BUILD_DIRECTORY}
-              cmake -E touch ${BUILD_DIRECTORY}/.keepme
-           fi
-    after_script:
-        - echo "${BUILD_DIRECTORY} directory created"
-    artifacts:
-        name: "${CI_BUILD_NAME}"
-        expire_in: 2 hrs
-        paths:
-            - ${BUILD_DIRECTORY}
-    cache:
-        key: "$CI_BUILD_REF" #"$CI_BUILD_REF_NAME"
-        untracked: true
-        paths:
-            - $BUILD_DIRECTORY
-
-.initialize:
-    <<: *dedicated-runner
-    variables:
-        JOB_DATE: "date +%Y-%m-%d-%H:%M:%S"
-        CC: /usr/bin/gcc
-        CXX: /usr/bin/g++
-    stage: configure
-#    dependencies:
-#        - validate
-    before_script:
-        - echo $CI_PIPELINE_ID
-        - echo "Initialize ${CI_PROJECT_NAME} build state, e.g. set properties or create directories."
-    script:
-        - >
-            if [ ! -d "${BUILD_DIRECTORY}" ]; then
-                cmake -E make_directory ${BUILD_DIRECTORY}
-            fi
-
-        - cmake -E chdir $BUILD_DIRECTORY cmake -G "${BUILD_GENERATOR}" 
-                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
-                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON 
-                -DCMAKE_INSTALL_PREFIX=${BUILD_INSTALL_DIRECTORY}/ ..
-
-    after_script:
-        - echo "${CI_PROJECT_NAME} initialization done"
-
-    artifacts:
-        name: "${CI_BUILD_NAME}" 
-        expire_in: 1 hour 
-        paths:
-            - $BUILD_DIRECTORY
-
-    cache:
-        key: "$CI_BUILD_REF"
-        untracked: true
-        paths:
-            - $BUILD_DIRECTORY
-
-.compile:
-    <<: *dedicated-runner
-    stage: compile
-    variables:
-        QTDIR: $CI_PROJECT_NAMESPACE/Qt5.11.2/5.11.2/gcc_64
-        CMAKE_INSTALL_PREFIX: $CI_PROJECT_NAMESPACE/dds
-
-    before_script:
-        - echo  "Compile the source code of the project."
-
-    script:
-        - echo " Build Options ${BUILD_OPTIONS}"
-
-    after_script:
-        - echo " Build Options ${BUILD_OPTIONS}"
-        - echo "Compile the source code done."²
-
-    dependencies: []
-
-    artifacts:
-         name: "${CI_BUILD_NAME}"
-         expire_in: 1 hour
-         paths:
-             - $BUILD_DIRECTOR
-
-    only:
-        - branches
-        - tags
+.agent-who: &agent-who
+    retry: 1
+    tags:
+        - agent-smith
 
 .unit-test: &unit-test
-    <<: *dedicated-runner
-    stage: unit-test
+    stage: test
     variables: &unit-test-variable
         DDS_TYPE: OPENDDS
 
     before_script:
         - echo ${DDS_TYPE} $BUILD_OPTIONS
+
     script:
         - echo ${DDS_TYPE} $BUILD_OPTIONS
+
     after_script:
         - echo ${DDS_TYPE} $BUILD_OPTIONS
 
@@ -424,26 +55,77 @@ validate:
         - master
         - tags
 
-.unit-test:adlinktech:
+.build_template: &build_definition
+    stage: build
+    script:
+        - cmake -E make_directory build
+        - cmake -E chdir build cmake .. -G "${BUILD_GENERATOR}" 
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
+                -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds
+        - cmake --build build --target all --clean-first
+        - cmake --build build --target install
+    artifacts:
+        name: "slg-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+        when: always
+        paths:
+        - "build/*"
+
+.docker-prerequisities: &docker-prerequisities
+    image: docker:stable
+    services:
+        - docker:dind
+
+docker build:
+    <<: *docker-prerequisities
+    stage: Build docker image
+    script:
+        - docker info
+#        - time docker build -t registry.gitlab.com/doevelopper/cfs-com:0.0.1 -f src/main/resources/docker/amd64/foss.Dockerfile .
+
+docker test:
+    <<: *docker-prerequisities
+    stage: Test docker image
+    script:
+        - docker info
+#        - time docker build -t registry.gitlab.com/doevelopper/cfs-com:0.0.1 -f src/main/resources/docker/amd64/foss.Dockerfile .
+
+docker push:
+    <<: *docker-prerequisities
+    stage: Push container to DTR
+    only:
+        - master
+    script:
+        - docker info
+#        - time docker tag registry.gitlab.com/doevelopper/cfs-com:0.0.1 doevelopper/foss-dds-dev:0.0.1
+#        - docker push ""
+
+unit-test:adlinktech:
+    image: registry.gitlab.com/doevelopper/cfs-com/vortex:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: vortex-opensplice
 
-.unit-test:objectcomputing:
+unit-test:objectcomputing:
+    image: registry.gitlab.com/doevelopper/cfs-com/opendds:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: opendds
 
-.unit-test:eProsima:
+unit-test:eProsima:
+    image: registry.gitlab.com/doevelopper/cfs-com/eprosima:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: fast-RTPS
 
-.unit-test:real-time-innovation:
+unit-test:real-time-innovation:
+    image: registry.gitlab.com/doevelopper/cfs-com/connext:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: ConnextDDS
+
+
+
