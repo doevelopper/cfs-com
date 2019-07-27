@@ -14,10 +14,6 @@ stages:
 # improved performance.
 variables:
     DOCKER_DRIVER: "overlay2"
-    # fill those if you have a proxy in your environment
-    http_proxy: 
-    https_proxy: 
-    no_proxy:
     STAGING_REGISTRY: "registry.gitlab.com"
     CONTAINER_DEV_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}_test
     CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
@@ -69,6 +65,20 @@ after_script:
         when: always
         paths:
         - "build/*"
+
+.only_stable: &only_stable
+    only:
+        - master
+        - /^release-.*$/
+
+.tumbleweed: &tumbleweed
+    only:
+        - develop
+        - /^feature-.*$/
+        - /^hotfix-.*$/
+        - /^bugfix-.*$/
+        - /^support-.*$/
+        - /^poc-.*$/
 
 .docker-prerequisities: &docker-prerequisities
     image: docker:stable
