@@ -91,28 +91,23 @@ after_script:
 
 docker build:
     <<: *docker-prerequisities
+    <<: *tumbleweed
     stage: Build docker image
     script:
-        - docker info || true
-        - make versioninfo
         - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 docker test:
     <<: *docker-prerequisities
+    <<: *tumbleweed
     stage: Test docker image
     script:
-        - docker info || true
-        - make versioninfo
         - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 docker push:
     <<: *docker-prerequisities
+    <<: *only_stable
     stage: Push container to DTR
-    only:
-        - master
     script:
-        - docker info || true
-        - make versioninfo
         - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 unit-test:adlinktech:

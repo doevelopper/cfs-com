@@ -31,9 +31,9 @@ DTR_NAMESPACE      	?= doelopper
 DOCKER_TRUSTED_REGISTRY ?= docker.io
 ARCH                ?= amd64
 PLATFORM            :=
-
 BASE_IMAGE          =
 IMAGE               =
+
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
         BASE_IMAGE := $(ARCH)/ubuntu:18.10
@@ -125,6 +125,7 @@ list_volumes: ## List all volumes.
 
 .PHONY: image-info
 image-info: ## Display docker image information.
+	@echo "+ $@"
 	@docker inspect --format='Description:  {{.Config.Labels.Description}}' $(BUILDER_FQIN)
 	@docker inspect --format='Vendor:   {{.Config.Labels.Vendor}}' $(BUILDER_FQIN)
 	@docker inspect --format='Authors:  {{.Author}}' $(BUILDER_FQIN)
@@ -135,10 +136,12 @@ image-info: ## Display docker image information.
 	@docker inspect --format='Size:         {{.Size}} bytes' $(BUILDER_FQIN)
 	@docker inspect --format='Container : {{.Config.Image}}' $(BUILDER_FQIN)
 	@docker inspect --format='{{.}} ' $(BUILDER_FQIN)
+	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
 #	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
 
 .PHONY: versioninfo
 versioninfo: ## Display informations about the image.
+	@echo "+ $@"
 	@echo "Version file: $(VERSIONFILE)"
 	@echo "Current version: $(VERSION)"
 	@echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
@@ -155,11 +158,11 @@ versioninfo: ## Display informations about the image.
 
 .PHONY: build
 build: build-image ## Build Docker images base.
-	@echo
+	@echo "+ $@"
 
 .PHONY: build-image
 build-image: git-status
-	@echo
+	@echo "+ $@"
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
 	# $(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file $(DOCKERFILE) .
 	@echo
@@ -170,7 +173,7 @@ build-image: git-status
 
 .PHONY: push-image
 push-image: build-image
-	@echo
+	@echo "+ $@"
 	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
 	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
 	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
