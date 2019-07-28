@@ -23,6 +23,17 @@ GIT_BRANCH        	:= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_BRANCH_STR    	:= $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
 GIT_REPO          	:= $(shell git config --local remote.origin.url | sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
 GIT_REPOS_URL     	:= $(shell git config --get remote.origin.url)
+CURRENT_BRANCH      := $(shell git rev-parse --abbrev-ref HEAD)
+GIT_BRANCHES        := $(shell git for-each-ref --format='%(refname:short)' refs/heads/ | xargs echo)
+GIT_REMOTES         := $(shell git remote | xargs echo )
+GIT_ROOTDIR         := $(shell git rev-parse --show-toplevel)
+GIT_DIRTY           := $(shell git diff --shortstat 2> /dev/null | tail -n1 )
+LAST_TAG_COMMIT     := $(shell git rev-list --tags --max-count=1)
+LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
+PROJECT_NAME        := $(shell basename $(CURDIR))
+# $(shell basename ${GIT_ROOTDIR})
+
+
 COVERITY_STREAM   	:= $(GIT_REPO)_$(GIT_BRANCH)
 
 DTR_NAMESPACE      	?= doelopper
@@ -37,12 +48,12 @@ IMAGE               =
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
         BASE_IMAGE := $(ARCH)/ubuntu:18.10
-		DOCKERFILE := src/main/resources/docker/amd64/foss.Dockerfile
-		IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/foss-dds
+		DOCKERFILE := src/main/resources/docker/amd64/Dockerfile
+		IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}
         ifeq ($(PLATFORM),RTI)
             BASE_IMAGE := $(ARCH)/ubuntu:16.04
 			DOCKERFILE := src/main/resources/docker/amd64/rti/Dockerfile
-			IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/rti-dds
+			IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}/rti-dds
         endif
     else
         $(error ERROR - unsupported value $(ARCH) for target arch!)
@@ -65,7 +76,7 @@ DOCKER_SHELL        := /bin/sh
 DOCKER              = docker
 DOCKER_LABEL        := --label org.label-schema.maintainer=$(USER)
 DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-DOCKER_LABEL        += --label org.label-schema.description="Env for developping RTI DDS c++ application"
+DOCKER_LABEL        += --label org.label-schema.description="Env for developping DDS c++ application"
 DOCKER_LABEL        += --label org.label-schema.name=$(IMAGE)
 DOCKER_LABEL        += --label org.label-schema.license="no"
 
@@ -90,9 +101,10 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 
 .PHONY: help
 help: ## Display this help and exits.
-	@echo '-----------------------------------------------  $(GIT_REPOS_URL)'
-	@echo
-	@echo "    Please use \`make <target>' where <target> is one of : "
+	@echo '---------------$(GIT_REPOS_URL) ------------------'
+	@echo '+----------------------------------------------------------------------+'
+	@echo '|                        Available Commands                            |'
+	@echo '+----------------------------------------------------------------------+'
 	@echo
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
@@ -146,7 +158,6 @@ versioninfo: ## Display informations about the image.
 	@echo "Current version: $(VERSION)"
 	@echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
 	@echo "Last tag: $(LAST_TAG)"
-	@echo "$(shell git rev-list $(LAST_TAG).. --count) commit(s) since last tag"
 	@echo "Build: $(BUILD) (total number of commits)"
 	@echo "next major version: $(NEXT_MAJOR_VERSION)"
 	@echo "next minor version: $(NEXT_MINOR_VERSION)"
