@@ -1,5 +1,4 @@
-# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
-# FROM $BASE_IMAGE
+
 FROM amd64/ubuntu:16.04
 
 ARG PMC="Adrien H."

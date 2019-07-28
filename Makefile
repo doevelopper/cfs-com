@@ -1,14 +1,6 @@
 .DEFAULT_GOAL:=help
 
-# RED=\x1b[91m
-# BLUE=\x1b[36m
-# COLOR_RESET=\x1b[0m
-# NO_COLOR=\x1b[0m
-# OK_COLOR=\x1b[32;01m
-# ERROR_COLOR=\x1b[31;01m
-# WARN_COLOR=\x1b[33;01m
-
-VERSIONFILE       	= VERSION
+VERSIONFILE       	= VERSION_FILE
 VERSION           	= $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
 PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
 PREVIOUS_VERSION  	=  $(shell [ -n "$(PREVIOUS_VERSIONFILE_COMMIT)" ] && git show $(PREVIOUS_VERSIONFILE_COMMIT)^:$(CURDIR)$(VERSIONFILE) )
@@ -87,14 +79,14 @@ endif
 
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
-DOCKER_LABEL        += --label org.label-schema.usage="C++ deeloppement"
+DOCKER_LABEL        += --label org.label-schema.usage="C++ deloppement environment"
 DOCKER_LABEL        += --label org.label-schema.vcs-ref="$(SHORT_SHA1)"
 DOCKER_LABEL        += --label org.label-schema.vcs-url="$(GIT_REPOS_URL)"
 DOCKER_LABEL        += --label org.label-schema.vcs-type="Git  SCM"
 DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering"
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
 DOCKER_LABEL        += --label org.label-schema.docker.cmd="docker run -v ~/:..."
-DOCKER_LABEL        += --label org.label-schema.release-date="2018-12-12"
+DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 .PHONY: help
 help: ## Display this help and exits.

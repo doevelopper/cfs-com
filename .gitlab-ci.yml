@@ -15,16 +15,20 @@ stages:
 variables:
     DOCKER_DRIVER: "overlay2"
     STAGING_REGISTRY: "registry.gitlab.com"
-    CONTAINER_DEV_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}_test
-    CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
+    DTR_NAMESPACE: "doevelopper"
+    CONTAINER_DEV_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}_test
+    CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
+    MAKE_DOCKER_BUILD_OPTIONS: -DDOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} -DDTR_NAMESPACE=${DTR_NAMESPACE} -DARCH=amd64
 
 before_script:
-    - docker info
+    - date
+    - docker version
 #     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
 #     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
 
 after_script:
-    - docker info
+    - date
+    - docker version
 #    - docker logout ${CI_REGISTRY}
 
 .agent-who: &agent-who
@@ -89,15 +93,17 @@ docker build:
     <<: *docker-prerequisities
     stage: Build docker image
     script:
-        - docker info
-#        - time docker build -t registry.gitlab.com/doevelopper/cfs-com:0.0.1 -f src/main/resources/docker/amd64/foss.Dockerfile .
+        - docker info || true
+        - make versioninfo
+        - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 docker test:
     <<: *docker-prerequisities
     stage: Test docker image
     script:
-        - docker info
-#        - time docker build -t registry.gitlab.com/doevelopper/cfs-com:0.0.1 -f src/main/resources/docker/amd64/foss.Dockerfile .
+        - docker info || true
+        - make versioninfo
+        - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 docker push:
     <<: *docker-prerequisities
@@ -105,33 +111,33 @@ docker push:
     only:
         - master
     script:
-        - docker info
-#        - time docker tag registry.gitlab.com/doevelopper/cfs-com:0.0.1 doevelopper/foss-dds-dev:0.0.1
-#        - docker push ""
+        - docker info || true
+        - make versioninfo
+        - make ${MAKE_DOCKER_BUILD_OPTIONS}
 
 unit-test:adlinktech:
-    image: registry.gitlab.com/doevelopper/cfs-com/vortex:latest
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/vortex:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: vortex-opensplice
 
 unit-test:objectcomputing:
-    image: registry.gitlab.com/doevelopper/cfs-com/opendds:latest
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/opendds:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: opendds
 
 unit-test:eProsima:
-    image: registry.gitlab.com/doevelopper/cfs-com/eprosima:latest
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/eprosima:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
         DDS_TYPE: fast-RTPS
 
 unit-test:real-time-innovation:
-    image: registry.gitlab.com/doevelopper/cfs-com/connext:latest
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/connext:latest
     <<: *unit-test
     variables:
         <<: *unit-test-variable
