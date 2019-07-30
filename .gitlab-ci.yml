@@ -2,13 +2,18 @@ stages:
     - Build docker image
     - Test docker image
     - Push container to DTR
-    - validate    # - validate the project is correct and all necessary information is available
-    - build       # - compile the source code of the project
-    - test        # - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
-    - package     # - take the compiled code and package it in its distributable format, such as a JAR.
-    - verify      # - run any checks on results of integration tests to ensure quality criteria are met
-    - install     # - install the package into the local repository, for use as a dependency in other projects locally
-    - deploy      # - done in the build environment, copies the final package to the remote repository for sharing with other developers and 
+    - Configure build
+    - Build sources
+    - Build test sources
+    - Unit testing
+    - Package artifacts
+    - Integration Test
+    - Quality assurance
+    - Code review
+    - Install to local staging repository
+    - web site generation
+    - Deploy artifacts to staging repositories
+    - Clean local artifacts
 
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
@@ -19,12 +24,33 @@ variables:
     CONTAINER_DEV_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
     CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:${CI_BUILD_REF_NAME}_${CI_BUILD_REF}
     MAKE_DOCKER_BUILD_OPTIONS: -DDOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} -DDTR_NAMESPACE=${DTR_NAMESPACE} -DARCH=amd64
+    GET_SOURCES_ATTEMPTS: "3"
+    BUILD_DIRECTORY: "target-$CI_PROJECT_NAME"
+    BUILD_GENERATOR: "Unix Makefiles"
+    COVERITY_COVERAGE_FLAG: "--all --enable-slow"
+    LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
+    LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
+    SONAR_URL: "https://latest-fiasco.acme"
+    CACHE_DIR: "${PWD}/.cache"
 
 before_script:
+    - echo "Starting Gitlab CI-controlled ..."
+    - echo "...continuous integration..."
+    - echo "... continuous deployement..."
+    - echo "... and Continuous Code Quality!"
     - date
     - docker version
 #     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
 #     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+    - export NUM_CORES=$(nproc --all)
+    - export CCACHE_BASEDIR=$CI_PROJECT_DIR
+    - export OS_NAME=$(lsb_release -is)
+    - export OS_VERS_LONG=$(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
+    - export PROJECT_NAME=$CI_PROJECT_NAME
+    - export TAG=$CI_BUILD_REF_NAM
+    - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
+    - export VERSION=`git describe --first-parent`
+    - env | sort
 
 after_script:
     - date
@@ -37,7 +63,7 @@ after_script:
         - agent-smith
 
 .unit-test: &unit-test
-    stage: test
+    stage: Unit testing
     variables: &unit-test-variable
         DDS_TYPE: OPENDDS
 
@@ -55,6 +81,15 @@ after_script:
         - master
         - tags
 
+
+.build-artefacts: &build-artefacts
+    artifacts:
+        name: "${CI_BUILD_REF_NAME}_${CI_BUILD_REF}"
+        when: on_success
+        expire_in: 1 day
+        paths:
+           - $BUILD_DIRECTORY
+
 .build_template: &build_definition
     stage: build
     script:
@@ -63,6 +98,7 @@ after_script:
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} 
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_NAMESPACE/dds
         - cmake --build build --target all --clean-first
+        - cmake --build build --target test -- --gtest_output=xml:tests/result.xml
         - cmake --build build --target install
     artifacts:
         name: "slg-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
@@ -75,6 +111,12 @@ after_script:
         - master
         - /^release-.*$/
 
+.branch_exceptions: &branch_exceptions
+    only:
+        - branches
+    except:
+        - coverity_scan
+        
 .tumbleweed: &tumbleweed
     only:
         - develop
@@ -84,59 +126,253 @@ after_script:
         - /^support-.*$/
         - /^poc-.*$/
 
+.packages: &packages
+    stage: Package artifacts
+    script:
+            -  echo ""
+    artifacts:
+        paths:
+            - ${BUILD_DIRECTORY}/*.tar.gz
+
 .docker-prerequisities: &docker-prerequisities
     image: docker:stable
     services:
         - docker:dind
+    variables:
+        DOCKER_DRIVER: "overlay2"
+        STAGING_REGISTRY: "registry.gitlab.com"   # docker.io - registry.gitlab.com artifactory
+        DTR_NAMESPACE: "doevelopper"
+        DOCKER_HOST: tcp://docker:2375
+    only:
+        refs:
+            - branches
+        changes:
+            - src/main/resources/docker/${ARCH}/Dockerfile
 
-docker build:
+.application-build-prerequisites: &application-build-prerequisites
+    before_script:
+        - echo "Running $CI_JOB_NAME in stage $CI_JOB_STAGE"
+        - echo $CI_PIPELINE_ID
+        - echo ${CMAKE_BUILD_TYPE} in ${BUILD_DIRECTORY}
+        - g++ --version
+        - cmake --version
+        - doxygen --version
+        - uncrustify --version 
+        - make --version 
+        - java -version 
+        - mvn --version 
+        - gradle -v 
+        - bazel version
+
+.container: &container
+    <<: *agent-who
     <<: *docker-prerequisities
-    <<: *tumbleweed
+    before_script:
+        - docker info
+# docker login asks for the password to be passed through stdin for security
+# we use $CI_JOB_TOKEN here which is a special token provided by GitLab
+#       - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+#       - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
+#       - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin       
+    script:
+        - make ${MAKE_DOCKER_BUILD_OPTIONS}
+        - make run
+
+docker:build:dds-base:
     stage: Build docker image
-    script:
-        - make ${MAKE_DOCKER_BUILD_OPTIONS}
+    <<: *container
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker test:
-    <<: *docker-prerequisities
-    <<: *tumbleweed
-    stage: Test docker image
-    script:
-        - make ${MAKE_DOCKER_BUILD_OPTIONS}
+docker:build:rti-dds-base:
+    stage: Build docker image
+    <<: *container
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker push:
-    <<: *docker-prerequisities
-    <<: *only_stable
+docker:build:omg-opendds:
+    stage: Build docker image
+    <<: *container
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+#    dependencies:
+#        - docker:build:dds-base
+
+docker:build:adlinkist-vortex:
+    stage: Build docker image
+    <<: *container
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+docker:build:eprosima-rtps:
+    stage: Build docker image
+    <<: *container
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+
+docker:push:dds-base:
     stage: Push container to DTR
+    <<: *container
+#	<<: *only_stable
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+#    script:
+#        - make ${MAKE_DOCKER_BUILD_OPTIONS} push
+
+docker:push:rti-dds-base:
+    stage: Push container to DTR
+    <<: *container
+#	<<: *only_stable
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
     script:
-        - make ${MAKE_DOCKER_BUILD_OPTIONS}
+        - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-unit-test:adlinktech:
-    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/vortex:latest
-    <<: *unit-test
+docker:push:omg-opendds:
+    stage: Push container to DTR
+    <<: *container
+#	<<: *only_stable
     variables:
-        <<: *unit-test-variable
-        DDS_TYPE: vortex-opensplice
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    script:
+        - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-unit-test:objectcomputing:
+docker:push:adlinkist-vortex:
+    stage: Push container to DTR
+    <<: *container
+#	<<: *only_stable
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    script:
+        - make ${MAKE_DOCKER_BUILD_OPTIONS} push
+
+docker:push:eprosima-rtps:
+    stage: Push container to DTR
+    <<: *container
+#	<<: *only_stable
+    variables:
+        IMAGE_NAME: debian:latest
+        IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    script:
+        - make ${MAKE_DOCKER_BUILD_OPTIONS} push        
+
+.rti_build_job_docker: &rti_build_job_docker
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/rti-connext:latest
+
+.opendds_build_job_docker: &opendds_build_job_docker
     image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/opendds:latest
-    <<: *unit-test
+
+.opensplice_build_job_docker: &opensplice_build_job_docker
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/vortex:latest
+
+.eprosima_build_job_docker: &eprosima_build_job_docker
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/fast-RTPS:latest
+
+.application_configure: &application_configure
+    <<: *agent-who
+    <<: *application-build-prerequisites
+    stage: Configure
+    
+# unit-test:adlinktech:
+#     <<: *opensplice_build_job_docker
+#     <<: *unit-test
+#     variables:
+#         <<: *unit-test-variable
+#         DDS_TYPE: vortex-opensplice
+#     <<: *application_configure
+
+# unit-test:objectcomputing:
+#     <<: *opendds_build_job_docker
+#     <<: *unit-test
+#     variables:
+#         <<: *unit-test-variable
+#         DDS_TYPE: opendds
+#     <<: *application_configure
+
+# unit-test:eProsima:
+#     <<: *eprosima_build_job_docker
+#     <<: *unit-test
+#     variables:
+#         <<: *unit-test-variable
+#         DDS_TYPE: fast-RTPS
+#     <<: *application_configure
+
+# unit-test:real-time-innovation:
+#     <<: *rti_build_job_docker
+#     <<: *unit-test
+#     variables:
+#         <<: *unit-test-variable
+#         DDS_TYPE: ConnextDDS
+#     <<: *application_configure
+
+deploy to staging:
+    stage: Install to local staging repository
+    before_script:
+        - echo "Deploy to $ENVS ($CI_JOB_NAME in $CI_JOB_STAGE)"
+    script:
+        - cicd/deploy $CI_ENVIRONMENT_NAME
+    environment:
+        name: staging
+        url:  https://dashboard.acme/status?id=staging/
+    when: manual
+    only:
+        # executes the build on every push to the branch: 
+        - master
+    except:
+        - branches
+    artifacts:
+        expire_in: 1d
+        paths:
+            - "*.zip"
+
+deploy-to-production:
+    stage: Deploy artifacts to staging repositories
+    before_script:
+        - echo "Deploy to $ENVS ($CI_JOB_NAME in $CI_JOB_STAGE)"
+    script:
+        - cicd/deploy $CI_ENVIRONMENT_NAME
+    environment:
+        name: production
+        url:  https://dashboard.acme/status?id=production
+    when: manual
+    only:
+        # executes the build on every push to the branch: 
+        - master
+        - tags
+        - /^v\d+\.\d+\.\d+$/
+        - /^v\d+\.\d+\.\d+([abc]\d*)?$/
+        - /^v\d+\.\d+\.\d+(?:(?:(?:\+|\.)?[a-zA-Z0-9]+)*)?$/
+        - /^v\d+\.\d+\.\d+(?:-(?:beta|rc)(?:(?:(?:\+|\.)?[a-zA-Z0-9]+)*)?)?$/
+    except:
+        - branches
+    artifacts:
+        expire_in: 1d
+        paths:
+            - "*.zip"
+            - "*.tgz"
+
+Open Merge Request:
+#    image: tmaier/gitlab-auto-merge-request
+    before_script: []      # We do not need any setup work, let's remove the global one (if any)
     variables:
-        <<: *unit-test-variable
-        DDS_TYPE: opendds
-
-unit-test:eProsima:
-    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/eprosima:latest
-    <<: *unit-test
-    variables:
-        <<: *unit-test-variable
-        DDS_TYPE: fast-RTPS
-
-unit-test:real-time-innovation:
-    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com/connext:latest
-    <<: *unit-test
-    variables:
-        <<: *unit-test-variable
-        DDS_TYPE: ConnextDDS
-
-
-
+        GIT_STRATEGY: none # We do not need a clone of the GIT repository to create a Merge Request
+    when: manual
+    stage: Code review
+    only:
+        - /^feature\/*/    # We have a very strict naming convention
+    script:
+        - >
+            HOST=${CI_PROJECT_URL} CI_PROJECT_ID=${CI_PROJECT_ID} CI_COMMIT_REF_NAME=${CI_COMMIT_REF_NAME} 
+            GITLAB_USER_ID=${GITLAB_USER_ID} PRIVATE_TOKEN=${PRIVATE_TOKEN} ./autoMergeRequest.sh
+            
+        - merge-request.sh # The name of the script
+            
