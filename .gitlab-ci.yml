@@ -99,10 +99,31 @@ after_script:
     <<: *build-artefacts-definition
 
 .test_template: &test_definition
+    variables:
+        TEST_ARGS: "--iterration 1 --outputpath $BUILD_DIRECTORY --module dummy"
     stage: Unit testing
     allow_failure: true
+    before_script:
+        - echo  "Run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed."    
     script:
-        - cmake --build build --target test -- --gtest_output=xml:tests/result.xml
+        - hostname
+#        - make -C $BUILD_DIRECTORY test ARGS="--extra-verbose"
+#        - cmake --build $BUILD_DIRECTORY --target test
+#        - ctest $BUILD_DIRECTORY -V --build-and-test
+#        - cmake --build $BUILD_DIRECTORY --target test -- ARGS="$TEST_ARGS"
+#        - cmake -E env CTEST_OUTPUT_ON_FAILURE=TRUE cmake --build $BUILD_DIRECTORY --target test    
+#        - cmake --build build --target test -- --gtest_output=xml:tests/result.xml
+    after_script:
+        - echo " ${CI_PROJECT_NAME} Unit testing done."
+
+.integration-test-template: &integration-test-definition
+    before_script:
+        - echo  "Process and deploy the package if necessary into an environment where integration tests can be run."
+    script:
+        - uname -a
+#        - cmake --build $BUILD_DIRECTORY --target integration-test
+    after_script:
+        - echo "Done."
 
 .only_stable: &only_stable
     only:
@@ -179,21 +200,21 @@ after_script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS}
 #        - make run
 
-docker:build:dds-base:
+docker:build:dds:base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
         IMAGE_NAME: debian:latest
         IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker:build:rti-dds-base:
+docker:build:rti:dds:base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
         IMAGE_NAME: debian:latest
         IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker:build:omg-opendds:
+docker:build:omg:opendds:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -202,21 +223,21 @@ docker:build:omg-opendds:
 #    dependencies:
 #        - docker:build:dds-base
 
-docker:build:adlinkist-vortex:
+docker:build:adlinkist:vortex:
     stage: Build docker image
     <<: *build-docker-container
     variables:
         IMAGE_NAME: debian:latest
         IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker:build:eprosima-rtps:
+docker:build:eprosima:rtps:
     stage: Build docker image
     <<: *build-docker-container
     variables:
         IMAGE_NAME: debian:latest
         IMAGE_TAG: $CI_REGISTRY_IMAGE/$IMAGE_NAME
 
-docker:push:dds-base:
+docker:push:dds:base:
     stage: Push container to DTR
     <<: *build-docker-container
 #	<<: *only_stable
@@ -226,7 +247,7 @@ docker:push:dds-base:
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-docker:push:rti-dds-base:
+docker:push:rti:dds:base:
     stage: Push container to DTR
     <<: *build-docker-container
 #	<<: *only_stable
@@ -236,7 +257,7 @@ docker:push:rti-dds-base:
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-docker:push:omg-opendds:
+docker:push:omg:opendds:
     stage: Push container to DTR
     <<: *build-docker-container
 #	<<: *only_stable
@@ -246,7 +267,7 @@ docker:push:omg-opendds:
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-docker:push:adlinkist-vortex:
+docker:push:adlinkist:vortex:
     stage: Push container to DTR
     <<: *build-docker-container
 #	<<: *only_stable
@@ -256,7 +277,7 @@ docker:push:adlinkist-vortex:
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} push
 
-docker:push:eprosima-rtps:
+docker:push:eprosima:rtps:
     stage: Push container to DTR
     <<: *build-docker-container
 #	<<: *only_stable
@@ -302,6 +323,16 @@ docker:push:eprosima-rtps:
 #         <<: *unit-test-variable
 #         DDS_TYPE: ConnextDDS
 #     <<: *application_configure
+
+Code duplicate detection:
+    <<: *agent-who
+    stage: Unit testing
+    before_script:
+        - echo  "Static code analysis, copy-paste detection and..."
+    script:
+        - uname -a
+    after_script:
+        - echo "Done."
 
 Continuous code quality:
     <<: *agent-who
@@ -518,6 +549,18 @@ deploy to production:
         paths:
             - "*.zip"
             - "*.tgz"
+
+End to end:
+    stage: Clean local artifacts
+    script:
+        - echo "Invoking end to end  ($CI_JOB_NAME in $CI_JOB_STAGE)"
+    environment:
+        name: qa/$CI_COMMIT_REF_NAME
+        url: https://dashboard.acme/status?id=staging/
+    when: manual   
+    only:
+        - /release\/.+/
+        - /hotfix\/.+/
 
 Open Merge Request:
 #    image: tmaier/gitlab-auto-merge-request
