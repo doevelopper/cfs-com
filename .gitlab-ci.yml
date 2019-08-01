@@ -29,6 +29,7 @@ variables:
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
     SONAR_URL: "https://latest-fiasco.acme"
     CACHE_DIR: "${PWD}/.cache"
+    CI_DEBUG_TRACE: "true"
 
 before_script:
     - echo "Starting Gitlab CI-controlled ..."
@@ -47,6 +48,7 @@ before_script:
     - export TAG=$CI_BUILD_REF_NAM
     - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
     - export VERSION=`git describe --first-parent`
+    - export PATH=~/.local/bin:${PATH}
     - env | sort
 
 after_script:
@@ -577,4 +579,26 @@ Open Merge Request:
             GITLAB_USER_ID=${GITLAB_USER_ID} PRIVATE_TOKEN=${PRIVATE_TOKEN} ./autoMergeRequest.sh
             
         - merge-request.sh # The name of the script
-            
+
+#  build-docker:
+#   stage: build
+#   variables:
+#     DOCKER_DRIVER: overlay
+#     DOCKER_HOST: tcp://docker:2375
+#   services:
+#   - alias: docker
+#     name: registry.gitlab.com/ercom/docker:17.11.0-ce-dind
+#   image: registry.gitlab.com/ercom/docker:17.11.0-ce-git
+#   script:
+#   - docker build -t codebeautifier .
+#   - docker run codebeautifier unittest
+#   - if ([ -n "$CI_COMMIT_TAG" ] || [ "$CI_COMMIT_REF_NAME" == "master" ]) && [ -n "$CI_BUILD_TOKEN" ]; then
+#         docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY};
+#         docker tag codebeautifier ${CI_REGISTRY_IMAGE}:$CI_COMMIT_REF_NAME;
+#         docker push ${CI_REGISTRY_IMAGE}:$CI_COMMIT_REF_NAME;
+#         if [ -n "$CI_COMMIT_TAG" ]; then
+#             docker tag codebeautifier ${CI_REGISTRY_IMAGE}:latest;
+#             docker push ${CI_REGISTRY_IMAGE}:latest;
+#         fi;
+#     fi
+               

@@ -33,7 +33,6 @@ LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
 PROJECT_NAME        := $(shell basename $(CURDIR))
 # $(shell basename ${GIT_ROOTDIR})
 
-
 COVERITY_STREAM   	:= $(GIT_REPO)_$(GIT_BRANCH)
 
 DTR_NAMESPACE      	?= doelopper
@@ -214,6 +213,14 @@ run-image : build-image
 #docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> eclipse
 #docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> netbeans
 #docker run --rm -ti -e HOST_PERMS="$(id -u):$(id -g)" --volume "${HOME}/.conan:/home/happyman/.conan" --volume ${HOME}/.vimrc:/home/happyman/.vim --volume ${HOME}/.vimrc:/home/happyman/.vimrc --volume ${HOME}/.bashrc:/home/happyman/.bashrc  <dtr>/ns/dds:latest --volume "$PWD:/home/happyman/workspace"
+
+# Run the docker
+# docker run --rm -ti --name="$CITBX_DOCKER_PREFIX-build" --hostname="$CITBX_DOCKER_PREFIX-build" \
+#     -e CI=true -e GITLAB_CI=true -v /var/run/docker.sock:/var/run/docker.sock \
+#     "${CITBX_DOCKER_RUN_ARGS[@]}" --label "$CITBX_DOCKER_PREFIX" "${CITBX_JOB_DOCKER_RUN_ARGS[@]}" \
+#     -e DOCKER_RUN_EXTRA_ARGS="$(bashopts_get_def bashopts_extra_args)" "${bashopts_extra_args[@]}" \
+#     $CITBX_DOCKER_IMAGE "${CITBX_PRE_COMMANDS[@]}" $CITBX_JOB_SHELL -c "$CITBX_COMMANDS" \
+#     || exit $?
 
 
 
