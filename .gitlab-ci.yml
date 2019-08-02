@@ -69,7 +69,7 @@ after_script:
         - coverity_scan
 
 .docker-prerequisities: &docker-prerequisities
-    image: registry.gear.ge.com/100034251/docker-dind-base:0.0.1
+    image: docker:19.03.1
     services:
         - docker:dind
     variables:
@@ -105,8 +105,9 @@ after_script:
         # - make run
 
 docker:build:docker-base:
-    <<: *agent-who
     stage: Build docker image
+    <<: *agent-who
+    <<: *build-docker-container
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} dind
         # - time docker build -t ${IMAGE_TAG} -f ./Dockerfile . 2>&1 | tee ${DDS_TYPE}.log
