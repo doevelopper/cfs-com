@@ -1,7 +1,7 @@
-# ARG BASE_IMAGE=amd64/ubuntu:16.04
-# FROM $BASE_IMAGE
-FROM amd64/ubuntu:18.10
-LABEL description="Env for developping distributed c++ application"
+ARG BASE_IMAGE=amd64/ubuntu
+ARG BASE_IMAGE_VERSION=18.10
+FROM ${BASE_IMAG}E:${BASE_IMAGE_VERSION} 
+LABEL description=""
 
 ARG PMC="Adrien H."
 
@@ -52,7 +52,7 @@ RUN cd /tmp \
     && rm -rf gdb-8.3.tar.gz gdb-8.3
 
 ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
-ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.0}
+ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.1}
 
 RUN cd /tmp \
     && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \

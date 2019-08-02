@@ -142,6 +142,6 @@ rti-dds-dev-build.sh
 !.vscode/launch.json
 !.vscode/extensions.json
 src/main/resources/docker/jdk-8u212-linux-x64.tar.gz
-src/main/resources/docker/amd64/rti/packges/*.rtipkg
-src/main/resources/docker/amd64/rti/packges/*.tar.gz
-packges/
+src/main/resources/docker/amd64/rti/packages/*.rtipkg
+src/main/resources/docker/amd64/rti/packages/*.tar.gz
+packages/

@@ -1,3 +1,20 @@
+```txt
+ __          __            __                                                  
+/   _  _ _  |_|. _ |_ |_  (_    _|_ _ _                                        
+\__(_)| (-  | ||(_)| )|_  __)\/_)|_(-|||                                       
+                _/           /                                                 
+ __                                                                            
+/   _  _  _     _ . _ _ |_. _  _    /\ |_  _|_ _ _  _|_. _  _   |   _    _ _   
+\__(_)|||||||_|| )|(_(_||_|(_)| )  /--\|_)_)|_| (_|(_|_|(_)| )  |__(_|\/(-| .  
+                                                                      /        
+```
+
+[![pipeline status](https://gitlab.com/doevelopper/cfs-com/badges/master/pipeline.svg)](https://gitlab.com/doevelopper/cfs-com/commits/master)
+[![coverage report](https://gitlab.com/doevelopper/cfs-com/badges/master/coverage.svg)](https://gitlab.com/doevelopper/cfs-com/commits/master)
+
+# Data distribution Service and Micro Services for linux applications
+
+
 # DDS Abstraction Library 
 Each DDS implementation can do everything we ask for (and even more), but it will not show you how to achieve that. 
 DDS AL Library sits on top of common DDS implementation and do initializes the runtime environment, 

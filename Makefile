@@ -1,19 +1,4 @@
 .DEFAULT_GOAL:=help
-
-VERSIONFILE       	= VERSION_FILE
-VERSION           	= $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
-PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
-PREVIOUS_VERSION  	=  $(shell [ -n "$(PREVIOUS_VERSIONFILE_COMMIT)" ] && git show $(PREVIOUS_VERSIONFILE_COMMIT)^:$(CURDIR)$(VERSIONFILE) )
-
-MAJOR         		= $(shell echo $(VERSION) | sed "s/^\([0-9]*\).*/\1/")
-MINOR         		= $(shell echo $(VERSION) | sed "s/[0-9]*\.\([0-9]*\).*/\1/")
-PATCH     		    = $(shell echo $(VERSION) | sed "s/[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/")
-STAGE 				= $(PATCH:$(VERSION)=0)
-BUILD             	= $(shell git log --oneline | wc -l | sed -e "s/[ \t]*//g")
-NEXT_MAJOR_VERSION 	= $(shell expr $(MAJOR) + 1).0.0-b$(BUILD)
-NEXT_MINOR_VERSION 	= $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
-NEXT_PATCH_VERSION 	= $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)
-
 DATE              	:= $(shell date -u "+%b-%d-%Y")
 SHA1              	:= $(shell git rev-parse HEAD)
 CWD               	:= $(shell pwd -P)
@@ -29,15 +14,11 @@ GIT_REMOTES         := $(shell git remote | xargs echo )
 GIT_ROOTDIR         := $(shell git rev-parse --show-toplevel)
 GIT_DIRTY           := $(shell git diff --shortstat 2> /dev/null | tail -n1 )
 LAST_TAG_COMMIT     := $(shell git rev-list --tags --max-count=1)
-LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
+# LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
 PROJECT_NAME        := $(shell basename $(CURDIR))
-# $(shell basename ${GIT_ROOTDIR})
-
-COVERITY_STREAM   	:= $(GIT_REPO)_$(GIT_BRANCH)
 
 DTR_NAMESPACE      	?= doelopper
-
-#  docker.io - registry.gitlab.com artifactory
+#  jfrog.io - docker.io - registry.gitlab.com - artifactory.io
 DOCKER_TRUSTED_REGISTRY ?= docker.io
 ARCH                ?= amd64
 PLATFORM            :=
@@ -47,12 +28,12 @@ IMAGE               =
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
         BASE_IMAGE := $(ARCH)/ubuntu:18.10
-		DOCKERFILE := src/main/resources/docker/amd64/Dockerfile
-		IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}
+        DOCKERFILE := src/main/resources/docker/amd64/Dockerfile
+        IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}
         ifeq ($(PLATFORM),RTI)
             BASE_IMAGE := $(ARCH)/ubuntu:16.04
-			DOCKERFILE := src/main/resources/docker/amd64/rti/Dockerfile
-			IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}/rti-dds
+            DOCKERFILE := src/main/resources/docker/amd64/rti/Dockerfile
+            IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}/rti-dds
         endif
     else
         $(error ERROR - unsupported value $(ARCH) for target arch!)
@@ -62,64 +43,71 @@ else
 
 endif
 
-DEV_IMAGE           ?= $(IMAGE)-dev
-PROD_IMAGE          ?= $(IMAGE)-image-deploy
-                      # FQIN - fully qualified image name
-                      # Builder - Contains all the build artifacts and depedencies
-                      # Runtime - Contains only the minimum necessary artifacts to run the microservice
-BUILDER_FQIN        := $(DEV_IMAGE)
-RUNTIME_FQIN        := $(IMAGE):$(VERSION)
-TARGETS             ?= linux/amd64 linux/arm64  windows/amd64
-SHELL               = /usr/bin/env bash
-DOCKER_SHELL        := /bin/sh
-DOCKER              = docker
-DOCKER_LABEL        := --label org.label-schema.maintainer=$(USER)
-DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-DOCKER_LABEL        += --label org.label-schema.description="Env for developping DDS c++ application"
-DOCKER_LABEL        += --label org.label-schema.name=$(IMAGE)
-DOCKER_LABEL        += --label org.label-schema.license="no"
+SHELL = $(MAKESHELL)
+MAKESHELL = sh
+MAKEFLAGS = --no-builtin-rules
+MAKEFLAGS += --no-builtin-variables
+MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --output-sync=target
 
-ifeq ($(GIT_BRANCH),master)
-	DOCKER_LABEL    += --label org.label-schema.is-beta="no"
-    DOCKER_LABEL    += --label org.label-schema.is-production="yes"
-else
-    DOCKER_LABEL    += --label org.label-schema.is-production="no"
-	DOCKER_LABEL    += --label org.label-schema.is-beta="yes"
-endif
+COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
+COMMON_IMG_BUILD_OPTS += DTR_NAMESPACE=$(DTR_NAMESPACE)
+COMMON_IMG_BUILD_OPTS += DOCKER_TRUSTED_REGISTRY=$(DOCKER_TRUSTED_REGISTRY)
+COMMON_IMG_BUILD_OPTS += ARCH=$(ARCH)
+COMMON_IMG_BUILD_OPTS += PLATFORM=
+COMMON_IMG_BUILD_OPTS += BASE_IMAGE=$(BASE_IMAGE)
+# COMMON_IMG_BUILD_OPTS += DOCKERFILE=$(DOCKERFILE)
+COMMON_IMG_BUILD_OPTS += IMAGE=$(IMAGE)
+COMMON_IMG_BUILD_OPTS += GIT_BRANCH=$(GIT_BRANCH)
+COMMON_IMG_BUILD_OPTS += GIT_REPOS_URL=$(GIT_REPOS_URL)
+COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
 
-DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
-DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
-DOCKER_LABEL        += --label org.label-schema.usage="C++ deloppement environment"
-DOCKER_LABEL        += --label org.label-schema.vcs-ref="$(SHORT_SHA1)"
-DOCKER_LABEL        += --label org.label-schema.vcs-url="$(GIT_REPOS_URL)"
-DOCKER_LABEL        += --label org.label-schema.vcs-type="Git  SCM"
-DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering"
-DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
-DOCKER_LABEL        += --label org.label-schema.docker.cmd="docker run -v ~/:..."
-DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+.PHONY: dind
+dind: ## Docker + docker-compose for DIND 
+	@echo "$@ -> from $<"
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ build
 
-.PHONY: help
-help: ## Display this help and exits.
-	@echo '---------------$(GIT_REPOS_URL) ------------------'
-	@echo '+----------------------------------------------------------------------+'
-	@echo '|                        Available Commands                            |'
-	@echo '+----------------------------------------------------------------------+'
-	@echo
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-	@echo ""
-	@echo
+.PHONY: dds-base
+dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
+	@echo "$@ -> from $<"
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ build
+
+.PHONY: opendds
+opendds: dds-base ## Build dev environment for OpenDDS
+	@echo "$@ -> from $< ..."
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/omg build
+
+.PHONY: opensplice
+opensplice: dds-base ## Builddev environment for Vortex OpenSPlice
+	@echo "$@ -> from $< ..."
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/adlinktech build
+
+.PHONY: rtps
+rtps: dds-base ## Build common dev environment FastRTPS
+	@echo "$@ -> from $< ..."
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/eprosima build
+
+.PHONY: rti-dds-base
+rti-dds-base: ## Build common dev environment for RealTime Innovation DDS
+	@echo "$@ -> from $< ..."
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/rti build
+
+.PHONY: run-dds-base
+run-dds-base: dds-base ## Build and run common dev environment for DDS
+	@echo "$@ -> from $< ..."
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ run
+
+.PHONY: check
+check: ## Check binaries prerequisities.
+	@docker --version  > /dev/null  || true
+	@helm  version > /dev/null  || true
+	@kubectl version > /dev/null|| true
+	@zip --version > /dev/null
+	@unzip -v > /dev/null
 
 .PHONY: git-status
 git-status : ## Check for uncommited chqnges
 	@test -n "$(GIT_STATUS)" && echo "$(WARN_COLOR)warning: you have uncommitted changes $(NO_COLOR)" || true
-
-.PHONY: check
-check: ## Check binaries prerequisities.
-	docker --version  > /dev/null
-	helm  version > /dev/null  || true
-	kubectl version > /dev/null|| true
-	zip --version > /dev/null
-	unzip -v > /dev/null
 
 .PHONY: list list_all_containers list_volumes
 list: list_all_containers list_volumes  ## List all containers and volumes."
@@ -134,94 +122,28 @@ list_volumes: ## List all volumes.
 	@echo "$(RED)  Dangling volumes (may be deleted via 'docker volume rm xxx'):  $(COLOR_RESET)"
 	@docker volume ls -f dangling=true
 
-.PHONY: image-info
-image-info: ## Display docker image information.
-	@echo "+ $@"
-	@docker inspect --format='Description:  {{.Config.Labels.Description}}' $(BUILDER_FQIN)
-	@docker inspect --format='Vendor:   {{.Config.Labels.Vendor}}' $(BUILDER_FQIN)
-	@docker inspect --format='Authors:  {{.Author}}' $(BUILDER_FQIN)
-	@docker inspect --format='Version:  {{.Config.Labels.Version}}' $(BUILDER_FQIN)
-	@docker inspect --format='DockerVersion:    {{.DockerVersion}}' $(BUILDER_FQIN)
-	@docker inspect --format='Architecture: {{.Architecture}}' $(BUILDER_FQIN)
-	@docker inspect --format='OS:       {{.Os}}' $(BUILDER_FQIN)
-	@docker inspect --format='Size:         {{.Size}} bytes' $(BUILDER_FQIN)
-	@docker inspect --format='Container : {{.Config.Image}}' $(BUILDER_FQIN)
-	@docker inspect --format='{{.}} ' $(BUILDER_FQIN)
-	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
-#	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
+.PHONY: show-info
+show-info:
+#	$(call blue, "  # $@ -> ...")
+	$(call blue, "  # $@ -> from $< ...")
 
-.PHONY: versioninfo
-versioninfo: ## Display informations about the image.
-	@echo "+ $@"
-	@echo "Version file: $(VERSIONFILE)"
-	@echo "Current version: $(VERSION)"
-	@echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
-	@echo "Last tag: $(LAST_TAG)"
-	@echo "Build: $(BUILD) (total number of commits)"
-	@echo "next major version: $(NEXT_MAJOR_VERSION)"
-	@echo "next minor version: $(NEXT_MINOR_VERSION)"
-	@echo "next patch version: $(NEXT_PATCH_VERSION)"
-	@echo "--------------"
-	@echo "Previous version file '$(VERSIONFILE)' commit: $(PREVIOUS_VERSIONFILE_COMMIT)"
-	@echo "Previous version **from** version file: '$(PREVIOUS_VERSION)'"
-
-
-.PHONY: build
-build: build-image ## Build Docker images base.
-	@echo "+ $@"
-
-.PHONY: build-image
-build-image: git-status
-	@echo "+ $@"
-	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	# $(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file $(DOCKERFILE) .
+.PHONY: help
+help: ## Display this help and exits.
+	$(call blue, "  # $@ -> from $< ...")
+	@echo '---------------$(GIT_REPOS_URL) ------------------'
+	@echo '+----------------------------------------------------------------------+'
+	@echo '|                        Available Commands                            |'
+	@echo '+----------------------------------------------------------------------+'
 	@echo
-	@echo "Build finished."
-
-.PHONY: push
- push: push-image ## Push docker image to DTR.
-
-.PHONY: push-image
-push-image: build-image
-	@echo "+ $@"
-	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
-	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
-	# $(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
 	@echo
-	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
-	# $(DOCKER) push $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH)
-	# $(DOCKER) push $(BUILDER_FQIN):latest
-	@echo "Image pushed to DTR"
 
-.PHONY: run
-run : run-image ## Run docker image.
-
-.PHONY: run-image
-run-image : build-image
-	@echo "+ $@"
-	@echo "$(BLUE) Running tag  $(BUILDER_FQIN)  $(NO_COLOR) : uses host's conan as package manager"
-	$(DOCKER) run --rm \
-    	--volume ${HOME}/.conan:/home/developer/.conan \
-    	--volume ${HOME}/.ssh:/home/developer/.ssh \
-		--volume ${HOME}/.vim:/home/developer/.vim \
-    	--volume ${HOME}/.vimrc:/home/developer/.vimrc \
-    	--volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
-		--volume ${HOME}/.m2:/home/developer/.m2 \
-    	--volume $(PWD):/home/developer/workspace \
-    	--tty --interactive $(BUILDER_FQIN):$(VERSION)
-
-#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> eclipse
-#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> netbeans
-#docker run --rm -ti -e HOST_PERMS="$(id -u):$(id -g)" --volume "${HOME}/.conan:/home/happyman/.conan" --volume ${HOME}/.vimrc:/home/happyman/.vim --volume ${HOME}/.vimrc:/home/happyman/.vimrc --volume ${HOME}/.bashrc:/home/happyman/.bashrc  <dtr>/ns/dds:latest --volume "$PWD:/home/happyman/workspace"
-
-# Run the docker
-# docker run --rm -ti --name="$CITBX_DOCKER_PREFIX-build" --hostname="$CITBX_DOCKER_PREFIX-build" \
-#     -e CI=true -e GITLAB_CI=true -v /var/run/docker.sock:/var/run/docker.sock \
-#     "${CITBX_DOCKER_RUN_ARGS[@]}" --label "$CITBX_DOCKER_PREFIX" "${CITBX_JOB_DOCKER_RUN_ARGS[@]}" \
-#     -e DOCKER_RUN_EXTRA_ARGS="$(bashopts_get_def bashopts_extra_args)" "${bashopts_extra_args[@]}" \
-#     $CITBX_DOCKER_IMAGE "${CITBX_PRE_COMMANDS[@]}" $CITBX_JOB_SHELL -c "$CITBX_COMMANDS" \
-#     || exit $?
-
-
-
-
+# FUNCTIONS
+define blue
+	# @tput setaf 4
+	@echo " "
+	@echo $1
+	@echo " "
+	# @tput sgr0
+endef
