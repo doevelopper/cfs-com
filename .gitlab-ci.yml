@@ -70,7 +70,7 @@ after_script:
         - coverity_scan
 
 .docker-prerequisities: &docker-prerequisities
-    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com-dind:0.0.1
+    image: docker.io/doevelopper/cfs-com-dind:0.0.1
     services:
         - docker:dind
         # command: ["--insecure-registry=registry.gitlab.com"]
@@ -130,3 +130,5 @@ docker:build:dds-base:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/Dockerfile
+#    dependencies:
+#         - docker:build:dds-base
