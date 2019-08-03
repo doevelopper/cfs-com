@@ -25,7 +25,7 @@ variables:
 
 before_script:
     - date
-    - docker version || true
+    # - docker version || true
     - echo "Starting Gitlab CI-controlled ..."
     - echo "...continuous integration..."
     - echo "... continuous deployement..."
@@ -38,11 +38,11 @@ before_script:
     - export TAG=$CI_BUILD_REF_NAM
     - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
     - export VERSION=`git describe --first-parent`
-    - env | sort
+    # - env | sort
 
 after_script:
     - date
-    - docker version  || true
+    # - docker version  || true
 #    - docker logout ${CI_REGISTRY}
 
 .agent-who: &agent-who
@@ -121,3 +121,4 @@ docker:build:docker-base:
         - docker pull ${CI_REGISTRY_IMAGE}/dind:0.0.1 || true
         - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
         - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
+
