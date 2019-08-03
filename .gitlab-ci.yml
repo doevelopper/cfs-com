@@ -79,7 +79,7 @@ after_script:
         # DOCKER_DRIVER: "overlay2"
         STAGING_REGISTRY: "registry.gitlab.com"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
         DTR_NAMESPACE: ${CI_PROJECT_NAMESPAC}
-        DOCKER_HOST: tcp://docker:2375
+        # DOCKER_HOST: tcp://docker:2375
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64
