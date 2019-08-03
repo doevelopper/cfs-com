@@ -109,6 +109,9 @@ after_script:
 
 docker:build:docker-base:
     stage: Build docker image
+    image: docker:19.03.1
+    services:
+        - docker:dind
     <<: *agent-who
     variables:
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
