@@ -102,7 +102,7 @@ after_script:
 # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
 #       - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 #       - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
-#       - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin       
+#       - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} ${GOAL}
 
@@ -117,8 +117,8 @@ docker:build:docker-base:
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
     script:
-        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY} 
+        - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
         - docker pull ${CI_REGISTRY_IMAGE}/dind:0.0.1 || true
-        - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
-        - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
+        # - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
+        # - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
 
