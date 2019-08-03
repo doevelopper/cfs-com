@@ -19,7 +19,7 @@ variables:
     GET_SOURCES_ATTEMPTS: "3"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
-    CI_DEBUG_TRACE: "true"
+    # CI_DEBUG_TRACE: "true"
     PROJECT_NAME: "$CI_PROJECT_NAME"
     PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
 
@@ -30,7 +30,6 @@ before_script:
     - echo "...continuous integration..."
     - echo "... continuous deployement..."
     - echo "... and Continuous Code Quality!"
-    - docker version
     - export NUM_CORES=$(nproc --all)
     - export CCACHE_BASEDIR=$CI_PROJECT_DIR
     - export OS_NAME=$(lsb_release -is)
