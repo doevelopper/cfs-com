@@ -8,6 +8,10 @@
 \__(_)|||||||_|| )|(_(_||_|(_)| )  /--\|_)_)|_| (_|(_|_|(_)| )  |__(_|\/(-| .  
                                                                       /        
 ```
+[![Docker Pulls][pull-shield]][pull]
+[![Automation][automated-shield]][pull]
+[![Status][status-shield]][pull]
+
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitlab.com/doevelopper/cppbdd101/tree/develop)
 [![License](https://img.shields.io/badge/license-Apache%20license%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -174,6 +178,21 @@ for details.
  SUCH DAMAGE.
 
 - Code and documentation copyright 2011-2018 A.H.L, Inc.
-- Code are released under [![License](https://img.shields.io/badge/license-Apache%20license%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-- Docs are released under [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-- CI/CD Scripts are under [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
+- Code are released under [![License][apache-license-shield]][apache-license]
+- Docs are released under [![License: CC BY-NC-SA 4.0][BY-NC-SA-4.0-shield]][BY-NC-SA-4.0]
+- CI/CD Scripts are under [![License: LGPL v3][LGPL-v3-shield]][LGPL-v3]
+  
+[LGPL-v3-shield]: https://img.shields.io/badge/License-LGPL%20v3-blue.svg
+[LGPL-v3]: http://www.gnu.org/licenses/lgpl-3.0
+[BY-NC-SA-4.0-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+[BY-NC-SA-4.0]: https://creativecommons.org/licenses/by-nc-sa/4.0/
+[apache-license-shield]: https://img.shields.io/badge/license-Apache%20license%202.0-blue.svg
+[apache-license]: https://opensource.org/licenses/Apache-2.0
+
+
+[pull-shield]: https://img.shields.io/docker/pulls/doevelopper/developmentplatform.svg
+[pull]: https://github.com/doevelopper/cfs-com/tree/master 
+[automated-shield]: https://img.shields.io/docker/automated/doevelopper/developmentplatform.svg
+[automated]: https://img.shields.io/docker/automated/doevelopper/developmentplatform.svg
+[status-shield]: https://img.shields.io/docker/status/doevelopper/developmentplatform.svg
+[status]: https://img.shields.io/docker/status/doevelopper/developmentplatform.svg

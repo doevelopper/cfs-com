@@ -70,7 +70,7 @@ after_script:
         - coverity_scan
 
 .docker-prerequisities: &docker-prerequisities
-    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}/dind:0.0.1
+    image: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/cfs-com-dind:0.0.1
     services:
         - docker:dind
         # command: ["--insecure-registry=registry.gitlab.com"]
@@ -78,8 +78,8 @@ after_script:
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
         # DOCKER_DRIVER: "overlay2"
-        STAGING_REGISTRY: "registry.gitlab.com"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
-        DTR_NAMESPACE: ${CI_PROJECT_NAMESPAC}
+        STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
+        DTR_NAMESPACE: ${CI_PROJECT_NAMESPACE}
         DOCKER_HOST: tcp://docker:2375
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
@@ -110,18 +110,23 @@ after_script:
 # docker:dind with docker-compose        
 docker:build:docker-base:
     stage: Build docker image
-    image: docker:19.03.1
-    services:
-        - docker:dind
-    <<: *agent-who
+    <<: *build-docker-container
     variables:
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
     script:
-        - echo "$CI_REGISTRY_PASSWORD - $CI_REGISTRY_USER $CI_REGISTRY"
-        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+        - echo " $CI_JOB_TOKEN $CI_REGISTRY "
         # - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY--password-stdin
         # - docker pull ${CI_REGISTRY_IMAGE}/dind:0.0.1 || true
         # - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
         # - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
 
+docker:build:dds-base:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        ARCH: amd64
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/Dockerfile
