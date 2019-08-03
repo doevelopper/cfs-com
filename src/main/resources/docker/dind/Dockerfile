@@ -14,11 +14,11 @@ RUN apk update
 RUN apk upgrade
 RUN apk add --no-cache \
 		ca-certificates \
-		py-pip python-dev \
-		libffi-dev \
 		openssl-dev \
         openssh \
         openssh-client \
+		python-dev \ 
+		py-pip libevent-dev libffi-dev \ 
 		make \
 		bash \
 		git \
@@ -27,14 +27,17 @@ RUN apk add --no-cache \
         && rm -rf /var/cache/apk/*
 
 
-RUN pip install "docker-compose${COMPOSE_VERSION:+==}${COMPOSE_VERSION}"
+# RUN pip install "docker-compose${COMPOSE_VERSION:+==}${COMPOSE_VERSION}"
+
+RUN curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION:+==}${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose
 
 RUN addgroup -S -g 1000 docker \
 	&& adduser -S -G docker -u 1000 docker
 
 ## docker-entrypoint.sh from Docker-Docker-Image
 ##  https://github.com/docker-library/docker/tree/6001c15038b05149a83dcc17e1bbeedc92979f6d
-COPY docker-entrypoint.sh /usr/local/bin/
+# COPY docker-entrypoint.sh /usr/local/bin/
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["sh"]
+# ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["/bin/bash"]
