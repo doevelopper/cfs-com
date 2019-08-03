@@ -117,5 +117,6 @@ docker:build:docker-base:
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
     script:
         - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+        - docker pull ${CI_REGISTRY_IMAGE}/dind:0.0.1 || true
         - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
-        - time docker push -t  ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
+        - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
