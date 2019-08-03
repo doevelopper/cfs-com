@@ -32,12 +32,12 @@ before_script:
     - echo "... and Continuous Code Quality!"
     - export NUM_CORES=$(nproc --all)
     - export CCACHE_BASEDIR=$CI_PROJECT_DIR
-    - export OS_NAME=$(lsb_release -is)
-    - export OS_VERS_LONG=$(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
+    # - export OS_NAME=$(lsb_release -is)
+    # - export OS_VERS_LONG=$(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
     - export PROJECT_NAME=$CI_PROJECT_NAME
     - export TAG=$CI_BUILD_REF_NAM
     - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
-    - export VERSION=`git describe --first-parent`
+    # - export VERSION=`git describe --first-parent`
     # - env | sort
 
 after_script:
@@ -79,7 +79,7 @@ after_script:
         # DOCKER_DRIVER: "overlay2"
         STAGING_REGISTRY: "registry.gitlab.com"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
         DTR_NAMESPACE: ${CI_PROJECT_NAMESPAC}
-        # DOCKER_HOST: tcp://docker:2375
+        DOCKER_HOST: tcp://docker:2375
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64
