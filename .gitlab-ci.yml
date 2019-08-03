@@ -132,3 +132,98 @@ docker:build:dds-base:
         DOCKER_FILE: src/main/resources/docker/${ARCH}/Dockerfile
 #    dependencies:
 #         - docker:build:dds-base
+
+docker:build:rti-dds-base:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.3
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/rti/Dockerfile
+
+docker:build:omg-opendds:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/omg/Dockerfile
+#    dependencies:
+#        - docker:build:dds-base
+
+docker:build:adlinkist-vortex:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/adlinktech/Dockerfile
+
+docker:build:eprosima-rtps:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/eprosima/Dockerfile
+
+docker:push:dds-base:
+    stage: Push container to DTR
+    <<: *build-docker-container
+#    <<: *only_stable
+    variables:
+        GOAL: push
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+
+docker:push:rti-dds-base:
+    stage: Push container to DTR
+    <<: *build-docker-container
+#    <<: *only_stable
+    variables:
+        GOAL: push
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+
+docker:push:omg-opendds:
+    stage: Push container to DTR
+    <<: *build-docker-container
+#    <<: *only_stable
+    variables:
+        GOAL: push
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+
+docker:push:adlinkist-vortex:
+    stage: Push container to DTR
+    <<: *build-docker-container
+#    <<: *only_stable
+    variables:
+        GOAL: push
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+
+docker:push:eprosima-rtps:
+    stage: Push container to DTR
+    <<: *build-docker-container
+#    <<: *only_stable
+    variables:
+        GOAL: push
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+
+docker:clean::none:
+    stage: Clean local artifacts
+    <<: *build-docker-container
+    script:
+        - echo "if yes | docker system prune; then echo "Success"; fi"
+
