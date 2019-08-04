@@ -17,12 +17,15 @@ stages:
 
 variables:
     GET_SOURCES_ATTEMPTS: "3"
+    ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
     # CI_DEBUG_TRACE: "true"
     PROJECT_NAME: "$CI_PROJECT_NAME"
     PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
     ARCH: amd64
+    COMMIT_ID: ${CI_COMMIT_SHA:0:8}
+    V: "0"
 
 before_script:
     - date
@@ -49,9 +52,9 @@ after_script:
 .agent-who: &agent-who
     retry: 1
     tags:
-        # - agent-smith
-        - gitlab-org
-        # - docker        
+        - agent-smith
+        #- gitlab-org
+        # - docker
 
 
 .only_stable: &only_stable
@@ -67,7 +70,22 @@ after_script:
         - /^bugfix-.*$/
         - /^bugfix[/]v[0-9.]*$/
         - /^support-.*$/
-  
+
+.notify: &notify
+  image: alpine
+  stage: notification
+  cache: {}
+  before_script:
+    - apk update && apk add git curl bash
+  only:
+    - schedules
+  except:
+    variables:
+      - $CI_SLACK_NOTIFY != "true"
+      - $CI_SLACK_WEBHOOK_URL == null
+      - $CI_SLACK_CHANNEL == null
+
+
 .branch_exceptions: &branch_exceptions
     only:
         - branches
@@ -79,7 +97,7 @@ after_script:
     services:
         - docker:dind
         # command: ["--insecure-registry=registry.gitlab.com"]
-    variables:
+    variables: &docker_variables
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
         # DOCKER_DRIVER: "overlay2"
@@ -115,7 +133,7 @@ after_script:
         - make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=${CI_PROJECT_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE}
         # - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
-# docker:dind with docker-compose        
+# docker:dind with docker-compose
 .docker:build:docker-base:
     stage: Build docker image
     <<: *build-docker-container
@@ -128,6 +146,13 @@ after_script:
         # - docker pull ${CI_REGISTRY_IMAGE}/dind:0.0.1 || true
         # - time docker build -t ${CONTAINER_IMAGE}/dind:0.0.1 -f ${DOCKER_FILE}  . ${BUILD_LOG}
         # - time docker push ${CONTAINER_IMAGE}/dind:0.0.1  ${BUILD_LOG}
+    only:
+        refs:
+            - schedules
+        variables:
+            - $PHASE == "Bootstrap"
+            # - $CI_COMMIT_TAG =~ /^deploy+/
+
 
 docker:build:dds-base:
     stage: Build docker image

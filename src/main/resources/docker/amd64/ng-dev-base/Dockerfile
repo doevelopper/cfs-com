@@ -64,7 +64,8 @@ RUN cd /tmp \
 #    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
 #    && rm -v jdk-8u212-linux-x64.tar.gz
 
-COPY src/main/resources/docker/jdk-8u212-linux-x64.tar.gz /tmp
+COPY jdk-8u212-linux-x64.tar.gz /tmp
+
 RUN  cd /tmp \
     && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
     && rm -v jdk-8u212-linux-x64.tar.gz

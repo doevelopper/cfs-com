@@ -1,6 +1,4 @@
-# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
-# FROM $BASE_IMAGE
-FROM doevelopper/foss-dds-dev:latest
+FROM doevelopper/cfs-com-dev:latest
 
 USER root
 
@@ -34,9 +32,9 @@ RUN cd /tmp \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
     && ./configure --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
     && make clean \
+    && cp -v ./gsoap/stdsoap2.c /usr/include \
     && make  \
     && make install \
-    && cp -v ./gsoap/stdsoap2.c /usr/include \
     && cd /tmp \
     && rm -rf  gsoap-${GSOAP_MAJOR_VERSION} gsoap_${GSOAP_VERSION}.zip
 

@@ -1,6 +1,4 @@
-# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
-# FROM $BASE_IMAGE
-FROM doevelopper/foss-dds-dev:latest
+FROM doevelopper/cfs-com-dev:latest
 
 USER root
 
@@ -210,7 +208,7 @@ RUN git config --global url."https://".insteadOf git://
 	# && cd ..
 
 ARG ACCOUNT
-ENV ACCOUNT ${ACCOUNT:-happyman}
+ENV ACCOUNT ${ACCOUNT:-doevelopper}
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT
 

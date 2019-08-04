@@ -105,7 +105,8 @@ build: build-image ## Build Docker images base.
 build-image:
 	# $(call purple, "  # $@ -> from $< ... $(BUILDER_FQIN)")
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	@$(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+	# @$(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@echo
 	@echo "Build finished."
 
