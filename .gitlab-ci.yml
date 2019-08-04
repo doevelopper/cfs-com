@@ -112,7 +112,7 @@ after_script:
 #       - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
 #       - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     script:
-        - make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=${CI_PROJECT_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE}"
+        - make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=${CI_PROJECT_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE}
         # - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
 # docker:dind with docker-compose        
