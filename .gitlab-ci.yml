@@ -50,7 +50,7 @@ after_script:
     tags:
         # - agent-smith
         - gitlab-org
-        - docker        
+        # - docker        
 
 
 .only_stable: &only_stable
