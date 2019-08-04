@@ -131,7 +131,7 @@ docker:build:dds-base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
-        GOAL: build
+        # GOAL: build
         MODULE: "dds-base"
         VERSION: 0.0.1
         IMAGE_NAME: ${CONTAINER_IMAGE}
