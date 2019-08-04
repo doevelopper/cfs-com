@@ -11,9 +11,6 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-ARG IMAGE_VERSION
-ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
-
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake texinfo texi2html \

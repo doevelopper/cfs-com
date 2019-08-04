@@ -114,7 +114,7 @@ after_script:
         - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE} 
 
 # docker:dind with docker-compose        
-docker:build:docker-base:
+.docker:build:docker-base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -140,7 +140,7 @@ docker:build:dds-base:
 #    dependencies:
 #         - docker:build:dds-base
 
-docker:build:rti-dds-base:
+.docker:build:rti-dds-base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -151,7 +151,7 @@ docker:build:rti-dds-base:
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/rti/Dockerfile
 
-docker:build:omg-opendds:
+.docker:build:omg-opendds:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -164,7 +164,7 @@ docker:build:omg-opendds:
 #    dependencies:
 #        - docker:build:dds-base
 
-docker:build:adlinkist-vortex:
+.docker:build:adlinkist-vortex:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -175,7 +175,7 @@ docker:build:adlinkist-vortex:
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/adlinktech/Dockerfile
 
-docker:build:eprosima-rtps:
+.docker:build:eprosima-rtps:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -197,7 +197,7 @@ docker:push:dds-base:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
 
-docker:push:rti-dds-base:
+.docker:push:rti-dds-base:
     stage: Push container to DTR
     <<: *build-docker-container
 #    <<: *only_stable
@@ -207,7 +207,7 @@ docker:push:rti-dds-base:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
 
-docker:push:omg-opendds:
+.docker:push:omg-opendds:
     stage: Push container to DTR
     <<: *build-docker-container
 #    <<: *only_stable
@@ -217,7 +217,7 @@ docker:push:omg-opendds:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
 
-docker:push:adlinkist-vortex:
+.docker:push:adlinkist-vortex:
     stage: Push container to DTR
     <<: *build-docker-container
 #    <<: *only_stable
@@ -227,7 +227,7 @@ docker:push:adlinkist-vortex:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
 
-docker:push:eprosima-rtps:
+.docker:push:eprosima-rtps:
     stage: Push container to DTR
     <<: *build-docker-container
 #    <<: *only_stable
@@ -237,7 +237,7 @@ docker:push:eprosima-rtps:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
 
-docker:clean::none:
+.docker:clean::none:
     stage: Clean local artifacts
     <<: *build-docker-container
     script:
