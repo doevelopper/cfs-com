@@ -56,7 +56,7 @@ DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering
 DOCKER_LABEL        += --label org.label-schema.documentation=$(GIT_REPOS_URL)
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
 DOCKER_LABEL        += --label org.label-schema.docker.cmd="make dds-base run"
-DOCKER_LABEL        += --label org.label-schema.docker.dockerfile="./dockerfile"
+DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
 DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # FQIN - fully qualified image name
