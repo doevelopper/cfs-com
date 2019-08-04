@@ -111,7 +111,8 @@ after_script:
 #       - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $STAGING_REGISTRY
 #       - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     script:
-        - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE} 
+        - echo " ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+        # - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
 # docker:dind with docker-compose        
 .docker:build:docker-base:
