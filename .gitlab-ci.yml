@@ -89,7 +89,7 @@ after_script:
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/Dockerfile
+        # DOCKER_FILE: src/main/resources/docker/${ARCH}/Dockerfile
     # only:
         # refs:
             # - branches
