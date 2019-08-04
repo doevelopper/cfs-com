@@ -24,6 +24,7 @@ ARCH                ?= amd64
 PLATFORM            :=
 BASE_IMAGE          =
 IMAGE               =
+GOAL			    := build
 
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
@@ -65,37 +66,32 @@ COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
 .PHONY: dind
 dind: ## Docker + docker-compose for DIND 
 	@echo "$@ -> from $<"
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ build
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ ${GOAL}
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
 	@echo "$@ -> from $<"
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ build
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
 
 .PHONY: opendds
 opendds: dds-base ## Build dev environment for OpenDDS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/omg build
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/omg ${GOAL}
 
 .PHONY: opensplice
 opensplice: dds-base ## Builddev environment for Vortex OpenSPlice
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/adlinktech build
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/adlinktech ${GOAL}
 
 .PHONY: rtps
 rtps: dds-base ## Build common dev environment FastRTPS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/eprosima build
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/eprosima ${GOAL}
 
 .PHONY: rti-dds-base
 rti-dds-base: ## Build common dev environment for RealTime Innovation DDS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/rti build
-
-.PHONY: run-dds-base
-run-dds-base: dds-base ## Build and run common dev environment for DDS
-	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ run
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/rti ${GOAL}
 
 .PHONY: check
 check: ## Check binaries prerequisities.
