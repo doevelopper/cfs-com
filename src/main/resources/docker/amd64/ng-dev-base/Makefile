@@ -99,11 +99,11 @@ versioninfo: ## Display informations about the image.
 
 .PHONY: build
 build: build-image ## Build Docker images base.
-	@echo "+ $@"
+	# @echo "+ $@"
 
 .PHONY: build-image
 build-image:
-	$(call purple, "  # $@ -> from $< ... $(BUILDER_FQIN)")
+	# $(call purple, "  # $@ -> from $< ... $(BUILDER_FQIN)")
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
 	@$(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@echo
@@ -114,7 +114,6 @@ build-image:
 
 .PHONY: push-image
 push-image: build-image
-	$(call purple, "  # $@ -> from $< ... $(BUILDER_FQIN)")
 	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
 	#@$(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
 	#@$(DOCKER) tag $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) $(BUILDER_FQIN):latest
@@ -166,9 +165,12 @@ help: ## Display this help and exits.
 
 
 define purple
-	# @tput setaf 5
+endef
+
+define purples
+	@tput setaf 5
 	@echo " "
 	@echo $1
 	@echo " "
-	# @tput sgr0
+	@tput sgr0
 endef

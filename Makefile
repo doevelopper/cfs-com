@@ -46,10 +46,10 @@ endif
 
 SHELL = $(MAKESHELL)
 MAKESHELL = sh
-MAKEFLAGS = --no-builtin-rules
-MAKEFLAGS += --no-builtin-variables
-MAKEFLAGS += --no-print-directory
-MAKEFLAGS += --output-sync=target
+# MAKEFLAGS = --no-builtin-rules
+# MAKEFLAGS += --no-builtin-variables
+# MAKEFLAGS += --no-print-directory
+# MAKEFLAGS += --output-sync=target
 
 COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
 COMMON_IMG_BUILD_OPTS += DTR_NAMESPACE=$(DTR_NAMESPACE)
@@ -70,7 +70,6 @@ dind: ## Docker + docker-compose for DIND
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
-	@echo "$@ -> from $<"
 	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
 
 .PHONY: opendds
