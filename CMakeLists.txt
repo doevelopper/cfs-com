@@ -1,4 +1,4 @@
-#       CMakeLists.txt
+#       cfs-com/CMakeLists.txt
 #
 #               Copyright (c) 2014-2018 A.H.L
 #
