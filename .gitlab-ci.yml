@@ -1,3 +1,26 @@
+#       cfs-com/CMakeLists.txt
+#
+#               Copyright (c) 2014-2018 A.H.L
+#
+#        Permission is hereby granted, free of charge, to any person obtaining
+#        a copy of this software and associated documentation files (the
+#        "Software"), to deal in the Software without restriction, including
+#        without limitation the rights to use, copy, modify, merge, publish,
+#        distribute, sublicense, and/or sell copies of the Software, and to
+#        permit persons to whom the Software is furnished to do so, subject to
+#        the following conditions:
+#
+#        The above copyright notice and this permission notice shall be
+#        included in all copies or substantial portions of the Software.
+#
+#        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 stages:
     - Build docker image
     - Test docker image
@@ -33,7 +56,7 @@ variables:
 before_script:
     - date
     - docker version || true
-    - echo "${DK_PW}" | docker login -u "${DK_USR}" docker.io --password-stdin
+    - echo "${CI_REGISTRY_PASSWORD}" | docker login -u "doevelopper" docker.io --password-stdin
 #    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY--password-stdin
     - echo "Starting Gitlab CI-controlled ..."
     - echo "...continuous integration..."
@@ -101,6 +124,10 @@ after_script:
     services:
         - docker:dind
     variables: &docker_variables
+        DOCKER_DRIVER: "overlay2"
+        STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
+        DTR_NAMESPACE: "doevelopper"
+        DOCKER_HOST: tcp://docker:2375    
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE}
@@ -132,22 +159,26 @@ docker:build:docker-base:
     services:
         - docker:dind
     variables:
+        GOAL: build
+        MODULE: "dind"
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         DOCKER_TLS_CERTDIR: ""
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
     script:
-        - docker pull dokcer.io/doevelopper/dind:0.0.2 || true
+        - echo " Building ${DOCKER_FILE}"
+        - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
+        - docker pull ${DOCKER_FILE} || true
         - docker build
             --label org.label-schema.maintainer="${CI_PROJECT_NAMESPACE}"
-            --label org.label-schema.title="dind docker-compose"
+            --label org.label-schema.title="CFS Docker in Docker"
             --label org.label-schema.description="Dind docker-compose make git"
             --label org.label-schema.name="${CONTAINER}"
             --label org.label-schema.license="Apache 2"
-            --label org.label-schema.is-production="no"
-            --label org.label-schema.is-beta="yes"
-            --label org.label-schema.schema-version="${VERSION}"
+            --label org.label-schema.is-production="yes"
+            --label org.label-schema.is-beta="no"
+            --label org.label-schema.schema-version="${STAGING_REGISTRY}/${DTR_NAMESPACE}/docker-dind-base:${VERSION}"
             --label org.label-schema.url="$(GIT_REPOS_URL)"
             --label org.label-schema.usage="dind"
             --label org.label-schema.vcs-ref="${COMMIT_ID}"
