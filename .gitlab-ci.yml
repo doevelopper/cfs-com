@@ -56,8 +56,7 @@ variables:
 before_script:
     - date
     - docker version || true
-    - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" docker.io --password-stdin
-#    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY--password-stdin
+    - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin docker.io
     - echo "Starting Gitlab CI-controlled ..."
     - echo "...continuous integration..."
     - echo "... continuous deployement..."
