@@ -165,7 +165,8 @@ docker:build:docker-base:
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         DOCKER_DIRVER: overlay2
-        DOCKER_HOST: tcp://docker:2375
+        DOCKER_CERT_PATH: "/certs"
+        # DOCKER_HOST: tcp://docker:2375
         # DOCKER_TLS_VERIFY: 1
         # DOCKER_CERT_PATH: "/certs/client"
         # DOCKER_TLS_CERTDIR: ""
