@@ -81,8 +81,8 @@ after_script:
     retry: 1
     tags:
         # - agent-smith
-        - gitlab-org
-        # - docker
+        # - gitlab-org
+        - docker
 
 
 .only_stable: &only_stable
@@ -165,7 +165,11 @@ docker:build:docker-base:
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         DOCKER_DIRVER: overlay2
-        DOCKER_CERT_PATH: "/certs"
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"
+        # DOCKER_CERT_PATH: "/certs"
         # DOCKER_HOST: tcp://docker:2375
         # DOCKER_TLS_VERIFY: 1
         # DOCKER_CERT_PATH: "/certs/client"
