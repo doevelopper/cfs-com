@@ -152,22 +152,21 @@ after_script:
         # - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
 # docker:dind with docker-compose
+# https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
 docker:build:docker-base:
     stage: Build docker image
     <<: *agent-who
-    image: docker:19
+    image: docker:19.03.0
     services:
-        - name: docker:dind
-          entrypoint: ["env", "-u", "DOCKER_HOST"]
-          command: ["dockerd-entrypoint.sh"]  
+        - docker:19.03.0-dind
     variables:
         GOAL: build
         MODULE: "dind"
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
-        DOCKER_DIRVER: "overlay2"
+        DOCKER_DIRVER: overlay2
         DOCKER_HOST: tcp://docker:2375       
-        DOCKER_TLS_CERTDIR: ""
+        DOCKER_TLS_CERTDIR: "/certs"
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
     script:
