@@ -168,7 +168,7 @@ docker:build:docker-base:
         DOCKER_HOST: tcp://docker:2375
         # DOCKER_TLS_VERIFY: 1
         # DOCKER_CERT_PATH: "/certs/client"
-        DOCKER_TLS_CERTDIR: ""
+        # DOCKER_TLS_CERTDIR: ""
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
     script:
