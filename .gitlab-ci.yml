@@ -157,12 +157,16 @@ docker:build:docker-base:
     <<: *agent-who
     image: docker:19
     services:
-        - docker:dind
+        - name: docker:dind
+          entrypoint: ["env", "-u", "DOCKER_HOST"]
+          command: ["dockerd-entrypoint.sh"]  
     variables:
         GOAL: build
         MODULE: "dind"
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
+        DOCKER_DIRVER: "overlay2"
+        DOCKER_HOST: tcp://docker:2375       
         DOCKER_TLS_CERTDIR: ""
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
