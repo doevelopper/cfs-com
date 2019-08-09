@@ -177,9 +177,9 @@ docker:build:docker-base:
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
     script:
-        - echo " Building ${DOCKER_FILE}"
+        - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        - docker pull ${DOCKER_FILE} || true
+        - docker pull ${CONTAINER} || true
         - docker build
             --label org.label-schema.maintainer="${CI_PROJECT_NAMESPACE}"
             --label org.label-schema.title="CFS Docker in Docker"
@@ -189,13 +189,13 @@ docker:build:docker-base:
             --label org.label-schema.is-production="yes"
             --label org.label-schema.is-beta="no"
             --label org.label-schema.schema-version="${STAGING_REGISTRY}/${DTR_NAMESPACE}/docker-dind-base:${VERSION}"
-            --label org.label-schema.url="$(GIT_REPOS_URL)"
+            --label org.label-schema.url="$(CI_REPOSITORY_URL)"
             --label org.label-schema.usage="dind"
             --label org.label-schema.vcs-ref="${COMMIT_ID}"
-            --label org.label-schema.vcs-url="$(GIT_REPOS_URL)"
+            --label org.label-schema.vcs-url="$(CI_REPOSITORY_URL)"
             --label org.label-schema.vcs-type="Git  SCM"
             --label org.label-schema.vendor="Acme Systems Engineering"
-            --label org.label-schema.documentation="$(GIT_REPOS_URL)"
+            --label org.label-schema.documentation="$(CI_REPOSITORY_URL)"
             --label org.label-schema.version="${VERSION}"
             --label org.label-schema.docker.cmd="make dind run"
             --label org.label-schema.docker.dockerfile="${DOCKER_FILE}"
