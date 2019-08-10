@@ -4,7 +4,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
-    && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
+   && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
@@ -20,64 +20,65 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
         libc6-dev libgtk-3-0 libpango-1.0-0 \
         htop emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
         x11-xserver-utils libxkbfile1 \
-    && mkdir -pv /var/run/dbus \
-    && apt-get clean --assume-yes  \
-    && apt-get --assume-yes --quiet clean \
-    && apt-get --assume-yes --quiet autoremove \
-    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
-    && rm -rf /usr/share/man/
+   && mkdir -pv /var/run/dbus \
+   && apt-get clean --assume-yes  \
+   && apt-get --assume-yes --quiet clean \
+   && apt-get --assume-yes --quiet autoremove \
+   && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
+   && rm -rf /usr/share/man/
 
         # libcairo2 libfontconfig1 libnss3 libxtst6 libglib2.0-bin \
         # libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
         # software-properties-common autogen libnotify-bin \
 
 RUN cd /tmp \
-    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
-    && tar -xvvf gdb-8.3.tar.gz \
-    && cd gdb-8.3 \
-    && ./configure \
-    && make \
-    && make install \
-    && cd /tmp \
-    && rm -rf gdb-8.3.tar.gz gdb-8.3
+   && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   && tar -xvvf gdb-8.3.tar.gz \
+   && cd gdb-8.3 \
+   && ./configure \
+   && make \
+   && make install \
+   && cd /tmp \
+   && rm -rf gdb-8.3.tar.gz gdb-8.3
 
 ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
-ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.1}
+ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
 RUN cd /tmp \
-    && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-    && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
-    && rm -v cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-    && mv -v cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
+   && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
+   && rm -v cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && mv -v cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
 RUN  cd /tmp \
-    && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
-    && unzip ninja-linux.zip \
-    && mv ninja /usr/bin/ninja \
-    && rm ninja-linux.zip
+   && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
+   && unzip ninja-linux.zip \
+   && mv ninja /usr/bin/ninja \
+   && rm ninja-linux.zip
 
 #curl -L -C - -b "oraclelicense=accept-securebackup-cookie" -O 'https://download.oracle.com/otn/java/jdk/8u221-b11/230deb18db3e4014bb8e3e8324f81b43/jdk-8u221-linux-x64.tar.gz'
-#    && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
+#  http://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/jdk-8u212-linux-x64.tar.gz
+# COPY jdk-8u212-linux-x64.tar.gz /tmp
 
-COPY jdk-8u212-linux-x64.tar.gz /tmp
 RUN  cd /tmp \
-    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
-    && rm -v jdk-8u212-linux-x64.tar.gz
+   && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
+   && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+   && rm -v jdk-8u212-linux-x64.tar.gz
 
 ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
-    &&  wget --no-check-certificate \
-    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
-    && tar -xvzf apache-maven-${MVN_VERSION}-bin.tar.gz \
-    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
-    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
+   &&  wget --no-check-certificate \
+   https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xvzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
+   && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
 ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
 RUN cd /tmp \
-    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-    && mkdir -pv /opt/gradle \
-    && unzip gradle-${GRADLE_VERSION}-bin.zip \
-    && mv -v gradle-${GRADLE_VERSION}  /opt/gradle/ \
-    && rm -vf gradle-${GRADLE_VERSION}-bin.zip
+   && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+   && mkdir -pv /opt/gradle \
+   && unzip gradle-${GRADLE_VERSION}-bin.zip \
+   && mv -v gradle-${GRADLE_VERSION}  /opt/gradle/ \
+   && rm -vf gradle-${GRADLE_VERSION}-bin.zip
 
 
 ENV JAVA_HOME /opt/jdk1.8.0_212
@@ -85,20 +86,20 @@ ENV JRE_HOME /opt/jdk1.8.0_212/jre
 ENV M2_HOME /opt/apache-maven/
 ENV M2 $M2_HOME/bin
 ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
-        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
+        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=512M"
 ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin:/opt/cmake/bin
 ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
 ARG BAZEL_VERSION
 ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
 RUN cd /tmp \
-    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
-    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
+   && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+   && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
+   && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+   && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 
 RUN pip install -q --no-cache-dir conan \
-    && pip install --upgrade conan_package_tools
+   && pip install --upgrade conan_package_tools
 
 #RUN cd /tmp \
 #    && wget --no-check-certificate https://github.com/conan-io/conan/releases/download/1.18.1/conan-ubuntu-64_1_18_1.deb
@@ -135,64 +136,64 @@ RUN pip install -q --no-cache-dir conan \
 #    cmake .. -G "Unix Makefiles"
     
 RUN cmake --version \
-    && make --version \
-    && gcc --version \
-    && java -version \
-    && mvn --version \
-    && gradle -v \
-    && bazel version \
-    && conan --version || true
+   && make --version \
+   && gcc --version \
+   && java -version \
+   && mvn --version \
+   && gradle -v \
+   && bazel version \
+   && conan --version || true
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
-    && cd uncrustify \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf uncrustify
+   && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
+   && cd uncrustify \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf uncrustify
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/danmar/cppcheck.git \
-    && cd cppcheck \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first  \
-    && cmake --build build --target install \
-    && cp --recursive --verbose cfg  /usr/local/bin || true \
-    && cd /tmp \
-    && rm -rvf cppcheck
+   && git clone --depth=1 https://github.com/danmar/cppcheck.git \
+   && cd cppcheck \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target install \
+   && cp --recursive --verbose cfg  /usr/local/bin || true \
+   && cd /tmp \
+   && rm -rvf cppcheck
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/doxygen/doxygen.git  \
-    && cd doxygen \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first  \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf doxygen
+   && git clone --depth=1 https://github.com/doxygen/doxygen.git  \
+   && cd doxygen \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf doxygen
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/google/googletest.git \
-    && cd googletest \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first  \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf googletest
+   && git clone --depth=1 https://github.com/google/googletest.git \
+   && cd googletest \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf googletest
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/google/benchmark.git \
-    && cd benchmark \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first  \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf benchmark
+   && git clone --depth=1 https://github.com/google/benchmark.git \
+   && cd benchmark \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf benchmark
 
 # RUN pip install cmakedoc
 # RUN cd /tmp \
@@ -211,26 +212,26 @@ ARG BOOST_VERSION_PATCH=0
 ARG BOOST_VERSION=1.69.0
 ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
 RUN cd /tmp \
-    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
-    && tar xfz boost_${BOOST_RELEASE}.tar.gz > /dev/null \
-    && cd boost_${BOOST_RELEASE} \
-    && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
-    && ./b2 --help \
-    && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
-    && ./b2 install --prefix=/usr/ \
-    && cd /tmp \
-    && rm -rvf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
+   && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
+   && tar xfz boost_${BOOST_RELEASE}.tar.gz > /dev/null \
+   && cd boost_${BOOST_RELEASE} \
+   && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
+   && ./b2 --help \
+   && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
+   && ./b2 install --prefix=/usr/ \
+   && cd /tmp \
+   && rm -rvf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
 #sml requires GCC >= 6.0.0
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/boost-experimental/sml.git \
-    && cd sml \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first -- -j `nproc` \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf sml
+   && git clone --depth=1 https://github.com/boost-experimental/sml.git \
+   && cd sml \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first -- -j `nproc` \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf sml
 
 RUN cd /tmp \
    && git clone --depth=1 --recurse-submodules https://github.com/cucumber/cucumber-cpp.git \
@@ -286,25 +287,25 @@ RUN cd /tmp \
 
 RUN cd /tmp \
 #    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
-    && cd openssl \
+   && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
+   && cd openssl \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
 #    && ./config --prefix=/usr  \
-    && ./config --prefix=/usr shared  \
-    && make  -j `nproc` \
-    && make install \
-    && cd /tmp \
-    && rm -rvf openssl
+   && ./config --prefix=/usr shared  \
+   && make  -j `nproc` \
+   && make install \
+   && cd /tmp \
+   && rm -rvf openssl
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
-    && cd protobuf \
-    && ./autogen.sh \
+   && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
+   && cd protobuf \
+   && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
-    && ./configure --prefix=/usr/ \
-    && make clean && make -j `nproc` && make install \
-    && cd /tmp \
-    && rm -rf protobuf
+   && ./configure --prefix=/usr/ \
+   && make clean && make -j `nproc` && make install \
+   && cd /tmp \
+   && rm -rf protobuf
 
 ENV PROTOBUF_HOME /usr
 
@@ -322,44 +323,44 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
 
 ARG APR_VERSION=1.7.0
 RUN cd /tmp \
-    && curl -L -O -k https://www-us.apache.org/dist/apr/apr-${APR_VERSION}.tar.gz  \
-    && tar -xvzf apr-${APR_VERSION}.tar.gz > /dev/null  \
-    && cd apr-${APR_VERSION} \
-    && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
+   && curl -L -O -k https://www-us.apache.org/dist/apr/apr-${APR_VERSION}.tar.gz  \
+   && tar -xvzf apr-${APR_VERSION}.tar.gz > /dev/null  \
+   && cd apr-${APR_VERSION} \
+   && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
-    && make clean && make && make install  \
-    && cd /tmp \
-    && rm -rvf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
+   && make clean && make && make install  \
+   && cd /tmp \
+   && rm -rvf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
 RUN cd /tmp \
-    && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
-    && cd libexpat/expat  \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-    && cmake --build build --target all --clean-first  \
-    && cmake --build build --target install \
-    && cd /tmp \
-    && rm -rvf libexpat
+   && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
+   && cd libexpat/expat  \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rvf libexpat
 
 ARG APU_VERSION=1.6.1
 RUN cd /tmp \
-    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
-    && tar -xvzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
-    && cd apr-util-${APU_VERSION} \
-    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
-    && make clean && make && make install  \
-    && cd /tmp \
-    && rm -rvf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
+   && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
+   && tar -xvzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
+   && cd apr-util-${APU_VERSION} \
+   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
+   && make clean && make && make install  \
+   && cd /tmp \
+   && rm -rvf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
 RUN cd /tmp \
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
-    && cd logging-log4cxx  \
-    && ./autogen.sh \
-    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
+   && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
+   && cd logging-log4cxx  \
+   && ./autogen.sh \
+   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
-    && make clean && make && make install  \
-    && cd /tmp \
-    && rm -rvf logging-log4cxx
+   && make clean && make && make install  \
+   && cd /tmp \
+   && rm -rvf logging-log4cxx
 
 RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/catchorg/Catch2.git \
@@ -382,7 +383,7 @@ RUN cd /tmp \
 	&& rm -Rf breakpad
 
 RUN cd /opt \
-    && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
+   && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
 ENV  PATH /opt/depot_tools:$PATH
 
 

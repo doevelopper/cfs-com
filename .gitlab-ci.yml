@@ -43,7 +43,7 @@ variables:
     ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
-    # CI_DEBUG_TRACE: "true"
+    CI_DEBUG_TRACE: "true"
     DOCKER_DRIVER: "overlay2"
     STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
     DTR_NAMESPACE: doevelopper
@@ -200,7 +200,7 @@ after_script:
             --label org.label-schema.vcs-url="$CI_REPOSITORY_URL"
             --label org.label-schema.vcs-type="Git  SCM"
             --label org.label-schema.vendor="Acme Systems Engineering"
-            --label org.label-schema.documentation="$CI_REPOSITORY_URL"
+            --label org.label-schema.documentation="$CI_PAGES_URL"
             --label org.label-schema.version="${VERSION}"
             --label org.label-schema.docker.cmd="make dind run"
             --label org.label-schema.docker.dockerfile="${DOCKER_FILE}"
@@ -210,6 +210,11 @@ after_script:
         - time docker tag ${CONTAINER} ${CONTAINER_LATEST}
         - time docker push ${CONTAINER}
         - time docker push ${CONTAINER_LATEST}
+    only:
+       # refs:
+           # - schedules
+       variables:
+           - $PHASE == "bootstrap"
 
 docker:build:dds-base:
     stage: Build docker image
