@@ -27,7 +27,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get update \
-    && apt-get install curl git make wget openssh locales \ 
+    && apt-get install curl git make wget locales \ 
         software-properties-common apt-transport-https ca-certificates \ 
         gnupg2 lsb-release --assume-yes \
     && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - \
@@ -55,7 +55,7 @@ RUN \
 # # Install helm
 # Note: Latest version of helm may be found at:
 # https://github.com/kubernetes/helm/releases
-ENV HELM_VERSION="v2.14.2"
+ENV HELM_VERSION="v2.14.3"
 RUN wget -q https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm
 
