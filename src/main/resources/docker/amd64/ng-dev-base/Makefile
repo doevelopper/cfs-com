@@ -69,12 +69,13 @@ else
     CONTAINER_IMAGE ?= $(IMAGE)-dev
 endif
 
+BUILD_ARGS          =  --build-arg MAKEFLAGS=$(MAKEFLAGS)
 ifneq ($(PROXY_URL),)
-    BUILD_ARGS          =  --build-arg http_proxy=$(PROXY_URL)
+    BUILD_ARGS          +=  --build-arg http_proxy=$(PROXY_URL)
     BUILD_ARGS          += --build-arg https_proxy=$(PROXY_URL)
     BUILD_ARGS          += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
 else
-    BUILD_ARGS          =
+    BUILD_ARGS          +=""
 endif
 
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"

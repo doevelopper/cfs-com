@@ -31,12 +31,14 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
         # libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
         # software-properties-common autogen libnotify-bin \
 
+ARG MAKEFLAGS
+
 RUN cd /tmp \
    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xvvf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure \
-   && make --silent -j `nproc`  \
+   && make \
    && make install \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
@@ -45,7 +47,7 @@ ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
 ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
 RUN cd /tmp \
    && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-   && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
+   && tar -xzf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
    && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
    && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
@@ -61,7 +63,7 @@ RUN  cd /tmp \
 
 RUN  cd /tmp \
    && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
-   && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+   && tar -xzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
    && rm jdk-8u212-linux-x64.tar.gz
 
 ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
@@ -77,7 +79,7 @@ RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
    && unzip gradle-${GRADLE_VERSION}-bin.zip \
-   && mv - gradle-${GRADLE_VERSION}  /opt/gradle/ \
+   && mv gradle-${GRADLE_VERSION}  /opt/gradle/ \
    && rm -f gradle-${GRADLE_VERSION}-bin.zip
 
 
@@ -213,7 +215,7 @@ ARG BOOST_VERSION=1.69.0
 ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
 RUN cd /tmp \
    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
-   && tar xfz boost_${BOOST_RELEASE}.tar.gz > /dev/null \
+   && tar xzf boost_${BOOST_RELEASE}.tar.gz > /dev/null \
    && cd boost_${BOOST_RELEASE} \
    && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
    && ./b2 --help \
@@ -292,7 +294,7 @@ RUN cd /tmp \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
 #    && ./config --prefix=/usr  \
    && ./config --prefix=/usr shared  \
-   && make --silent -j `nproc` \
+   && make \
    && make install \
    && cd /tmp \
    && rm -rf openssl
@@ -303,20 +305,20 @@ RUN cd /tmp \
    && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
    && ./configure --prefix=/usr/ \
-   && make clean && make --silent -j `nproc` && make install \
+   && make clean && make && make install \
    && cd /tmp \
    && rm -rf protobuf
 
 ENV PROTOBUF_HOME /usr
 
 RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/xerces-c-3.2.2.tar.gz \
-   && tar -xvzf xerces-c-3.2.2.tar.gz  > /dev/null \
+   && tar -xzf xerces-c-3.2.2.tar.gz  > /dev/null \
    && cd xerces-c-3.2.2/ \
    && ./configure --prefix=/usr/local \
            --enable-static --enable-shared --enable-netaccessor-socket \
            --enable-transcoder-gnuiconv --enable-transcoder-iconv \
            --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t \
-   && make clean && make --silent -j `nproc` && make install \
+   && make clean && make && make install \
    && cd /tmp \
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
@@ -324,11 +326,11 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
 ARG APR_VERSION=1.7.0
 RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist/apr/apr-${APR_VERSION}.tar.gz  \
-   && tar -xvzf apr-${APR_VERSION}.tar.gz > /dev/null  \
+   && tar -xzf apr-${APR_VERSION}.tar.gz > /dev/null  \
    && cd apr-${APR_VERSION} \
    && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
-   && make clean && make --silent && make install  \
+   && make clean && make && make install  \
    && cd /tmp \
    && rm -rf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
@@ -345,10 +347,10 @@ RUN cd /tmp \
 ARG APU_VERSION=1.6.1
 RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
-   && tar -xvzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
+   && tar -xzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
    && cd apr-util-${APU_VERSION} \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
-   && make clean && make --silent && make install  \
+   && make clean && make && make install  \
    && cd /tmp \
    && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
@@ -358,7 +360,7 @@ RUN cd /tmp \
    && ./autogen.sh \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
-   && make clean && make --silent && make install  \
+   && make clean && make && make install  \
    && cd /tmp \
    && rm -rf logging-log4cxx
 
@@ -377,7 +379,7 @@ RUN cd /tmp \
 	&& cd breakpad \
 	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
 	&& ./configure --prefix=/usr/local \
-	&& make --silent -j `nproc` \
+	&& make \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf breakpad
