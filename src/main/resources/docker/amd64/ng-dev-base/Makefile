@@ -48,7 +48,7 @@ NEXT_MINOR_VERSION  = $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
 NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)
 
 TOP_LEVEL_DIR       := $(shell git rev-parse --show-toplevel)
-TARGETS             ?= linux/amd64 linux/arm64  windows/amd64
+TARGETS             ?= linux/amd64 linux/arm64 windows/amd64
 SHELL               = /usr/bin/env bash
 DOCKER_SHELL        := /bin/sh
 DOCKER              = docker
@@ -112,8 +112,8 @@ build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images
 
 .PHONY: build-image
 build-image:
-	@echo "$(CLR_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(CLR_DEFAULT)"
-	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+	@echo "$(CLR_CY_AN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(CLR_DE_FAULT)"
+	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
 	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
 .PHONY: push

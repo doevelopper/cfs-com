@@ -37,9 +37,9 @@ RUN cd /tmp \
    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xvvf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
-   && ./configure \
-   && make  > /dev/null 2>&1 \
-   && make install \
+   && ./configure > /dev/null 2>&1 \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -307,7 +307,7 @@ RUN cd /tmp \
    && ./configure --prefix=/usr/ \
    && make clean \ 
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf protobuf
 
