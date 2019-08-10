@@ -99,6 +99,71 @@ else
     BUILD_ARGS      +=
 endif
 
+ .PHONY: dtr-login
+dtr-login: ## loging to DTR
+	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+
+.PHONY: dtr-logout
+dtr-logout: ## Logout from DTR
+	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
+
+.PHONY: build
+build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images base.
+
+.PHONY: build-image
+build-image:
+	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
+	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
+
+.PHONY: push
+ push: push-image ## Push docker image to DTR.
+
+.PHONY: push-image
+push-image:
+	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
+	@$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	@echo
+	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
+	@$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
+	@$(DOCKER) push $(BUILDER_FQIN):latest
+	@echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
+	@echo "Image pushed to DTR"
+
+.PHONY: run
+run : run-image ## Run docker image.
+
+.PHONY: run-image
+run-image : build-image
+	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
+	$(DOCKER) run --rm \
+        --name="dev-build" \
+        --hostname="docker-dev-build" \
+        --volume ${HOME}/.conan:/home/developer/.conan \
+        --volume ${HOME}/.ssh:/home/developer/.ssh \
+        --volume ${HOME}/.m2:/home/developer/.m2 \
+        --volume $(PWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
+        --volume $(PWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
+        --volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
+        --volume $(PWD):/home/developer/workspace \
+        --volume /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY}  \
+        --tty --interactive $(BUILDER_FQIN):$(VERSION)  
+        # || exit $?
+
+.PHONY: versioninfo
+versioninfo: ## Display informations about the image.
+	@echo "Version file: $(VERSIONFILE)"
+	@echo "Current version: $(VERSION)"
+	@echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
+	@echo "Last tag: $(LAST_TAG)"
+	@echo "Build: $(BUILD) (total number of commits)"
+	@echo "next major version: $(NEXT_MAJOR_VERSION)"
+	@echo "next minor version: $(NEXT_MINOR_VERSION)"
+	@echo "next patch version: $(NEXT_PATCH_VERSION)"
+	@echo "--------------"
+	@echo "Previous version file '$(VERSIONFILE)' commit: $(PREVIOUS_VERSIONFILE_COMMIT)"
+	@echo "Previous version **from** version file: '$(PREVIOUS_VERSION)'"
+
 .PHONY: image-info
 image-info: ## Display docker image information.
 	@docker inspect --format='Description:  {{.Config.Labels.Description}}' $(BUILDER_FQIN)

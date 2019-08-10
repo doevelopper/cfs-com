@@ -69,6 +69,8 @@ else
 
 endif
 
+SILENT_FLAG = '--no-print-directory -j$(shell nproc --all) --silent'
+
 COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
 COMMON_IMG_BUILD_OPTS += DTR_NAMESPACE=$(DTR_NAMESPACE)
 COMMON_IMG_BUILD_OPTS += DOCKER_TRUSTED_REGISTRY=$(DOCKER_TRUSTED_REGISTRY)
@@ -81,16 +83,16 @@ COMMON_IMG_BUILD_OPTS += GIT_BRANCH=$(GIT_BRANCH)
 COMMON_IMG_BUILD_OPTS += GIT_REPOS_URL=$(GIT_REPOS_URL)
 COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
 COMMON_IMG_BUILD_OPTS += PROXY_URL=$(PROXY_URL)
-# COMMON_IMG_BUILD_OPTS += DK_MKFALGS="--no-print-directory -j$[$(nproc) + 1]  --silent"
+COMMON_IMG_BUILD_OPTS += DK_MKFALGS=${SILENT_FLAG}
 
 .PHONY: dind
-dind: ## Docker + docker-compose for DIND 
+dind: ## Docker + docker-compose for 
 	@echo "$@ -> from $<"
 	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ ${GOAL}
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
-	# @$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
 
 .PHONY: opendds
 opendds: dds-base ## Build dev environment for OpenDDS
@@ -139,7 +141,6 @@ list_volumes: ## List all volumes.
 
 .PHONY: show-info
 show-info:
-#	$(call blue, "  # $@ -> ...")
 	$(call blue, "  # $@ -> from $< ...")
 
 .PHONY: help
@@ -161,7 +162,7 @@ notice:
 	@echo "  it is intended only as a convenience for local development   "
 	@echo "  please maintain consistency between this and the jenkinsfile "
 	@echo " "
-,
+
 # FUNCTIONS
 define blue
 	# @tput setaf 4

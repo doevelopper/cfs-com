@@ -148,7 +148,7 @@ after_script:
         MODULE: "dind"
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=${ARCH} DOCKER_FILE=${DOCKER_FILE} DTR_PASSWORD=$DOCKER_PASSWORD
     before_script:
-        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"        
+        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
     script:
         - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
         - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
@@ -223,7 +223,6 @@ docker:build:dds-base:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/ng-dev-base/Dockerfile
-        GOAL: ""
         MODULE: "dds-base"
         DOCKER_TLS_CERTDIR: ""
         DOCKER_HOST: tcp://docker:2375
