@@ -43,7 +43,7 @@ variables:
     ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
-    CI_DEBUG_TRACE: "true"
+    # CI_DEBUG_TRACE: "true"
     DOCKER_DRIVER: "overlay2"
     STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
     DTR_NAMESPACE: doevelopper

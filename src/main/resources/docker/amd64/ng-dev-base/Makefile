@@ -112,7 +112,7 @@ image-info: ## Display docker image information.
 	@docker inspect --format='Container : {{.Config.Image}}' $(BUILDER_FQIN)
 	@docker inspect --format='{{.}} ' $(BUILDER_FQIN)
 	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
-#	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
+	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
 
 .PHONY: versioninfo
 versioninfo: ## Display informations about the image.
@@ -142,7 +142,7 @@ build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images
 .PHONY: build-image
 build-image:
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+	# @$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
 .PHONY: push
