@@ -229,8 +229,8 @@ docker:build:dds-base:
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} DTR_PASSWORD=$DOCKER_PASSWORD
         DOCKER_TLS_CERTDIR: ""
         DOCKER_HOST: tcp://docker:2375
-    before_script:
-        - MAKEFLAGS="--no-print-directory -j$[$(nproc) + 1]  --silent"
+    # before_script:
+        # - MAKEFLAGS="--no-print-directory -j$[$(nproc) + 1]  --silent"
 
 
 .docker:build:omg-opendds:

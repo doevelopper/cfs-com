@@ -73,8 +73,8 @@ endif
 # MAKESHELL = sh
 # MAKEFLAGS = --no-builtin-rules
 # MAKEFLAGS += --no-builtin-variables
-MAKEFLAGS += --no-print-directory
-MAKEFLAGS += --silent
+# MAKEFLAGS += --no-print-directory
+# MAKEFLAGS += --silent
 # MAKEFLAGS += --output-sync=target
 
 COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
@@ -89,7 +89,7 @@ COMMON_IMG_BUILD_OPTS += GIT_BRANCH=$(GIT_BRANCH)
 COMMON_IMG_BUILD_OPTS += GIT_REPOS_URL=$(GIT_REPOS_URL)
 COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
 COMMON_IMG_BUILD_OPTS += PROXY_URL=$(PROXY_URL)
-COMMON_IMG_BUILD_OPTS += DK_MKFALGS=$(MAKEFLAGS)
+COMMON_IMG_BUILD_OPTS += DK_MKFALGS="--no-print-directory -j$[$(nproc) + 1]  --silent"
 
 .PHONY: dind
 dind: ## Docker + docker-compose for DIND 
