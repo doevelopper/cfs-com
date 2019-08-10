@@ -36,7 +36,7 @@ RUN cd /tmp \
    && tar -xvvf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure \
-   && make \
+   && make --silent -j `nproc`  \
    && make install \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
@@ -46,8 +46,8 @@ ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
 RUN cd /tmp \
    && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
    && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
-   && rm -v cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-   && mv -v cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
+   && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
 RUN  cd /tmp \
    && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
@@ -62,13 +62,13 @@ RUN  cd /tmp \
 RUN  cd /tmp \
    && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
-   && rm -v jdk-8u212-linux-x64.tar.gz
+   && rm jdk-8u212-linux-x64.tar.gz
 
 ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
    &&  wget --no-check-certificate \
    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
-   && tar -xvzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz \
    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
@@ -77,8 +77,8 @@ RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
    && unzip gradle-${GRADLE_VERSION}-bin.zip \
-   && mv -v gradle-${GRADLE_VERSION}  /opt/gradle/ \
-   && rm -vf gradle-${GRADLE_VERSION}-bin.zip
+   && mv - gradle-${GRADLE_VERSION}  /opt/gradle/ \
+   && rm -f gradle-${GRADLE_VERSION}-bin.zip
 
 
 ENV JAVA_HOME /opt/jdk1.8.0_212
@@ -149,51 +149,51 @@ RUN cd /tmp \
    && cd uncrustify \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first \
+   && cmake --build build --target all --clean-first -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf uncrustify
+   && rm -rf uncrustify
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/danmar/cppcheck.git \
    && cd cppcheck \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target all --clean-first  -- --silent \
    && cmake --build build --target install \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
-   && rm -rvf cppcheck
+   && rm -rf cppcheck
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/doxygen/doxygen.git  \
    && cd doxygen \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target all --clean-first -- --silent  \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf doxygen
+   && rm -rf doxygen
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/googletest.git \
    && cd googletest \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target all --clean-first -- --silent  \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf googletest
+   && rm -rf googletest
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/benchmark.git \
    && cd benchmark \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target all --clean-first -- --silent  \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf benchmark
+   && rm -rf benchmark
 
 # RUN pip install cmakedoc
 # RUN cd /tmp \
@@ -202,7 +202,7 @@ RUN cd /tmp \
    # && ./configure --prefix=/usr \
    # && make install \
    # && cd /tmp \
-   # && rm -Rvf stdman
+   # && rm -Rf stdman
 
 ENV MANPATH=${MANPATH}:/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
@@ -220,7 +220,7 @@ RUN cd /tmp \
    && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
    && ./b2 install --prefix=/usr/ \
    && cd /tmp \
-   && rm -rvf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
+   && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
 #sml requires GCC >= 6.0.0
 RUN cd /tmp \
@@ -228,10 +228,10 @@ RUN cd /tmp \
    && cd sml \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- -j `nproc` \
+   && cmake --build build --target all --clean-first -- -j `nproc` -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf sml
+   && rm -rf sml
 
 RUN cd /tmp \
    && git clone --depth=1 --recurse-submodules https://github.com/cucumber/cucumber-cpp.git \
@@ -240,20 +240,20 @@ RUN cd /tmp \
    && bundle install \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-   && cmake --build build --target all --clean-first \
+   && cmake --build build --target all --clean-first -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf cucumber-cpp
+   && rm -rf cucumber-cpp
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/double-conversion.git \
    && cd double-conversion \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- -j `nproc` \
+   && cmake --build build --target all --clean-first -- -j `nproc` -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf double-conversion
+   && rm -rf double-conversion
 
 #RUN cd /tmp \
 #   && git clone --depth=1 https://github.com/google/cctz.git \
@@ -264,17 +264,17 @@ RUN cd /tmp \
 #   && ctest \
 #   && cmake --build build --config Release --target install \
 #   && cd /tmp \
-#   && rm -rvf cctz
+#   && rm -rf cctz
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/capture-thread.git \
    && cd capture-thread \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first \
+   && cmake --build build --target all --clean-first -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf capture-thread
+   && rm -rf capture-thread
 
 # RUN cd /tmp \
    # && git clone --depth=1 https://github.com/google/statechart.git \
@@ -292,10 +292,10 @@ RUN cd /tmp \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
 #    && ./config --prefix=/usr  \
    && ./config --prefix=/usr shared  \
-   && make  -j `nproc` \
+   && make --silent -j `nproc` \
    && make install \
    && cd /tmp \
-   && rm -rvf openssl
+   && rm -rf openssl
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
@@ -303,7 +303,7 @@ RUN cd /tmp \
    && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
    && ./configure --prefix=/usr/ \
-   && make clean && make -j `nproc` && make install \
+   && make clean && make --silent -j `nproc` && make install \
    && cd /tmp \
    && rm -rf protobuf
 
@@ -316,7 +316,7 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
            --enable-static --enable-shared --enable-netaccessor-socket \
            --enable-transcoder-gnuiconv --enable-transcoder-iconv \
            --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t \
-   && make clean && make -j `nproc` && make install \
+   && make clean && make --silent -j `nproc` && make install \
    && cd /tmp \
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
@@ -328,19 +328,19 @@ RUN cd /tmp \
    && cd apr-${APR_VERSION} \
    && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
-   && make clean && make && make install  \
+   && make clean && make --silent && make install  \
    && cd /tmp \
-   && rm -rvf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
+   && rm -rf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
    && cd libexpat/expat  \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first  \
+   && cmake --build build --target all --clean-first -- --silent \
    && cmake --build build --target install \
    && cd /tmp \
-   && rm -rvf libexpat
+   && rm -rf libexpat
 
 ARG APU_VERSION=1.6.1
 RUN cd /tmp \
@@ -348,9 +348,9 @@ RUN cd /tmp \
    && tar -xvzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
    && cd apr-util-${APU_VERSION} \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
-   && make clean && make && make install  \
+   && make clean && make --silent && make install  \
    && cd /tmp \
-   && rm -rvf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
+   && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
 RUN cd /tmp \
    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
@@ -358,16 +358,16 @@ RUN cd /tmp \
    && ./autogen.sh \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
-   && make clean && make && make install  \
+   && make clean && make --silent && make install  \
    && cd /tmp \
-   && rm -rvf logging-log4cxx
+   && rm -rf logging-log4cxx
 
 RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/catchorg/Catch2.git \
 	&& cd Catch2 \
 	&& cmake -E make_directory build \
 	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first \
+	&& cmake --build build --target all --clean-first -- --silent \
 	&& cmake --build build --target install || true \
 	&& cd /tmp \
 	&& rm -Rf Catch2
@@ -377,7 +377,7 @@ RUN cd /tmp \
 	&& cd breakpad \
 	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
 	&& ./configure --prefix=/usr/local \
-	&& make -j `nproc` \
+	&& make --silent -j `nproc` \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf breakpad

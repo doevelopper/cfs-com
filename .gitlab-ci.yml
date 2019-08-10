@@ -229,3 +229,51 @@ docker:build:dds-base:
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} DTR_PASSWORD=$DOCKER_PASSWORD
         DOCKER_TLS_CERTDIR: ""
         DOCKER_HOST: tcp://docker:2375
+
+.docker:build:omg-opendds:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}-opendds
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/omg/Dockerfile
+    only:
+       variables:
+           - $BASE == "yes"
+
+.docker:build:adlinkist-vortex:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}-opensplice-vortex
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/adlinktech/Dockerfile
+    only:
+       variables:
+           - $BASE == "yes"
+
+.docker:build:eprosima-rtps:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}-fast-rtps
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/eprosima/Dockerfile
+    only:
+       variables:
+           - $BASE == "yes"
+
+.docker:build:rti-dds-base:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 5.3.3
+        IMAGE_NAME: ${CONTAINER_IMAGE}-rti-connext
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/rti/Dockerfile
+    only:
+       variables:
+           - $BASE == "yes"
