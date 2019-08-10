@@ -27,7 +27,9 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get update \
-    && apt-get install curl git make wget locales software-properties-common apt-transport-https ca-certificates gnupg2 lsb-release --assume-yes\
+    && apt-get install curl git make wget openssh locales \ 
+        software-properties-common apt-transport-https ca-certificates \ 
+        gnupg2 lsb-release --assume-yes \
     && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - \
     && add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" \
     && apt-get update \
@@ -40,12 +42,24 @@ RUN curl -k -L https://github.com/docker/compose/releases/download/1.24.1/docker
     && chmod +x /usr/local/bin/docker-compose \
     && docker-compose --version
 
+
 # # Install Kubectl
+# Note: Latest version of kubectl may be found at:
+# https://aur.archlinux.org/packages/kubectl-bin/
+ENV KUBE_LATEST_VERSION="v1.15.0"
 RUN \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
-RUN addgroup -S -g 1000 docker \
-	&& adduser -S -G docker -u 1000 docker
+
+# # Install helm
+# Note: Latest version of helm may be found at:
+# https://github.com/kubernetes/helm/releases
+ENV HELM_VERSION="v2.14.2"
+RUN wget -q https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
+    && chmod +x /usr/local/bin/helm
+
+# RUN addgroup -S -g 1000 docker \
+#   && adduser -S -G docker -u 1000 docker
 
 CMD ["/bin/bash"]
