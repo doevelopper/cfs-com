@@ -114,78 +114,6 @@ image-info: ## Display docker image information.
 	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
 	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
 
-.PHONY: versioninfo
-versioninfo: ## Display informations about the image.
-	@echo "Version file: $(VERSIONFILE)"
-	@echo "Current version: $(VERSION)"
-	@echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
-	@echo "Last tag: $(LAST_TAG)"
-	@echo "Build: $(BUILD) (total number of commits)"
-	@echo "next major version: $(NEXT_MAJOR_VERSION)"
-	@echo "next minor version: $(NEXT_MINOR_VERSION)"
-	@echo "next patch version: $(NEXT_PATCH_VERSION)"
-	@echo "--------------"
-	@echo "Previous version file '$(VERSIONFILE)' commit: $(PREVIOUS_VERSIONFILE_COMMIT)"
-	@echo "Previous version **from** version file: '$(PREVIOUS_VERSION)'"
-
- .PHONY: dtr-login
-dtr-login: ## loging to DTR
-	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
-
-.PHONY: dtr-logout
-dtr-logout: ## Logout from DTR
-	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
-
-.PHONY: build
-build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images base.
-
-.PHONY: build-image
-build-image:
-	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	# @$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
-	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
-
-.PHONY: push
- push: push-image ## Push docker image to DTR.
-
-.PHONY: push-image
-push-image:
-	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
-	@$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
-	@echo
-	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
-	@$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
-	@$(DOCKER) push $(BUILDER_FQIN):latest
-	@echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
-	@echo "Image pushed to DTR"
-
-.PHONY: run
-run : run-image ## Run docker image.
-
-.PHONY: run-image
-run-image : build-image
-	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
-	# $(DOCKER) run --rm \
-        # --volume ${HOME}/.conan:/home/developer/.conan \
-        # --volume ${HOME}/.ssh:/home/developer/.ssh \
-        # --volume ${HOME}/.vim:/home/developer/.vim \
-        # --volume ${HOME}/.vimrc:/home/developer/.vimrc \
-        # --volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
-        # --volume ${HOME}/.m2:/home/developer/.m2 \
-        # --volume $(PWD):/home/developer/workspace \
-        # --tty --interactive $(BUILDER_FQIN):$(VERSION)
-
-#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> eclipse
-#docker run --rm -it -v $(pwd):/home/java -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY <Image Name> netbeans
-#docker run --rm -ti -e HOST_PERMS="$(id -u):$(id -g)" --volume "${HOME}/.conan:/home/happyman/.conan" --volume ${HOME}/.vimrc:/home/happyman/.vim --volume ${HOME}/.vimrc:/home/happyman/.vimrc --volume ${HOME}/.bashrc:/home/happyman/.bashrc  <dtr>/ns/dds:latest --volume "$PWD:/home/happyman/workspace"
-# Run the docker
-# docker run --rm -ti --name="$CITBX_DOCKER_PREFIX-build" --hostname="$CITBX_DOCKER_PREFIX-build" \
-#     -e CI=true -e GITLAB_CI=true -v /var/run/docker.sock:/var/run/docker.sock \
-#     "${CITBX_DOCKER_RUN_ARGS[@]}" --label "$CITBX_DOCKER_PREFIX" "${CITBX_JOB_DOCKER_RUN_ARGS[@]}" \
-#     -e DOCKER_RUN_EXTRA_ARGS="$(bashopts_get_def bashopts_extra_args)" "${bashopts_extra_args[@]}" \
-#     $CITBX_DOCKER_IMAGE "${CITBX_PRE_COMMANDS[@]}" $CITBX_JOB_SHELL -c "$CITBX_COMMANDS" \
-#     || exit $?
-
 .PHONY: help
 help: ## Display this help and exits.
 	@echo "$@ ->"
@@ -197,15 +125,3 @@ help: ## Display this help and exits.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo
-
-
-define purple
-endef
-
-define purples
-	@tput setaf 5
-	@echo " "
-	@echo $1
-	@echo " "
-	@tput sgr0
-endef

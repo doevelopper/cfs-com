@@ -98,7 +98,7 @@ dind: ## Docker + docker-compose for DIND
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
+	# @$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
 
 .PHONY: opendds
 opendds: dds-base ## Build dev environment for OpenDDS
