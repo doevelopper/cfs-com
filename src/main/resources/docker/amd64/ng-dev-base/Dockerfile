@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
+RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
    && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
@@ -38,7 +38,7 @@ RUN cd /tmp \
    && tar -xvvf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure \
-   && make \
+   && make  > /dev/null \
    && make install \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
@@ -151,7 +151,7 @@ RUN cd /tmp \
    && cd uncrustify \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent \
+   && cmake --build build --target all --clean-first -- --silent > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf uncrustify
@@ -161,7 +161,7 @@ RUN cd /tmp \
    && cd cppcheck \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  -- --silent \
+   && cmake --build build --target all --clean-first  -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
@@ -172,7 +172,7 @@ RUN cd /tmp \
    && cd doxygen \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  \
+   && cmake --build build --target all --clean-first -- --silent   > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf doxygen
@@ -182,7 +182,7 @@ RUN cd /tmp \
    && cd googletest \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  \
+   && cmake --build build --target all --clean-first -- --silent   > /dev/null\
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf googletest
@@ -192,7 +192,7 @@ RUN cd /tmp \
    && cd benchmark \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  \
+   && cmake --build build --target all --clean-first -- --silent > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf benchmark
@@ -219,7 +219,7 @@ RUN cd /tmp \
    && cd boost_${BOOST_RELEASE} \
    && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
    && ./b2 --help \
-   && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
+   && ./b2 link=shared threading=multi variant=release address-model=64 > /dev/null \
    && ./b2 install --prefix=/usr/ \
    && cd /tmp \
    && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
@@ -230,7 +230,7 @@ RUN cd /tmp \
    && cd sml \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- -j `nproc` -- --silent \
+   && cmake --build build --target all --clean-first -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf sml
@@ -242,7 +242,7 @@ RUN cd /tmp \
    && bundle install \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-   && cmake --build build --target all --clean-first -- --silent \
+   && cmake --build build --target all --clean-first -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf cucumber-cpp
@@ -252,7 +252,7 @@ RUN cd /tmp \
    && cd double-conversion \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- -j `nproc` -- --silent \
+   && cmake --build build --target all --clean-first -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf double-conversion
@@ -273,7 +273,7 @@ RUN cd /tmp \
    && cd capture-thread \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent \
+   && cmake --build build --target all --clean-first -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf capture-thread
@@ -294,7 +294,7 @@ RUN cd /tmp \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
 #    && ./config --prefix=/usr  \
    && ./config --prefix=/usr shared  \
-   && make \
+   && make  > /dev/null \
    && make install \
    && cd /tmp \
    && rm -rf openssl
@@ -305,7 +305,9 @@ RUN cd /tmp \
    && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
    && ./configure --prefix=/usr/ \
-   && make clean && make && make install \
+   && make clean \ 
+   && make  > /dev/null\
+   && make install \
    && cd /tmp \
    && rm -rf protobuf
 
@@ -318,7 +320,9 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
            --enable-static --enable-shared --enable-netaccessor-socket \
            --enable-transcoder-gnuiconv --enable-transcoder-iconv \
            --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t \
-   && make clean && make && make install \
+   && make clean\
+   && make  > /dev/null \
+   && make install \
    && cd /tmp \
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
@@ -339,7 +343,7 @@ RUN cd /tmp \
    && cd libexpat/expat  \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first -- --silent \
+   && cmake --build build --target all --clean-first -- --silent  > /dev/null \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf libexpat
@@ -350,7 +354,9 @@ RUN cd /tmp \
    && tar -xzf apr-util-${APU_VERSION}.tar.gz > /dev/null  \
    && cd apr-util-${APU_VERSION} \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
-   && make clean && make && make install  \
+   && make clean \
+   && make  > /dev/null \
+   && make install  \
    && cd /tmp \
    && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
@@ -360,7 +366,9 @@ RUN cd /tmp \
    && ./autogen.sh \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
-   && make clean && make && make install  \
+   && make clean \ 
+   && make  > /dev/null\ 
+   && make install  \
    && cd /tmp \
    && rm -rf logging-log4cxx
 
@@ -369,7 +377,7 @@ RUN cd /tmp \
 	&& cd Catch2 \
 	&& cmake -E make_directory build \
 	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first -- --silent \
+	&& cmake --build build --target all --clean-first -- --silent  > /dev/null \
 	&& cmake --build build --target install || true \
 	&& cd /tmp \
 	&& rm -Rf Catch2
@@ -379,7 +387,7 @@ RUN cd /tmp \
 	&& cd breakpad \
 	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
 	&& ./configure --prefix=/usr/local \
-	&& make \
+	&& make  > /dev/null \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf breakpad
