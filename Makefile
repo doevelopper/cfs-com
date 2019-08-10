@@ -52,13 +52,14 @@ GOAL			    := build
 
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
-        BASE_IMAGE := $(ARCH)/ubuntu:18.10
+        # BASE_IMAGE := $(ARCH)/ubuntu:18.10
+        BASE_IMAGE := docker.io/doevelopper/dind:0.0.2
         DOCKERFILE := src/main/resources/docker/amd64/Dockerfile
         IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}
         ifeq ($(PLATFORM),RTI)
-            BASE_IMAGE := $(ARCH)/ubuntu:16.04
+            BASE_IMAGE := docker.io/doevelopper/dind-bis:0.0.2
             DOCKERFILE := src/main/resources/docker/amd64/rti/Dockerfile
-            IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}/rti-dds
+            IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}-rti-dds
         endif
     else
         $(error ERROR - unsupported value $(ARCH) for target arch!)
@@ -68,8 +69,8 @@ else
 
 endif
 
-SHELL = $(MAKESHELL)
-MAKESHELL = sh
+# SHELL = $(MAKESHELL)
+# MAKESHELL = sh
 # MAKEFLAGS = --no-builtin-rules
 # MAKEFLAGS += --no-builtin-variables
 # MAKEFLAGS += --no-print-directory
@@ -81,11 +82,12 @@ COMMON_IMG_BUILD_OPTS += DOCKER_TRUSTED_REGISTRY=$(DOCKER_TRUSTED_REGISTRY)
 COMMON_IMG_BUILD_OPTS += ARCH=$(ARCH)
 COMMON_IMG_BUILD_OPTS += PLATFORM=
 COMMON_IMG_BUILD_OPTS += BASE_IMAGE=$(BASE_IMAGE)
-# COMMON_IMG_BUILD_OPTS += DOCKERFILE=$(DOCKERFILE)
+COMMON_IMG_BUILD_OPTS += DOCKERFILE=$(DOCKER_FILE)
 COMMON_IMG_BUILD_OPTS += IMAGE=$(IMAGE)
 COMMON_IMG_BUILD_OPTS += GIT_BRANCH=$(GIT_BRANCH)
 COMMON_IMG_BUILD_OPTS += GIT_REPOS_URL=$(GIT_REPOS_URL)
 COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
+COMMON_IMG_BUILD_OPTS += PROXY_URL=$(PROXY_URL)
 
 .PHONY: dind
 dind: ## Docker + docker-compose for DIND 
@@ -157,6 +159,15 @@ help: ## Display this help and exits.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 	@echo
+
+.PHONY: notice
+notice:
+	@echo " "
+	@echo "NOTICE "
+	@echo "  this makefile is not used by the jenkinsfile                 "
+	@echo "  it is intended only as a convenience for local development   "
+	@echo "  please maintain consistency between this and the jenkinsfile "
+	@echo " "
 
 # FUNCTIONS
 define blue

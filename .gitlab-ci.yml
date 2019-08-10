@@ -120,14 +120,17 @@ after_script:
         - coverity_scan
 
 .docker-prerequisities: &docker-prerequisities
-    image: docker.io/doevelopper/cfs-com-dind:0.0.1
+    image: docker.io/doevelopper/dind:0.0.2
     services:
         - docker:dind
     variables: &docker_variables
-        DOCKER_DRIVER: "overlay2"
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"    
         STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
         DTR_NAMESPACE: "doevelopper"
-        DOCKER_HOST: tcp://docker:2375    
         CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
         CONTAINER_RELEASE_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}:latest
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE}
@@ -146,14 +149,15 @@ after_script:
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE}
     before_script:
         - docker info
-        - echo "[${GOAL}] <-> ${CI_JOB_NAME}:${CI_JOB_STAGE}"
+        - docker version  || true
+        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"        
     script:
-        - make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=${CI_PROJECT_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE}
-        # - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
+        - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
+        - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
 # docker:dind with docker-compose
 # https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
-docker:build:docker-base:
+.docker:build:docker-base:
     stage: Build docker image
     <<: *agent-who
     image: docker:19.03.0
@@ -176,6 +180,7 @@ docker:build:docker-base:
         # DOCKER_TLS_CERTDIR: ""
         VERSION: 0.0.2
         CONTAINER: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:${VERSION}
+        CONTAINER_LATEST: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/dind:latest
     script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
@@ -202,6 +207,20 @@ docker:build:docker-base:
             --label org.label-schema.release-date="$(date +%Y-%m-%d-%H:%M:%S)"
             --tag ${CONTAINER}
             --file ${DOCKER_FILE} .
+        - time docker tag ${CONTAINER} ${CONTAINER_LATEST}
         - time docker push ${CONTAINER}
+        - time docker push ${CONTAINER_LATEST}
 
-
+docker:build:dds-base:
+    stage: Build docker image
+    <<: *build-docker-container
+    variables:
+        VERSION: 0.0.1
+        IMAGE_NAME: ${CONTAINER_IMAGE}
+        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/ng-dev-base/Dockerfile
+        GOAL: build
+        MODULE: "dds-base"
+        DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} DTR_PASSWORD=$DOCKER_PASSWORD
+        DOCKER_TLS_CERTDIR: ""
+        DOCKER_HOST: tcp://docker:2375
