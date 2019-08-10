@@ -89,7 +89,7 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 BUILDER_FQIN        := $(CONTAINER_IMAGE)
 RUNTIME_FQIN        := $(IMAGE):$(VERSION)
 
-BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
+BUILD_ARGS          = --build-arg MAKEFLAGS="$(DK_MKFALGS)"
 
 ifneq ($(PROXY_URL),)
     BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
@@ -112,7 +112,7 @@ build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images
 
 .PHONY: build-image
 build-image:
-	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
+	@echo "$(CLR_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(CLR_DEFAULT)"
 	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
