@@ -4,7 +4,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
-   && apt-get install -qq --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
+   && apt-get -qq install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
@@ -19,7 +19,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         htop libxss1 libasound2 x11-apps dbus gpg \
         libc6-dev libgtk-3-0 libpango-1.0-0 \
         htop emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1 \
+        x11-xserver-utils libxkbfile1  > /dev/null 2>&1 \
    && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
