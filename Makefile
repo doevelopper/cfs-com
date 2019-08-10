@@ -73,7 +73,8 @@ endif
 # MAKESHELL = sh
 # MAKEFLAGS = --no-builtin-rules
 # MAKEFLAGS += --no-builtin-variables
-# MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --silent
 # MAKEFLAGS += --output-sync=target
 
 COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
@@ -88,6 +89,7 @@ COMMON_IMG_BUILD_OPTS += GIT_BRANCH=$(GIT_BRANCH)
 COMMON_IMG_BUILD_OPTS += GIT_REPOS_URL=$(GIT_REPOS_URL)
 COMMON_IMG_BUILD_OPTS += SHORT_SHA1=$(SHORT_SHA1)
 COMMON_IMG_BUILD_OPTS += PROXY_URL=$(PROXY_URL)
+COMMON_IMG_BUILD_OPTS += DK_MKFALGS=$(MAKEFLAGS)
 
 .PHONY: dind
 dind: ## Docker + docker-compose for DIND 
@@ -168,7 +170,7 @@ notice:
 	@echo "  it is intended only as a convenience for local development   "
 	@echo "  please maintain consistency between this and the jenkinsfile "
 	@echo " "
-
+,
 # FUNCTIONS
 define blue
 	# @tput setaf 4

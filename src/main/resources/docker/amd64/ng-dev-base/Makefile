@@ -69,14 +69,6 @@ else
     CONTAINER_IMAGE ?= $(IMAGE)-dev
 endif
 
-BUILD_ARGS          =  --build-arg MAKEFLAGS=$(MAKEFLAGS)
-ifneq ($(PROXY_URL),)
-    BUILD_ARGS          +=  --build-arg http_proxy=$(PROXY_URL)
-    BUILD_ARGS          += --build-arg https_proxy=$(PROXY_URL)
-    BUILD_ARGS          += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
-else
-    BUILD_ARGS          +=""
-endif
 
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
@@ -96,6 +88,16 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 # Runtime - Contains only the minimum necessary artifacts to run the microservice
 BUILDER_FQIN        := $(CONTAINER_IMAGE)
 RUNTIME_FQIN        := $(IMAGE):$(VERSION)
+
+BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
+
+ifneq ($(PROXY_URL),)
+    BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg https_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
+else
+    BUILD_ARGS      +=
+endif
 
 .PHONY: image-info
 image-info: ## Display docker image information.
@@ -140,10 +142,8 @@ build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images
 .PHONY: build-image
 build-image:
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	# @$(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
-	@echo
-	@echo "Build finished."
+	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
 .PHONY: push
  push: push-image ## Push docker image to DTR.
