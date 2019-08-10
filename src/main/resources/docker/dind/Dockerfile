@@ -27,14 +27,13 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get update \
-    && apt-get install curl locales software-properties-common apt-transport-https ca-certificates gnupg2 lsb-release -y \
+    && apt-get install curl git make wget locales software-properties-common apt-transport-https ca-certificates gnupg2 lsb-release --assume-yes\
     && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - \
     && add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" \
     && apt-get update \
-    && apt-get install docker-ce docker-ce-cli containerd.io \
-    && apt-get install make git curl wget\
-    && apt-get autoremove -y \
-    && apt-get clean -y \
+    && apt-get install docker-ce docker-ce-cli containerd.io --assume-yes\
+    && apt-get autoremove --assume-yes \
+    && apt-get clean --assume-yes \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -k -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
