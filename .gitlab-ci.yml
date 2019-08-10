@@ -227,9 +227,6 @@ docker:build:dds-base:
         MODULE: "dds-base"
         DOCKER_TLS_CERTDIR: ""
         DOCKER_HOST: tcp://docker:2375
-    # before_script:
-        # - MAKEFLAGS="--no-print-directory -j$[$(nproc) + 1]  --silent"
-
 
 .docker:build:omg-opendds:
     stage: Build docker image
