@@ -69,14 +69,6 @@ else
 
 endif
 
-# SHELL = $(MAKESHELL)
-# MAKESHELL = sh
-# MAKEFLAGS = --no-builtin-rules
-# MAKEFLAGS += --no-builtin-variables
-# MAKEFLAGS += --no-print-directory
-# MAKEFLAGS += --silent
-# MAKEFLAGS += --output-sync=target
-
 COMMON_IMG_BUILD_OPTS = PROJECT_NAME=$(PROJECT_NAME)
 COMMON_IMG_BUILD_OPTS += DTR_NAMESPACE=$(DTR_NAMESPACE)
 COMMON_IMG_BUILD_OPTS += DOCKER_TRUSTED_REGISTRY=$(DOCKER_TRUSTED_REGISTRY)
