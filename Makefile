@@ -91,6 +91,7 @@ dind: ## Docker + docker-compose for
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
+	@echo "$(COMMON_IMG_BUILD_OPTS)"
 	@echo "DTR_PASSWORD=$(DTR_PASSWORD)"
 	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
 
