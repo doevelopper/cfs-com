@@ -101,7 +101,6 @@ endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
-	@echo "DTR_PASSWORD=$(DTR_PASSWORD)"
 	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
 
 .PHONY: dtr-logout
@@ -109,9 +108,7 @@ dtr-logout: ## Logout from DTR
 	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 
 .PHONY: build
-build: dtr-login dtr-logout ## Build and deploy Docker images base.
-
-# build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
+build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
 
 .PHONY: build-image
 build-image:
