@@ -43,6 +43,7 @@ variables:
     ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
+    CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
     # CI_DEBUG_TRACE: "true"
     DOCKER_DRIVER: "overlay2"
     STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
@@ -56,7 +57,6 @@ variables:
 before_script:
     - date
     - docker version || true
-    # - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}" docker.io
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     - echo "Starting Gitlab CI-controlled ..."
     - echo "...continuous integration..."
@@ -98,6 +98,7 @@ after_script:
         - /^bugfix-.*$/
         - /^bugfix[/]v[0-9.]*$/
         - /^support-.*$/
+#        - /(develop|feature|bugfix|hotfix)\/?(.*)/
 
 .notify: &notify
   image: alpine
@@ -184,6 +185,7 @@ after_script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
         - docker pull ${CONTAINER} || true
+#         - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
         - docker build
             --label org.label-schema.maintainer="${CI_PROJECT_NAMESPACE}"
             --label org.label-schema.title="CFS Docker in Docker"
@@ -215,7 +217,7 @@ after_script:
        variables:
            - $PHASE == "bootstrap"
 
-docker:build:dds-base:
+.docker:build:dds-base:
     stage: Build docker image
     <<: *build-docker-container
     variables:
@@ -230,17 +232,21 @@ docker:build:dds-base:
         DOCKER_HOST: tcp://docker:2375
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=${ARCH} DOCKER_FILE=${DOCKER_FILE}
 
-.docker:build:omg-opendds:
-    stage: Build docker image
+docker:build:omg-opendds:
     <<: *build-docker-container
+    image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    stage: Build docker image
     variables:
+        GOAL: build
         VERSION: 0.0.1
+        ARCH: amd64
         IMAGE_NAME: ${CONTAINER_IMAGE}-opendds
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/omg/Dockerfile
-    only:
-       variables:
-           - $BASE == "yes"
+        MODULE: "opendds"
+    # only:
+    #    variables:
+        #    - $BASE_DONE == "yes"
 
 .docker:build:adlinkist-vortex:
     stage: Build docker image

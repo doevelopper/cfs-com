@@ -1,5 +1,5 @@
 .DEFAULT_GOAL:=help
-
+# %W% %G% %U%
 #        cfs-com/src/main/resources/docker/amd64/omg/Makefile
 #
 #               Copyright (c) 2014-2018 A.H.L
@@ -22,7 +22,7 @@
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
-
+colors
 # Define colors
 CLR_DEFAULT := $(shell echo '\033[00m')
 CLR_RED     := $(shell echo '\033[31m')
@@ -32,6 +32,7 @@ CLR_BLUE    := $(shell echo '\033[34m')
 CLR_PURPLE  := $(shell echo '\033[35m')
 CLR_CYAN    := $(shell echo '\033[36m')
 
+INFO              := @bash -c ' printf $(CLR_YELLOW); echo "=> $$1"; printf $(CLR_DEFAULT)'
 
 VERSIONFILE         = VERSION_FILE
 VERSION             = $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
@@ -62,11 +63,13 @@ DOCKER_LABEL        += --label org.label-schema.license="no"
 ifeq ($(GIT_BRANCH),master)
     DOCKER_LABEL    += --label org.label-schema.is-beta="no"
     DOCKER_LABEL    += --label org.label-schema.is-production="yes"
-    CONTAINER_IMAGE ?= $(IMAGE)-image-deploy
+    CONTAINER_IMAGE ?= $(IMAGE)-image-
+    DOCKER_TAG = latest
 else
     DOCKER_LABEL    += --label org.label-schema.is-production="no"
     DOCKER_LABEL    += --label org.label-schema.is-beta="yes"
     CONTAINER_IMAGE ?= $(IMAGE)-dev
+	DOCKER_TAG 		= $(GIT_BRANCH)
 endif
 
 ifneq ($(PROXY_URL),)
@@ -138,8 +141,8 @@ build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images
 
 .PHONY: build-image
 build-image:
+	${INFO} "Building Object Coputing Group Docker Images for $ARCH Architectures"	
 	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	# @$(DOCKER) build $(DOCKER_LABEL) --no-cache --force-rm $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
 	@echo
 	@echo "Build finished."

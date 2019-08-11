@@ -1,5 +1,5 @@
 .DEFAULT_GOAL:=help
-
+# %W% %G% %U%
 #        cfs-com/Makefile
 #
 #               Copyright (c) 2014-2018 A.H.L
@@ -22,7 +22,7 @@
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
-
+INFO                := @bash -c ' printf $(YELLOW); echo "=> $$1"; printf $(NC)'
 DATE              	:= $(shell date -u "+%b-%d-%Y")
 SHA1              	:= $(shell git rev-parse HEAD)
 CWD               	:= $(shell pwd -P)

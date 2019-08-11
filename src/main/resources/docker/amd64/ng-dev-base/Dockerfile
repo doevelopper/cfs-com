@@ -35,7 +35,7 @@ ARG MAKEFLAGS
 
 RUN cd /tmp \
    && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
-   && tar -xvvf gdb-8.3.tar.gz \
+   && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
