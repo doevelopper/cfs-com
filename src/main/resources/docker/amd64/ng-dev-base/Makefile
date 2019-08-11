@@ -24,13 +24,14 @@
 # 
 
 # Define colors
-CLR_DEFAULT := $(shell echo '\033[00m')
-CLR_RED     := $(shell echo '\033[31m')
-CLR_GREEN   := $(shell echo '\033[32m')
-CLR_YELLOW  := $(shell echo '\033[33m')
-CLR_BLUE    := $(shell echo '\033[34m')
-CLR_PURPLE  := $(shell echo '\033[35m')
-CLR_CYAN    := $(shell echo '\033[36m')
+
+DEFAULT := $(shell echo '\033[00m')
+RED     := $(shell echo '\033[31m')
+GREEN   := $(shell echo '\033[32m')
+YELLOW  := $(shell echo '\033[33m')
+BLUE    := $(shell echo '\033[34m')
+PURPLE  := $(shell echo '\033[35m')
+CYAN    := $(shell echo '\033[36m')
 
 
 VERSIONFILE         = VERSION_FILE
@@ -69,7 +70,6 @@ else
     CONTAINER_IMAGE ?= $(IMAGE)-dev
 endif
 
-
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
 DOCKER_LABEL        += --label org.label-schema.usage="C++ deloppement environment"
@@ -101,6 +101,7 @@ endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
+	@echo "DTR_PASSWORD=$(DTR_PASSWORD)"
 	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
 
 .PHONY: dtr-logout
@@ -108,7 +109,9 @@ dtr-logout: ## Logout from DTR
 	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 
 .PHONY: build
-build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images base.
+build: dtr-login dtr-logout ## Build and deploy Docker images base.
+
+# build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
 
 .PHONY: build-image
 build-image:

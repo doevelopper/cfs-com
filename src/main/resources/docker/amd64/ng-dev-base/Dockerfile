@@ -53,7 +53,7 @@ RUN cd /tmp \
 
 RUN  cd /tmp \
    && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
-   && unzip ninja-linux.zip \
+   && unzip ninja-linux.zip > /dev/null 2>&1 \
    && mv ninja /usr/bin/ninja \
    && rm ninja-linux.zip
 
@@ -78,7 +78,7 @@ ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
 RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
-   && unzip gradle-${GRADLE_VERSION}-bin.zip \
+   && unzip gradle-${GRADLE_VERSION}-bin.zip > /dev/null 2>&1 \
    && mv gradle-${GRADLE_VERSION}  /opt/gradle/ \
    && rm -f gradle-${GRADLE_VERSION}-bin.zip
 
@@ -97,7 +97,7 @@ ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
 RUN cd /tmp \
    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
-   && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+   && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh > /dev/null 2>&1 \
    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 
 RUN pip install -q --no-cache-dir conan \
@@ -150,8 +150,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
    && cd uncrustify \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf uncrustify
@@ -160,8 +160,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/danmar/cppcheck.git \
    && cd cppcheck \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first  -- --silent  > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
@@ -171,8 +171,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/doxygen/doxygen.git  \
    && cd doxygen \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf doxygen
@@ -182,7 +182,7 @@ RUN cd /tmp \
    && cd googletest \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent   > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf googletest
@@ -191,8 +191,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/benchmark.git \
    && cd benchmark \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf benchmark
@@ -229,8 +229,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/boost-experimental/sml.git \
    && cd sml \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf sml
@@ -241,8 +241,8 @@ RUN cd /tmp \
    && gem install bundler -v 1.17.3 \
    && bundle install \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. \
-   && cmake --build build --target all --clean-first -- --silent  > /dev/null 2>&1 \
+   && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off -DCMAKE_CXX_FLAGS=-std=c++11 -DCMAKE_INSTALL_PREFIX=/usr/local .. > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf cucumber-cpp
@@ -251,8 +251,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/double-conversion.git \
    && cd double-conversion \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf double-conversion
@@ -272,8 +272,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/capture-thread.git \
    && cd capture-thread \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-   && cmake --build build --target all --clean-first -- --silent  > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf capture-thread
@@ -293,7 +293,7 @@ RUN cd /tmp \
    && cd openssl \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
 #    && ./config --prefix=/usr  \
-   && ./config --prefix=/usr shared  \
+   && ./config --prefix=/usr shared > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
    && make install \
    && cd /tmp \
@@ -304,7 +304,7 @@ RUN cd /tmp \
    && cd protobuf \
    && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
-   && ./configure --prefix=/usr/ \
+   && ./configure --prefix=/usr/ > /dev/null 2>&1 \
    && make clean \ 
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
@@ -319,7 +319,7 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
    && ./configure --prefix=/usr/local \
            --enable-static --enable-shared --enable-netaccessor-socket \
            --enable-transcoder-gnuiconv --enable-transcoder-iconv \
-           --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t \
+           --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t > /dev/null 2>&1 \
    && make clean\
    && make > /dev/null 2>&1 \
    && make install \
@@ -333,7 +333,7 @@ RUN cd /tmp \
    && tar -xzf apr-${APR_VERSION}.tar.gz \
    && cd apr-${APR_VERSION} \
    && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
-        --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child \
+        --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child > /dev/null 2>&1 \
    && make clean  \
    && make > /dev/null 2>&1 \
    && make install  \
@@ -344,8 +344,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
    && cd libexpat/expat  \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first -- --silent > /dev/null 2>&1 \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/  > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf libexpat
@@ -355,7 +355,7 @@ RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
    && tar -xzf apr-util-${APU_VERSION}.tar.gz  \
    && cd apr-util-${APU_VERSION} \
-   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ \
+   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/ > /dev/null 2>&1 \
    && make clean \
    && make > /dev/null 2>&1 \
    && make install  \
@@ -367,7 +367,7 @@ RUN cd /tmp \
    && cd logging-log4cxx  \
    && ./autogen.sh \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
-        --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 \
+        --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 > /dev/null 2>&1 \
    && make clean \ 
    && make > /dev/null 2>&1 \ 
    && make install  \
@@ -379,7 +379,7 @@ RUN cd /tmp \
 	&& cd Catch2 \
 	&& cmake -E make_directory build \
 	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first -- --silent > /dev/null 2>&1 \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
 	&& cmake --build build --target install || true \
 	&& cd /tmp \
 	&& rm -Rf Catch2
@@ -388,7 +388,7 @@ RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/google/breakpad.git \
 	&& cd breakpad \
 	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
-	&& ./configure --prefix=/usr/local \
+	&& ./configure --prefix=/usr/local > /dev/null 2>&1 \
 	&& make > /dev/null 2>&1 \
 	&& make install \
 	&& cd /tmp \
