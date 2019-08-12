@@ -1,6 +1,6 @@
 .DEFAULT_GOAL:=help
-# %W% %G% %U%
-#        cfs-com/src/main/resources/docker/amd64/omg/Makefile
+
+#       cfs-com/src/main/resources/docker/amd64/ng-dev-base/Makefile
 #
 #               Copyright (c) 2014-2018 A.H.L
 #
@@ -22,17 +22,17 @@
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
-colors
-# Define colors
-CLR_DEFAULT := $(shell echo '\033[00m')
-CLR_RED     := $(shell echo '\033[31m')
-CLR_GREEN   := $(shell echo '\033[32m')
-CLR_YELLOW  := $(shell echo '\033[33m')
-CLR_BLUE    := $(shell echo '\033[34m')
-CLR_PURPLE  := $(shell echo '\033[35m')
-CLR_CYAN    := $(shell echo '\033[36m')
 
-INFO              := @bash -c ' printf $(CLR_YELLOW); echo "=> $$1"; printf $(CLR_DEFAULT)'
+# Define colors
+
+DEFAULT := $(shell echo '\033[00m')
+RED     := $(shell echo '\033[31m')
+GREEN   := $(shell echo '\033[32m')
+YELLOW  := $(shell echo '\033[33m')
+BLUE    := $(shell echo '\033[34m')
+PURPLE  := $(shell echo '\033[35m')
+CYAN    := $(shell echo '\033[36m')
+
 
 VERSIONFILE         = VERSION_FILE
 VERSION             = $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
@@ -49,7 +49,7 @@ NEXT_MINOR_VERSION  = $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
 NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)
 
 TOP_LEVEL_DIR       := $(shell git rev-parse --show-toplevel)
-TARGETS             ?= linux/amd64 linux/arm64  windows/amd64
+TARGETS             ?= linux/amd64 linux/arm64 windows/amd64
 SHELL               = /usr/bin/env bash
 DOCKER_SHELL        := /bin/sh
 DOCKER              = docker
@@ -63,33 +63,23 @@ DOCKER_LABEL        += --label org.label-schema.license="no"
 ifeq ($(GIT_BRANCH),master)
     DOCKER_LABEL    += --label org.label-schema.is-beta="no"
     DOCKER_LABEL    += --label org.label-schema.is-production="yes"
-    CONTAINER_IMAGE ?= $(IMAGE)-image-
-    DOCKER_TAG = latest
+    CONTAINER_IMAGE ?= $(IMAGE)-image-deploy
 else
     DOCKER_LABEL    += --label org.label-schema.is-production="no"
     DOCKER_LABEL    += --label org.label-schema.is-beta="yes"
     CONTAINER_IMAGE ?= $(IMAGE)-dev
-	DOCKER_TAG 		= $(GIT_BRANCH)
-endif
-
-ifneq ($(PROXY_URL),)
-    BUILD_ARGS          =  --build-arg http_proxy=$(PROXY_URL)
-    BUILD_ARGS          += --build-arg https_proxy=$(PROXY_URL)
-    BUILD_ARGS          += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*,registry.gear.ge.com"
-else
-    BUILD_ARGS          =
 endif
 
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
-DOCKER_LABEL        += --label org.label-schema.usage="OpenDDS applications deloppement environment"
+DOCKER_LABEL        += --label org.label-schema.usage="C++ deloppement environment"
 DOCKER_LABEL        += --label org.label-schema.vcs-ref="$(SHORT_SHA1)"
 DOCKER_LABEL        += --label org.label-schema.vcs-url="$(GIT_REPOS_URL)"
 DOCKER_LABEL        += --label org.label-schema.vcs-type="Git  SCM"
 DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering"
 DOCKER_LABEL        += --label org.label-schema.documentation=$(GIT_REPOS_URL)
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
-DOCKER_LABEL        += --label org.label-schema.docker.cmd="make $CONTAINER_IMAGE run"
+DOCKER_LABEL        += --label org.label-schema.docker.cmd="make dds-base run"
 DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
 DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -99,20 +89,66 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 BUILDER_FQIN        := $(CONTAINER_IMAGE)
 RUNTIME_FQIN        := $(IMAGE):$(VERSION)
 
-.PHONY: image-info
-image-info: ## Display docker image information.
-	@docker inspect --format='Description:  {{.Config.Labels.Description}}' $(BUILDER_FQIN)
-	@docker inspect --format='Vendor:   {{.Config.Labels.Vendor}}' $(BUILDER_FQIN)
-	@docker inspect --format='Authors:  {{.Author}}' $(BUILDER_FQIN)
-	@docker inspect --format='Version:  {{.Config.Labels.Version}}' $(BUILDER_FQIN)
-	@docker inspect --format='DockerVersion:    {{.DockerVersion}}' $(BUILDER_FQIN)
-	@docker inspect --format='Architecture: {{.Architecture}}' $(BUILDER_FQIN)
-	@docker inspect --format='OS:       {{.Os}}' $(BUILDER_FQIN)
-	@docker inspect --format='Size:         {{.Size}} bytes' $(BUILDER_FQIN)
-	@docker inspect --format='Container : {{.Config.Image}}' $(BUILDER_FQIN)
-	@docker inspect --format='{{.}} ' $(BUILDER_FQIN)
-	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
-#	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
+BUILD_ARGS          = --build-arg MAKEFLAGS="$(DK_MKFALGS)"
+
+ifneq ($(PROXY_URL),)
+    BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg https_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
+else
+    BUILD_ARGS      +=
+endif
+
+ .PHONY: dtr-login
+dtr-login: ## loging to DTR
+	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+
+.PHONY: dtr-logout
+dtr-logout: ## Logout from DTR
+	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
+
+.PHONY: build
+build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
+
+.PHONY: build-image
+build-image:
+	@echo "$(CLR_CY_AN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(CLR_DE_FAULT)"
+	# @$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
+	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
+
+.PHONY: push
+ push: push-image ## Push docker image to DTR.
+
+.PHONY: push-image
+push-image:
+	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
+	# @$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	@echo
+	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
+	# @$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
+	# @$(DOCKER) push $(BUILDER_FQIN):latest
+	# @echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
+	@echo "Image pushed to DTR"
+
+.PHONY: run
+run : run-image ## Run docker image.
+
+.PHONY: run-image
+run-image : build-image
+	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
+	$(DOCKER) run --rm \
+        --name="dev-build" \
+        --hostname="docker-dev-build" \
+        --volume ${HOME}/.conan:/home/developer/.conan \
+        --volume ${HOME}/.ssh:/home/developer/.ssh \
+        --volume ${HOME}/.m2:/home/developer/.m2 \
+        --volume $(PWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
+        --volume $(PWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
+        --volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
+        --volume $(PWD):/home/developer/workspace \
+        --volume /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY}  \
+        --tty --interactive $(BUILDER_FQIN):$(VERSION)  
+        # || exit $?
 
 .PHONY: versioninfo
 versioninfo: ## Display informations about the image.
@@ -128,35 +164,29 @@ versioninfo: ## Display informations about the image.
 	@echo "Previous version file '$(VERSIONFILE)' commit: $(PREVIOUS_VERSIONFILE_COMMIT)"
 	@echo "Previous version **from** version file: '$(PREVIOUS_VERSION)'"
 
-.PHONY: dtr-login
-dtr-login: ## loging to DTR
-	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+.PHONY: image-info
+image-info: ## Display docker image information.
+	@docker inspect --format='Description:  {{.Config.Labels.Description}}' $(BUILDER_FQIN)
+	@docker inspect --format='Vendor:   {{.Config.Labels.Vendor}}' $(BUILDER_FQIN)
+	@docker inspect --format='Authors:  {{.Author}}' $(BUILDER_FQIN)
+	@docker inspect --format='Version:  {{.Config.Labels.Version}}' $(BUILDER_FQIN)
+	@docker inspect --format='DockerVersion:    {{.DockerVersion}}' $(BUILDER_FQIN)
+	@docker inspect --format='Architecture: {{.Architecture}}' $(BUILDER_FQIN)
+	@docker inspect --format='OS:       {{.Os}}' $(BUILDER_FQIN)
+	@docker inspect --format='Size:         {{.Size}} bytes' $(BUILDER_FQIN)
+	@docker inspect --format='Container : {{.Config.Image}}' $(BUILDER_FQIN)
+	@docker inspect --format='{{.}} ' $(BUILDER_FQIN)
+	@docker inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
+	@docker inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
 
-.PHONY: dtr-logout
-dtr-logout: ## Logout from DTR
-	@docker logout ${DOCKER_TRUSTED_REGISTRY} || true
-
-.PHONY: build
-build: build-image  dtr-login  push dtr-logout ## Build and deploy Docker images base.
-
-.PHONY: build-image
-build-image:
-	${INFO} "Building Object Coputing Group Docker Images for $ARCH Architectures"	
-	@echo "$(BLUE) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(NO_COLOR) "
-	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile  .
+.PHONY: help
+help: ## Display this help and exits.
+	@echo "$@ ->"
+	@echo '---------------$(CURDIR)------------------'
+	@echo '+----------------------------------------------------------------------+'
+	@echo '|                        Available Commands                            |'
+	@echo '+----------------------------------------------------------------------+'
 	@echo
-	@echo "Build finished."
-
-.PHONY: push
- push: push-image ## Push docker image to DTR.
-
-.PHONY: push-image
-push-image:
-	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
-	@$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf " \033[36m%-20s\033[0m  %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo ""
 	@echo
-	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
-	@$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
-	@$(DOCKER) push $(BUILDER_FQIN):latest
-	@echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
-	@echo "Image pushed to DTR"

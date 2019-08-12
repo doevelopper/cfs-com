@@ -113,7 +113,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	@echo "$(CLR_CY_AN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(CLR_DE_FAULT)"
-	@$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
+	# @$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
 	@echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
 .PHONY: push
@@ -122,12 +122,12 @@ build-image:
 .PHONY: push-image
 push-image:
 	@echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(NO_COLOR) "
-	@$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	# @$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
 	@echo
 	@echo "$(BLUE) Pushing  $(BUILDER_FQIN):$(MAJOR).$(MINOR).$(PATCH) to $(DOCKER_TRUSTED_REGISTRY) $(NO_COLOR) "
-	@$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
-	@$(DOCKER) push $(BUILDER_FQIN):latest
-	@echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
+	# @$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
+	# @$(DOCKER) push $(BUILDER_FQIN):latest
+	# @echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
 	@echo "Image pushed to DTR"
 
 .PHONY: run

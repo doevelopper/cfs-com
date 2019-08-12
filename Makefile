@@ -90,27 +90,27 @@ dind: ## Docker + docker-compose for
 
 .PHONY: dds-base
 dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/ng-dev-base/ ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/common/ ${GOAL}
 
-.PHONY: opendds
-opendds: dds-base ## Build dev environment for OpenDDS
+.PHONY: omg-opendds
+opendds: ## Build dev environment for OpenDDS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/omg ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/omg ${GOAL}
 
-.PHONY: opensplice
-opensplice: dds-base ## Builddev environment for Vortex OpenSPlice
+.PHONY: vortex-opensplice
+opensplice: ## Builddev environment for Vortex OpenSPlice
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/adlinktech ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/adlinktech ${GOAL}
 
-.PHONY: rtps
-rtps: dds-base ## Build common dev environment FastRTPS
+.PHONY: fast-rtps
+rtps: ## Build common dev environment FastRTPS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/eprosima ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/eprosima ${GOAL}
 
-.PHONY: rti-dds-base
+.PHONY: rti-connext-dds
 rti-dds-base: ## Build common dev environment for RealTime Innovation DDS
 	@echo "$@ -> from $< ..."
-	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/amd64/rti ${GOAL}
+	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/rti ${GOAL}
 
 .PHONY: check
 check: ## Check binaries prerequisities.
