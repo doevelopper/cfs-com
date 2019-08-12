@@ -135,19 +135,19 @@ run : run-image ## Run docker image.
 
 .PHONY: run-image
 run-image : build-image
-	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
-	$(DOCKER) run --rm \
-        --name="dev-build" \
-        --hostname="docker-dev-build" \
-        --volume ${HOME}/.conan:/home/developer/.conan \
-        --volume ${HOME}/.ssh:/home/developer/.ssh \
-        --volume ${HOME}/.m2:/home/developer/.m2 \
-        --volume $(PWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
-        --volume $(PWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
-        --volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
-        --volume $(PWD):/home/developer/workspace \
-        --volume /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY}  \
-        --tty --interactive $(BUILDER_FQIN):$(VERSION)  
+	@echo "Running contrainer $(BUILDER_FQIN) "
+	# $(DOCKER) run --rm \
+        # --name="dev-build" \
+        # --hostname="docker-dev-build" \
+        # --volume ${HOME}/.conan:/home/developer/.conan \
+        # --volume ${HOME}/.ssh:/home/developer/.ssh \
+        # --volume ${HOME}/.m2:/home/developer/.m2 \
+        # --volume $(PWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
+        # --volume $(PWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
+        # --volume $(PWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
+        # --volume $(PWD):/home/developer/workspace \
+        # --volume /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} \
+        # --tty --interactive $(BUILDER_FQIN):$(VERSION)
         # || exit $?
 
 .PHONY: versioninfo

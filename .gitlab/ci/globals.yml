@@ -1,0 +1,104 @@
+#         cfs-com/.gitlab/ci/globals.yml
+#
+#               Copyright (c) 2014-2018 A.H.L
+#
+#        Permission is hereby granted, free of charge, to any person obtaining
+#        a copy of this software and associated documentation files (the
+#        "Software"), to deal in the Software without restriction, including
+#        without limitation the rights to use, copy, modify, merge, publish,
+#        distribute, sublicense, and/or sell copies of the Software, and to
+#        permit persons to whom the Software is furnished to do so, subject to
+#        the following conditions:
+#
+#        The above copyright notice and this permission notice shall be
+#        included in all copies or substantial portions of the Software.
+#
+#        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+.agent-who:
+    retry: 
+        max: 1
+        when:
+            - unknown_failure
+            - api_failure
+            - runner_system_failure
+    tags:
+        # - agent-smith
+        # - gitlab-org
+        - docker
+
+.only_stable:
+    only:
+        - master
+        - /^release-.*$/
+
+.tumbleweed:
+    only:
+        - develop
+        - /^feature-.*$/
+        - /^hotfix-.*$/
+        - /^bugfix-.*$/
+        - /^bugfix[/]v[0-9.]*$/
+        - /^support-.*$/
+#        - /(develop|feature|bugfix|hotfix)\/?(.*)/
+
+.notify:
+    image: alpine
+    stage: notification
+    cache: {}
+    before_script:
+        - apk update && apk add git curl bash
+    only:
+        - schedules
+    except:
+        variables:
+            - $CI_SLACK_NOTIFY != "true"
+            - $CI_SLACK_WEBHOOK_URL == null
+            - $CI_SLACK_CHANNEL == null
+
+.branch_exceptions:
+    only:
+        - branches
+    except:
+        - coverity_scan
+
+.docker-prerequisities: &docker-prerequisities
+    image: docker.io/doevelopper/dind:0.0.2
+    services:
+        - docker:dind
+    variables: &docker_variables
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"    
+        STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
+        DTR_NAMESPACE: "doevelopper"
+        ROOT_CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
+        DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} IMG_NAME=${CONTAINER}
+        # DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=${ARCH} DOCKER_FILE=${DOCKER_FILE}        
+    # only:
+        # refs:
+            # - branches
+        # changes:
+            # - src/main/resources/docker/${ARCH}/Dockerfile
+
+.build-docker-container: &build-docker-container
+    extends: .agent-who
+    <<: *docker-prerequisities
+    variables:
+        GOAL: build
+        MODULE: "dind"
+    before_script:
+        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
+        - export DTR_PASSWORD=$DOCKER_PASSWORD
+        # - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+    script:
+        - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
+        # - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"

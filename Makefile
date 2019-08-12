@@ -50,16 +50,13 @@ BASE_IMAGE          =
 IMAGE               =
 GOAL			    := build
 
+DIND := docker.io/doevelopper/dind:0.0.2
+
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
-        # BASE_IMAGE := $(ARCH)/ubuntu:18.10
-        BASE_IMAGE := docker.io/doevelopper/dind:0.0.2
-        DOCKERFILE := src/main/resources/docker/amd64/Dockerfile
-        IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}
+        BASE_IMAGE := $(ARCH)/ubuntu:18.10
         ifeq ($(PLATFORM),RTI)
-            BASE_IMAGE := docker.io/doevelopper/dind-bis:0.0.2
-            DOCKERFILE := src/main/resources/docker/amd64/rti/Dockerfile
-            IMAGE := $(DOCKER_TRUSTED_REGISTRY)/${DTR_NAMESPACE}/${PROJECT_NAME}-rti-dds
+        	BASE_IMAGE := $(ARCH)/ubuntu:18.04
         endif
     else
         $(error ERROR - unsupported value $(ARCH) for target arch!)
@@ -84,7 +81,7 @@ COMMON_IMG_BUILD_OPTS += PROXY_URL=$(PROXY_URL)
 COMMON_IMG_BUILD_OPTS += DK_MKFALGS="--no-print-directory -j$(shell nproc --all) --silent"
 
 .PHONY: dind
-dind: ## Docker + docker-compose for 
+dind: ## Docker + docker-compose for custom dind
 	@echo "$@ -> from $<"
 	@$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ ${GOAL}
 

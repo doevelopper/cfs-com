@@ -1,0 +1,85 @@
+#         cfs-com/.gitlab/ci/dind.yml
+#
+#               Copyright (c) 2014-2018 A.H.L
+#
+#        Permission is hereby granted, free of charge, to any person obtaining
+#        a copy of this software and associated documentation files (the
+#        "Software"), to deal in the Software without restriction, including
+#        without limitation the rights to use, copy, modify, merge, publish,
+#        distribute, sublicense, and/or sell copies of the Software, and to
+#        permit persons to whom the Software is furnished to do so, subject to
+#        the following conditions:
+#
+#        The above copyright notice and this permission notice shall be
+#        included in all copies or substantial portions of the Software.
+#
+#        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# docker:dind with docker-compose
+# https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+docker:build:docker-base:
+    stage: Build in docker image
+    <<: *agent-who
+    image: docker:19.03.0
+    services:
+        - docker:19.03.0-dind
+    variables:
+        GOAL: build
+        MODULE: "dind"
+        DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
+        BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"
+        # DOCKER_CERT_PATH: "/certs"
+        # DOCKER_HOST: tcp://docker:2375
+        # DOCKER_TLS_VERIFY: 1
+        # DOCKER_CERT_PATH: "/certs/client"
+        # DOCKER_TLS_CERTDIR: ""
+        VERSION: 0.0.2
+        CONTAINER: ${ROOT_CONTAINER_IMAGE}-dind:${VERSION}
+    before_script:
+        - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
+    script:
+        - echo " Building ${CONTAINER}"
+        - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
+        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+        # - docker pull ${CONTAINER} || true
+        # - docker build
+        #     --label org.label-schema.maintainer="${CI_PROJECT_NAMESPACE}"
+        #     --label org.label-schema.title="CFS Docker in Docker"
+        #     --label org.label-schema.description="Dind docker-compose make git"
+        #     --label org.label-schema.name="${CONTAINER}"
+        #     --label org.label-schema.license="Apache 2"
+        #     --label org.label-schema.is-production="yes"
+        #     --label org.label-schema.is-beta="no"
+        #     --label org.label-schema.schema-version="${STAGING_REGISTRY}/${DTR_NAMESPACE}/docker-dind-base:${VERSION}"
+        #     --label org.label-schema.url="$CI_REPOSITORY_URL"
+        #     --label org.label-schema.usage="dind"
+        #     --label org.label-schema.vcs-ref="${COMMIT_ID}"
+        #     --label org.label-schema.vcs-url="$CI_REPOSITORY_URL"
+        #     --label org.label-schema.vcs-type="Git  SCM"
+        #     --label org.label-schema.vendor="Acme Systems Engineering"
+        #     --label org.label-schema.documentation="$CI_PAGES_URL"
+        #     --label org.label-schema.version="${VERSION}"
+        #     --label org.label-schema.docker.cmd="make dind run"
+        #     --label org.label-schema.docker.dockerfile="${DOCKER_FILE}"
+        #     --label org.label-schema.release-date="$(date +%Y-%m-%d-%H:%M:%S)"
+        #     --tag ${CONTAINER}
+        #     --file ${DOCKER_FILE} .
+        # - time docker tag ${CONTAINER} ${CONTAINER}:latest
+        # - time docker push ${CONTAINER}
+        # - time docker push ${CONTAINER}:latest
+    # only:
+       # refs:
+           # - schedules
+    #    variables:
+        #    - $PHASE == "bootstrap"
