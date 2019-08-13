@@ -80,4 +80,14 @@ after_script:
 
 include:
     - local: .gitlab/ci/globals.yml
-    # - local: .gitlab/ci/base.yml
+    # - local: .gitlab/ci/base.
+    
+Fake Job :
+    stage: Unit testing
+    before_script:
+        - echo 'overwrite'
+    script:
+        - echo 'script'
+    after_script:
+        - echo 'overwrite'
+
