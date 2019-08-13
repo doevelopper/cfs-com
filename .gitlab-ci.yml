@@ -58,10 +58,10 @@ before_script:
     - date
     - docker version || true
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
-    - echo "Starting Gitlab CI-controlled ..."
-    - echo "...continuous integration..."
-    - echo "... continuous deployement..."
-    - echo "... and Continuous Code Quality!"
+    - echo -e "\033[0;31m****** Starting Gitlab CI-controlled ...******\033[0m"
+    - echo -e "\033[0;31m******...continuous integration...******\033[0m"
+    - echo -e "\033[0;31m******... continuous deployement...******\033[0m"
+    - echo -e "\033[0;31m******... and Continuous Code Quality!******\033[0m"
     - export NUM_CORES=$(nproc --all)
     - export CCACHE_BASEDIR=$CI_PROJECT_DIR
     - export OS_NAME=$(lsb_release -is) || true
@@ -69,6 +69,7 @@ before_script:
     - export PROJECT_NAME=$CI_PROJECT_NAME
     - export TAG=$CI_BUILD_REF_NAME
     - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
+    - export COMMIT_TIME=$(git show -s --format=%ct $CI_APPLICATION_TAG)
     # - export VERSION=`git describe --first-parent`|| true
     - env | sort
 
@@ -79,4 +80,4 @@ after_script:
 
 include:
     - local: .gitlab/ci/globals.yml
-    - local: .gitlab/ci/base.yml
+    # - local: .gitlab/ci/base.yml

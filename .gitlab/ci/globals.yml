@@ -68,8 +68,15 @@
     except:
         - coverity_scan
 
-.docker-prerequisities: &docker-prerequisities
-    image: docker.io/doevelopper/dind:0.0.2
+.amd64_variables:
+    variables:
+        IMAGE_ARCH=amd64
+
+.arm64v8_variables:
+    variables:
+        IMAGE_ARCH=arm64v8
+
+.docker: &docker
     services:
         - docker:dind
     variables: &docker_variables
@@ -77,10 +84,15 @@
         DOCKER_HOST: tcp://docker:2376
         DOCKER_TLS_VERIFY: 1
         DOCKER_TLS_CERTDIR: "/certs"
-        DOCKER_CERT_PATH: "/certs/client"    
+        DOCKER_CERT_PATH: "/certs/client"
         STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
         DTR_NAMESPACE: "doevelopper"
         ROOT_CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
+
+.docker-app-prerequisities: &docker-app-prerequisities
+    variables: &docker_app_variables
+    image: docker.io/doevelopper/dind:0.0.2
+    variable: 
         DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} IMG_NAME=${CONTAINER}
         # DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=${ARCH} DOCKER_FILE=${DOCKER_FILE}        
     # only:
@@ -89,9 +101,9 @@
         # changes:
             # - src/main/resources/docker/${ARCH}/Dockerfile
 
-.build-docker-container: &build-docker-container
+.create-docker-container: &create-docker-container
     extends: .agent-who
-    <<: *docker-prerequisities
+    <<: *docker-app-prerequisities
     variables:
         GOAL: build
         MODULE: "dind"
