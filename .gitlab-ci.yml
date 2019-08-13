@@ -53,35 +53,37 @@ variables:
     ARCH: amd64
     COMMIT_ID: ${CI_COMMIT_SHA:0:8}
     V: "0"
+    NUM_CORES: $(nproc --all)
+    CCACHE_BASEDIR: $CI_PROJECT_DIR
+    OS_NAME: $(lsb_release -is) || true
+    OS_VERS_LONG: $(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
+    PROJECT_NAME: $CI_PROJECT_NAME
+    TAG: $CI_BUILD_REF_NAME
+    BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
+    COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
+    #VERSION: `git describe --first-parent`|| true
 
-before_script:
-    - date
-    - docker version || true
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
-    - echo -e "\033[0;31m****** Starting Gitlab CI-controlled ...******\033[0m"
-    - echo -e "\033[0;31m******...continuous integration...******\033[0m"
-    - echo -e "\033[0;31m******... continuous deployement...******\033[0m"
-    - echo -e "\033[0;31m******... and Continuous Code Quality!******\033[0m"
-    - export NUM_CORES=$(nproc --all)
-    - export CCACHE_BASEDIR=$CI_PROJECT_DIR
-    - export OS_NAME=$(lsb_release -is) || true
-    - export OS_VERS_LONG=$(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
-    - export PROJECT_NAME=$CI_PROJECT_NAME
-    - export TAG=$CI_BUILD_REF_NAME
-    - export BUILD_DATE=$(date +%Y-%m-%d-%H:%M:%S)
-    - export COMMIT_TIME=$(git show -s --format=%ct $CI_APPLICATION_TAG)
-    # - export VERSION=`git describe --first-parent`|| true
-    - env | sort
+.pre_shared: &pre_shared 
+    before_script:
+        - date
+        - docker version || true
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+        - echo -e "\033[0;31m****** Starting Gitlab CI-controlled ...******\033[0m"
+        - echo -e "\033[0;31m******...continuous integration...******\033[0m"
+        - echo -e "\033[0;31m******... continuous deployement...******\033[0m"
+        - echo -e "\033[0;31m******... and Continuous Code Quality!******\033[0m"
+        - env | sort
 
-after_script:
-    - date
-    - docker version  || true
-    - docker logout docker.io || true
+.post_shared: &post_shared 
+    after_script:
+        - date
+        - docker version  || true
+        - docker logout docker.io || true
 
 include:
     - local: .gitlab/ci/globals.yml
     # - local: .gitlab/ci/base.
-    
+
 Fake Job :
     stage: Unit testing
     before_script:
@@ -90,4 +92,3 @@ Fake Job :
         - echo 'script'
     after_script:
         - echo 'overwrite'
-
