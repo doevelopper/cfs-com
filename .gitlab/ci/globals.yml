@@ -111,45 +111,44 @@
         - docker version  || true
         - docker logout docker.io || true
 
-.docker-hub-dind: &docker-hub-dind
+.dind_hub_variables:
+    variables:
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"
+        ROOT_IMG_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
+        DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} IMG_NAME=${ROOT_IMG_IMAGE}
+        BUILD_OPTIONS: ${DOCKER_BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE}
+
+.docker-hub-dind:
     stage: Build in docker image
-    extends: .agent-who
+    extends: 
+        - .agent-who
+        - .dind_hub_variables
     image: docker:19.03.0
     services:
         - docker:19.03.0-dind
-    variables: &dind_hub_variables
-        DOCKER_DIRVER: overlay2
-        DOCKER_HOST: tcp://docker:2376
-        DOCKER_TLS_VERIFY: 1
-        DOCKER_TLS_CERTDIR: "/certs"
-        DOCKER_CERT_PATH: "/certs/client"
 
-.docker: &docker
+.docker:
     services:
         - docker:dind
-    variables: &docker_variables
-        DOCKER_DIRVER: overlay2
-        DOCKER_HOST: tcp://docker:2376
-        DOCKER_TLS_VERIFY: 1
-        DOCKER_TLS_CERTDIR: "/certs"
-        DOCKER_CERT_PATH: "/certs/client"
-        ROOT_CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
+    extends: .dind_hub_variables
 
-.docker-app-prerequisities: &docker-app-prerequisities
-    variables: &docker_app_variables
+.docker-app-prerequisities:
     image: docker.io/doevelopper/dind:0.0.2
-    variable: 
-        DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=amd64 DOCKER_FILE=${DOCKER_FILE} IMG_NAME=${CONTAINER}
-        # DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=${ARCH} DOCKER_FILE=${DOCKER_FILE}        
+    extends: .docker
     # only:
         # refs:
             # - branches
         # changes:
             # - src/main/resources/docker/${ARCH}/Dockerfile
 
-.create-docker-container: &create-docker-container
-    extends: .agent-who
-    <<: *docker-app-prerequisities
+.create-docker-container:
+    extends: 
+        - .agent-who
+        - .docker-app-prerequisities
     variables:
         GOAL: build
         MODULE: "dind"

@@ -27,9 +27,8 @@
 # docker:dind with docker-compose
 # https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
 docker:build:docker-base:
-    <<: *docker-hub-dind
-    variables:
-        <<: *dind_hub_variables
+    extends: 
+        - .docker-hub-dind
     before_script:
         - export DTR_PASSWORD=$DOCKER_PASSWORD
         - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
@@ -37,7 +36,7 @@ docker:build:docker-base:
     script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        # - make ${MAKE_DOCKER_BUILD_OPTIONS} VERSION=${VERSION} GOAL=${GOAL} ${MODULE}
+        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} VERSION=${VERSION} GOAL=${GOAL} ${MODULE}"
     # only:
        # refs:
            # - schedules
@@ -60,7 +59,9 @@ docker:build:docker-base:
         MODULE: "dind"
         DOCKER_FILE: src/main/resources/docker/dind/Dockerfile
         BUILD_LOG: "2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
-        # DOCKER_HOST: tcp://docker:2375docker:build:docker-base:
+        # DOCKER_HOST: tcp://docker:2375
+
+.docker:build:docker-base:
     stage: Build in docker image
     extends: .agent-who    
     image: docker:19.03.0
@@ -95,20 +96,3 @@ docker:build:docker-base:
     #    variables:
         #    - $PHASE == "bootstrap"
 
-        # DOCKER_TLS_CERTDIR: ""
-    #     ROOT_CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}        
-    #     VERSION: 0.0.1
-    #     CONTAINER: ${ROOT_CONTAINER_IMAGE}-dind:${VERSION}
-    # before_script:
-    #     - export DTR_PASSWORD=$DOCKER_PASSWORD
-    #     - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
-    #     - apk add bash make git
-    # script:
-    #     - echo " Building ${CONTAINER}"
-    #     - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-    #     - make ${MAKE_DOCKER_BUILD_OPTIONS} VERSION=${VERSION} GOAL=${GOAL} ${MODULE}
-    # only:
-       # refs:
-           # - schedules
-    #    variables:
-        #    - $PHASE == "bootstrap"
