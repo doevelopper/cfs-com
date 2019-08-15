@@ -23,10 +23,9 @@
 
 ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
 FROM $BASE_IMAGE 
-# FROM doevelopper/cfs-com-dev:0.0.1
 
 ARG OPENDDS_BUILD_OPTIONS="-std=c++11 --ipv6 --openssl --xerces3=/usr/local --java --rapidjson --glib --boost=/usr"
-ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --features=versioned_namespace=1 --macros=c++11=1 --no-debug --optimize"
+ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --macros=c++11=1 --no-debug --optimize"
 ARG DDS_BUILD_CONFIG_OPTIONS="--security --safety-profile=base --cmake=/opt/cmake/bin/"
 ARG DDS_SAFETY_BASE_NO_BUILTIN_TOPICS="--safety-profile=base --no-built-in-topics"
 ARG DDS_SECURITY="--security --features=versioned_namespace=1"
@@ -67,6 +66,15 @@ RUN cd /tmp \
     && export DANCE_ROOT=/tmp/DAnCE \
     && export MPC_ROOT=/tmp/MPC \
     && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
+	&& echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h; \
+	&& echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
+	&& echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
+	&& echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
+	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
+	&& echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
+	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
+	&& echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
+	&& echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
     && cd OpenDDS \
     && ./configure --help \
     && ./configure --prefix=${DDS_BASE_DIR} \
@@ -191,7 +199,7 @@ RUN cd /tmp \
 	# && cd ..
 
 ARG ACCOUNT
-ENV ACCOUNT ${ACCOUNT:-doevelopper}
+ENV ACCOUNT ${ACCOUNT:-developer}
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT
 

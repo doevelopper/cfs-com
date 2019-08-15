@@ -1,4 +1,28 @@
-FROM doevelopper/cfs-com-dev:latest
+#        cfs-com/src/main/resources/docker/amd64/omg/Dockerfile
+#
+#               Copyright (c) 2014-2018 A.H.L
+#
+#        Permission is hereby granted, free of charge, to any person obtaining
+#        a copy of this software and associated documentation files (the
+#        "Software"), to deal in the Software without restriction, including
+#        without limitation the rights to use, copy, modify, merge, publish,
+#        distribute, sublicense, and/or sell copies of the Software, and to
+#        permit persons to whom the Software is furnished to do so, subject to
+#        the following conditions:
+#
+#        The above copyright notice and this permission notice shall be
+#        included in all copies or substantial portions of the Software.
+#
+#        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# 
+
+ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
+FROM $BASE_IMAGE 
 
 USER root
 
@@ -18,7 +42,7 @@ RUN git config --global url."https://".insteadOf git://
 ARG GSOAP_MAJOR_VERSION
 ARG GSOAP_VERSION
 ENV GSOAP_MAJOR_VERSION ${GSOAP_MAJOR_VERSION:-2.8}
-ENV GSOAP_VERSION ${GSOAP_VERSION:-2.8.82}
+ENV GSOAP_VERSION ${GSOAP_VERSION:-2.8.89}
 
 ENV PROTOBUF_HOME /usr
 
@@ -64,10 +88,7 @@ RUN cd /tmp \
 
 ARG ACCOUNT
 ENV ACCOUNT ${ACCOUNT:-developer}
-
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT
-
 WORKDIR /home/$ACCOUNT
 CMD ["/bin/bash"]
-
