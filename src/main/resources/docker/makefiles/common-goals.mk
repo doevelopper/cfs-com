@@ -21,6 +21,14 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
 
+ifeq ($(KBUILD_VERBOSE),1)
+  quiet =
+  Q =
+else
+  quiet=quiet_
+  Q = @
+endif
+
 DOCKER_LABEL        += --label org.label-schema.maintainer=$(DTR_NAMESPACE)
 DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 DOCKER_LABEL        += --label org.label-schema.license="Licence · Apache-2.0"
@@ -44,11 +52,11 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
-	# echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
 
 .PHONY: dtr-logout
 dtr-logout: ## Logout from DTR
-	# $(Q)docker logout ${DOCKER_TRUSTED_REGISTRY} || true
+	$(Q)$(DOCKER) logout ${DOCKER_TRUSTED_REGISTRY} || true
 
 .PHONY: build
 build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
@@ -70,7 +78,7 @@ push-image:
 	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"
 	# $(Q)$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
 	# $(Q)$(DOCKER) push $(BUILDER_FQIN):latest
-	# $(Q)echo "$(MAJOR).$(MINOR).$(PATCH)" > $(VERSIONFILE)
+	# $(Q)echo "$(VERSION)" > $(VERSIONFILE)
 	$(Q)echo "$(SH_GREEN) Images $(BUILDER_FQIN):[$(VERSION)|latest] pushed to DTR$(SH_DEFAULT)"
 
 .PHONY: run

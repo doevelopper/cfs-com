@@ -23,15 +23,6 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
 
-
-ifeq ($(KBUILD_VERBOSE),1)
-  quiet =
-  Q =
-else
-  quiet=quiet_
-  Q = @
-endif
-
 include $(CWD)/src/main/resources/docker/makefiles/semver-variables.mk
 
 DOCKER_LABEL        := --label org.label-schema.title="Dind docker-compose make git"

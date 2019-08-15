@@ -45,8 +45,9 @@ docker:build:docker-base:
         VERSION: 0.0.1
         CONTAINER: ${ROOT_CONTAINER_IMAGE}-dind:${VERSION}
     before_script:
+        - export DTR_PASSWORD=$DOCKER_PASSWORD
         - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
-        - apk add bash make
+        - apk add bash make git
     script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
