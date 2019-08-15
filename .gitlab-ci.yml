@@ -42,12 +42,10 @@ variables:
     # CI_DEBUG_TRACE: "true"
     GET_SOURCES_ATTEMPTS: "3"
     ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
+    GIT_DEPTH: "1"
     LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
     CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
-    # DOCKER_DRIVER: "overlay2"
-    # DOCKER_HOST: tcp://docker:2375
-    # docker.io - registry.gitlab.com artifactory.io  jfrog.io
     STAGING_REGISTRY: "docker.io"
     DTR_NAMESPACE: doevelopper
     PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"

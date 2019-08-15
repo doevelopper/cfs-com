@@ -30,7 +30,7 @@
             - runner_system_failure
     tags:
         # - agent-smith
-        # - gitlab-org
+        - gitlab-org
         - docker
 
 .default-cache: &default-cache
@@ -110,6 +110,19 @@
         - date
         - docker version  || true
         - docker logout docker.io || true
+
+.docker-hub-dind: &docker-hub-dind
+    stage: Build in docker image
+    extends: .agent-who
+    image: docker:19.03.0
+    services:
+        - docker:19.03.0-dind
+    variables: &dind_hub_variables
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"
 
 .docker: &docker
     services:
