@@ -21,7 +21,9 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-FROM amd64/ubuntu:19.04
+ARG BASE_IMAGE=amd64/ubuntu:19.04
+FROM ${BASE_IMAGE}
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -48,9 +50,9 @@ RUN curl -k -L https://github.com/docker/compose/releases/download/1.24.1/docker
 # https://aur.archlinux.org/packages/kubectl-bin/
 ENV KUBE_LATEST_VERSION="v1.15.0"
 RUN \
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
-    chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubectl
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \ 
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl
 
 # # Install helm
 # Note: Latest version of helm may be found at:

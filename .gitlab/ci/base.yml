@@ -23,7 +23,8 @@
 
 docker:build:dds-base:
     stage: Build docker image
-    <<: *build-docker-container
+    extends:
+        - .create-docker-container
     variables:
         GOAL: build
         VERSION: 0.0.1
@@ -38,7 +39,8 @@ docker:build:dds-base:
 
 docker:build:rti-dds-base:
     stage: Build docker image
-    <<: *build-docker-container
+    extends:
+        - .create-docker-container
     variables:
         VERSION: 5.3.3
         MODULE: "rti-connext-dds"

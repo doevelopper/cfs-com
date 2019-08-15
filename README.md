@@ -10,15 +10,15 @@
 ```
 [![Docker Pulls][pull-shield]][pull]
 [![Automation][automated-shield]][pull]
-[![Status][status-shield]][pull]
 
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://gitlab.com/doevelopper/cppbdd101/tree/develop)
-[![License](https://img.shields.io/badge/license-Apache%20license%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
+[![Language][CPP-shield]][CPP]
+[![Maintenance][Maintenance-shield]][Main-tenance]
 
-[![pipeline status](https://gitlab.com/doevelopper/cfs-com/badges/master/pipeline.svg)](https://gitlab.com/doevelopper/cfs-com/commits/master)
-[![coverage report](https://gitlab.com/doevelopper/cfs-com/badges/master/coverage.svg)](https://gitlab.com/doevelopper/cfs-com/commits/master)
+[![Master pipeline][pipeline-status-shield]][pipeline-status]
+[![Coverage report][pipeline-status-shield]][pipeline-status]
+
+[![Ubuntu 18.04 package][ubuntu-18-10-shield]][ubuntu-18-10]
+ </br>
 
 # Data distribution Service and Micro Services for linux applications
 
@@ -188,11 +188,17 @@ for details.
 [BY-NC-SA-4.0]: https://creativecommons.org/licenses/by-nc-sa/4.0/
 [apache-license-shield]: https://img.shields.io/badge/license-Apache%20license%202.0-blue.svg
 [apache-license]: https://opensource.org/licenses/Apache-2.0
-
-
 [pull-shield]: https://img.shields.io/docker/pulls/doevelopper/developmentplatform.svg
-[pull]: https://github.com/doevelopper/cfs-com/tree/master 
+[pull]: https://github.com/doevelopper/cfs-com/tree/master
 [automated-shield]: https://img.shields.io/docker/automated/doevelopper/developmentplatform.svg
 [automated]: https://img.shields.io/docker/automated/doevelopper/developmentplatform.svg
-[status-shield]: https://img.shields.io/docker/status/doevelopper/developmentplatform.svg
-[status]: https://img.shields.io/docker/status/doevelopper/developmentplatform.svg
+[ubuntu-18-10-shield]: https://repology.org/badge/version-for-repo/ubuntu_18_04/cpprestsdk.svg
+[ubuntu-18-10]: https://github.com/doevelopper/cfs-com/tree/master
+[CPP-shield]: https://img.shields.io/badge/language-C++-blue.svg
+[CPP]: https://isocpp.org/
+[Maintenance-shield]: https://img.shields.io/badge/Maintained%3F-yes-green.svg
+[Main-tenance]: https://gitlab.com/doevelopper/cppbdd101/tree/develop
+[pipeline-status-shield]: https://gitlab.com/doevelopper/cfs-com/badges/master/pipeline.svg
+[pipeline-status]: https://gitlab.com/doevelopper/cfs-com/commits/master
+[coverage-report-shield]: https://gitlab.com/doevelopper/cfs-com/badges/master/coverage.svg
+[coverage-report]: https://gitlab.com/doevelopper/cfs-com/commits/master

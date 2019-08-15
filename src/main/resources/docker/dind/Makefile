@@ -1,6 +1,6 @@
 .DEFAULT_GOAL:=help
 
-#       cfs-com/src/main/resources/docker/amd64/ng-dev-base/Makefile
+#       cfs-com/src/main/resources/docker/dind/Makefile
 #
 #               Copyright (c) 2014-2018 A.H.L
 #
@@ -34,7 +34,7 @@ endif
 
 include $(CWD)/src/main/resources/docker/makefiles/semver-variables.mk
 
-DOCKER_LABEL        := --label org.label-schema.title="CI DIND"
+DOCKER_LABEL        := --label org.label-schema.title="Dind docker-compose make git"
 DOCKER_LABEL        += --label org.label-schema.description="Docker in docker for running container usin CI"
 DOCKER_LABEL        += --label org.label-schema.name=$(IMAGE)
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"

@@ -1,4 +1,4 @@
-#       cfs-com/src/main/resources/docker/amd64/ng-dev-base/Makefile
+#       cfs-com/src/main/resources/docker/makefiles/common-goals.mk
 #
 #               Copyright (c) 2014-2018 A.H.L
 #

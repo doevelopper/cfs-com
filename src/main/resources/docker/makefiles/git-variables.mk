@@ -1,5 +1,5 @@
 # %W% %G% %U%
-#        cfs-com/Makefile
+#        cfs-com/src/main/resources/docker/makefiles/git-variables.mk
 #
 #               Copyright (c) 2014-2018 A.H.L
 #

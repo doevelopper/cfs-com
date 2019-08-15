@@ -33,6 +33,24 @@
         # - gitlab-org
         - docker
 
+.default-cache: &default-cache
+    key: "dind-${CI_BUILD_REF_NAME}_${CI_BUILD_REF}"
+    paths:
+        - ${CI_PROJECT_PATH}/.cache
+
+.agent-who-default-cache:
+    extends: .agent-who
+    cache:
+        <<: *default-cache
+
+# Jobs that only need to pull cache
+.dedicated-pull-cache-job:
+    extends: .agent-who
+    cache:
+        <<: *default-cache
+        policy: pull
+    stage: Unit testing
+
 .only_stable:
     only:
         - master
@@ -76,6 +94,23 @@
     variables:
         IMAGE_ARCH=arm64v8
 
+.pre_shared: &pre_shared 
+    before_script:
+        - date
+        - docker version || true
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+        - echo -e "\033[0;31m****** Starting Gitlab CI-controlled ...******\033[0m"
+        - echo -e "\033[0;31m******...continuous integration...******\033[0m"
+        - echo -e "\033[0;31m******... continuous deployement...******\033[0m"
+        - echo -e "\033[0;31m******... and Continuous Code Quality!******\033[0m"
+        - env | sort
+
+.post_shared: &post_shared 
+    after_script:
+        - date
+        - docker version  || true
+        - docker logout docker.io || true
+
 .docker: &docker
     services:
         - docker:dind
@@ -85,8 +120,6 @@
         DOCKER_TLS_VERIFY: 1
         DOCKER_TLS_CERTDIR: "/certs"
         DOCKER_CERT_PATH: "/certs/client"
-        STAGING_REGISTRY: "docker.io"   # docker.io - registry.gitlab.com artifactory.io  jfrog.io
-        DTR_NAMESPACE: "doevelopper"
         ROOT_CONTAINER_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
 
 .docker-app-prerequisities: &docker-app-prerequisities
@@ -110,7 +143,7 @@
     before_script:
         - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
-        # - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
         - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
-        # - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"

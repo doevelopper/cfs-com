@@ -25,7 +25,7 @@
 # https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
 docker:build:docker-base:
     stage: Build in docker image
-    <<: *agent-who
+    extends: .agent-who    
     image: docker:19.03.0
     services:
         - docker:19.03.0-dind
@@ -39,45 +39,16 @@ docker:build:docker-base:
         DOCKER_TLS_VERIFY: 1
         DOCKER_TLS_CERTDIR: "/certs"
         DOCKER_CERT_PATH: "/certs/client"
-        # DOCKER_CERT_PATH: "/certs"
         # DOCKER_HOST: tcp://docker:2375
-        # DOCKER_TLS_VERIFY: 1
-        # DOCKER_CERT_PATH: "/certs/client"
         # DOCKER_TLS_CERTDIR: ""
-        VERSION: 0.0.2
+        VERSION: 0.0.1
         CONTAINER: ${ROOT_CONTAINER_IMAGE}-dind:${VERSION}
     before_script:
         - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
     script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
-        # - docker pull ${CONTAINER} || true
-        # - docker build
-        #     --label org.label-schema.maintainer="${CI_PROJECT_NAMESPACE}"
-        #     --label org.label-schema.title="CFS Docker in Docker"
-        #     --label org.label-schema.description="Dind docker-compose make git"
-        #     --label org.label-schema.name="${CONTAINER}"
-        #     --label org.label-schema.license="Apache 2"
-        #     --label org.label-schema.is-production="yes"
-        #     --label org.label-schema.is-beta="no"
-        #     --label org.label-schema.schema-version="${STAGING_REGISTRY}/${DTR_NAMESPACE}/docker-dind-base:${VERSION}"
-        #     --label org.label-schema.url="$CI_REPOSITORY_URL"
-        #     --label org.label-schema.usage="dind"
-        #     --label org.label-schema.vcs-ref="${COMMIT_ID}"
-        #     --label org.label-schema.vcs-url="$CI_REPOSITORY_URL"
-        #     --label org.label-schema.vcs-type="Git  SCM"
-        #     --label org.label-schema.vendor="Acme Systems Engineering"
-        #     --label org.label-schema.documentation="$CI_PAGES_URL"
-        #     --label org.label-schema.version="${VERSION}"
-        #     --label org.label-schema.docker.cmd="make dind run"
-        #     --label org.label-schema.docker.dockerfile="${DOCKER_FILE}"
-        #     --label org.label-schema.release-date="$(date +%Y-%m-%d-%H:%M:%S)"
-        #     --tag ${CONTAINER}
-        #     --file ${DOCKER_FILE} .
-        # - time docker tag ${CONTAINER} ${CONTAINER}:latest
-        # - time docker push ${CONTAINER}
-        # - time docker push ${CONTAINER}:latest
+        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} VERSION=${VERSION} GOAL=${GOAL} ${MODULE}"
     # only:
        # refs:
            # - schedules
