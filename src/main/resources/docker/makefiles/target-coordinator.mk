@@ -49,7 +49,6 @@ COMMON_IMG_BUILD_OPTS += DTR_NS="${DOCKER_TRUSTED_REGISTRY}/${DTR_NAMESPACE}/${P
 
 .PHONY: dind
 dind: ## Docker + docker-compose for custom dind
-	@echo "$@ -> from $<"
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/dind/ ${GOAL}
 
 .PHONY: dds-base
@@ -57,23 +56,19 @@ dds-base: ## Build common dev environment for OpenSPlice,FastRTPS,OpenDDS
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/common/ ${GOAL}
 
 .PHONY: omg-opendds
-opendds: ## Build dev environment for OpenDDS
-	@echo "$@ -> from $< ..."
+omg-opendds: ## Build dev environment for OpenDDS
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/omg ${GOAL}
 
 .PHONY: vortex-opensplice
-opensplice: ## Builddev environment for Vortex OpenSPlice
-	@echo "$@ -> from $< ..."
+vortex-opensplice: ## Builddev environment for Vortex OpenSPlice
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/adlinktech ${GOAL}
 
 .PHONY: fast-rtps
-rtps: ## Build common dev environment FastRTPS
-	@echo "$@ -> from $< ..."
+fast-rtps: ## Build common dev environment FastRTPS
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/eprosima ${GOAL}
 
 .PHONY: rti-connext-dds
-rti-dds-base: ## Build common dev environment for RealTime Innovation DDS
-	@echo "$@ -> from $< ..."
+rti-connext-dds: ## Build common dev environment for RealTime Innovation DDS
 	$(Q)$(MAKE) $(COMMON_IMG_BUILD_OPTS) -C src/main/resources/docker/$(ARCH)/rti ${GOAL}
 
 .PHONY: check
@@ -103,7 +98,7 @@ list_volumes: ## List all volumes.
 
 .PHONY: show-info
 show-info:
-	$(call blue, "  # $@ -> from $< ...")
+	$(Q)$(call blue, "  # $@ -> from $< ...")
 
 .PHONY: help
 help: ## Display this help and exits.
