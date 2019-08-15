@@ -66,6 +66,7 @@ variables:
 include:
     - local: .gitlab/ci/globals.yml
     - local: .gitlab/ci/dind.yml
+    - local: .gitlab/ci/base.yml
 
 Fake Job :
     stage: Unit testing

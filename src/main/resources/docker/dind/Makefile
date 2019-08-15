@@ -33,7 +33,7 @@ DOCKER_LABEL        += --label org.label-schema.name=$(CONTAINER_IMAGE)
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(CONTAINER_IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
 DOCKER_LABEL        += --label org.label-schema.usage="running using gitlab-ci"
-DOCKER_LABEL        += --label org.label-schema.docker.cmd="make ${PROJECT_NAME}$(shell basename $(CURDIR)) run"
+DOCKER_LABEL        += --label org.label-schema.docker.cmd="make $(CONTAINER_IMAGE) run"
 DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
 
 # FQIN - fully qualified image name

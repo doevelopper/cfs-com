@@ -72,7 +72,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 
 .PHONY: build-image
 build-image:
-	$(Q)echo "$(CLR_CY_AN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
+	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
 	# $(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS)  -t $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
 	$(Q)echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
@@ -81,7 +81,7 @@ build-image:
 
 .PHONY: push-image
 push-image:
-	$(Q)echo "$(BLUE) Apply tag $(MAJOR).$(MINOR).$(PATCH) on $(BUILDER_FQIN)  $(SH_DEFAULT)"
+	$(Q)echo "$(SH_BLUE) Apply tag [$(VERSION)|latest] on $(BUILDER_FQIN)  $(SH_DEFAULT)"
 	# $(Q)$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
 	$(Q)echo
 	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"

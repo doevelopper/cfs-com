@@ -21,10 +21,10 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-.docker:build:omg-opendds:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-dev:0.0.1
-    stage: Build docker image
+docker:build:omg-opendds:
+    extends: .create-docker-container
+    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    # stage: Build docker image
     variables:
         GOAL: build
         VERSION: 3.13.2
@@ -36,10 +36,10 @@
     #    variables:
         #    - $BASE_DONE == "yes"
 
-.docker:build:adlinkist-vortex:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-dev:0.0.1    
-    stage: Build docker image
+docker:build:adlinkist-vortex:
+    extends: .create-docker-container
+    # image: docker.io/doevelopper/cfs-com-dev:0.0.1    
+    # stage: Build docker image
     variables:
         VERSION: 6.9.0
         MODULE: "vortex-opensplice"
@@ -50,10 +50,10 @@
     #    variables:
     #        - $BASE == "yes"
 
-.docker:build:eprosima-rtps:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-dev:0.0.1
-    stage: Build docker image
+docker:build:eprosima-rtps:
+    extends: .create-docker-container
+    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    # stage: Build docker image
     variables:
         VERSION: 1.9.0
         MODULE: "fast-rtps"

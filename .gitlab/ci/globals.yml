@@ -131,6 +131,7 @@
         - .dind_hub_variables
 
 .docker:
+    stage: Build docker image
     services:
         - docker:dind
     extends: .dind_hub_variables
@@ -148,9 +149,6 @@
     extends: 
         - .agent-who
         - .docker-app-prerequisities
-    variables:
-        GOAL: build
-        MODULE: "dind"
     before_script:
         - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
         - export DTR_PASSWORD=$DOCKER_PASSWORD

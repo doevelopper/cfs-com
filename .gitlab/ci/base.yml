@@ -22,7 +22,6 @@
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 docker:build:dds-base:
-    stage: Build docker image
     extends:
         - .create-docker-container
     variables:
@@ -38,7 +37,6 @@ docker:build:dds-base:
         # changes: [ subdir/**/*, Dockerfile, requirem
 
 docker:build:rti-dds-base:
-    stage: Build docker image
     extends:
         - .create-docker-container
     variables:
