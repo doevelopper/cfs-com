@@ -32,8 +32,8 @@ docker:build:dds-base:
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         DOCKER_FILE: src/main/resources/docker/${ARCH}/common/Dockerfile
-        DOCKER_TLS_CERTDIR: ""
-        DOCKER_HOST: tcp://docker:2375
+        # DOCKER_TLS_CERTDIR: ""
+        # DOCKER_HOST: tcp://docker:2375
     # only:
         # changes: [ subdir/**/*, Dockerfile, requirem
 
