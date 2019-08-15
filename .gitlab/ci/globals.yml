@@ -30,7 +30,7 @@
             - runner_system_failure
     tags:
         # - agent-smith
-        - gitlab-org
+        # - gitlab-org
         - docker
 
 .default-cache: &default-cache
