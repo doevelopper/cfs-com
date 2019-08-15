@@ -46,6 +46,7 @@ docker:build:docker-base:
         CONTAINER: ${ROOT_CONTAINER_IMAGE}-dind:${VERSION}
     before_script:
         - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
+        - apk add make
     script:
         - echo " Building ${CONTAINER}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
