@@ -156,3 +156,22 @@
     script:
         - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
         - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+
+
+
+#  Caching configurations
+
+.per job caching:
+    cache:
+        key: "$CI_BUILD_NAME"
+        untracked: true
+
+.per branch caching:
+    cache:
+        key: "$CI_BUILD_REF_NAME"
+        untracked: true
+
+.per job and per branch caching:
+    cache:
+        key: "$CI_BUILD_STAGE/$CI_BUILD_REF_NAME"
+        untracked: true

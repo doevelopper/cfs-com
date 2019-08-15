@@ -23,6 +23,7 @@
 
 stages:
     - Build in docker image
+    - Build own dind image
     - Build docker image
     - Test docker image
     - Configure build
