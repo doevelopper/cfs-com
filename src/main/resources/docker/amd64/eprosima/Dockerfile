@@ -39,15 +39,15 @@ RUN cd /tmp \
     && cd Fast-RTPS \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake .. -DTHIRDPARTY=ON -DPERFORMANCE_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/eprosima \
-    && cmake --build build --target all --clean-first -- -j `nproc` \
-    && cmake --build build --target install \
+    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
     && cd /tmp \
     && rm -rf Fast-RTPS
 
 # Clone and install Micro XRCE-DDS Agent
 #RUN git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git agent \
 #    && mkdir agent/build && cd agent/build \
-#    && cmake -DTHIRDPARTY=ON -DVERBOSE=ON .. \
+#    && cmake -DTHIRDPARTY=ON -DVERBOSE=ON -DCMAKE_INSTALL_PREFIX=/usr/dds-qgent .. \
 #    && make -j `nproc` install
 
 ARG ACCOUNT

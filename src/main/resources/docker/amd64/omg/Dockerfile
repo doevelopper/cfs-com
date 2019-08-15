@@ -45,13 +45,31 @@ RUN git config --global url."https://".insteadOf git://
 
 USER root
 
+
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \ 
     && apt-get install --assume-yes --no-install-recommends nodejs
 
+ENV QT_MAJOR_VERSION ${QT_MAJOR_VERSION:-5.13}
+ENV QT_VERSION ${QT_VERSION:-${QT_MAJOR_VERSION}.0}
+ENV QT_VERSION_STR ${QT_MAJOR_VERSION}.${QT_VERSION}
+
+RUN cd /tmp\
+    && wget http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION_STR}/qt-opensource-linux-x64-${QT_VERSION_STR}.run
+
+RUN cd /tmp \
+    && export CMAKE_PREFIX_PATH=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64:$CMAKE_PREFIX_PATH \ 
+    && export QTDIR=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64 \
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \ 
+    && cd wireshark \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} \
+    && cmake --build build --target all --clean-first \
+    && cmake --build build --target install \
+    cd /tmp \
+    rm -Rf wireshark
+
 ENV DDS_BASE_DIR=/opt/dds
 
-#    && export CMAKE_INSTALL_PREFIX: $CI_PROJECT_NAMESPACE/dds
-#    && export QTDIR: $CI_PROJECT_NAMESPACE/Qt5.11.2/5.11.2/gcc_64
 
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/DOCGroup/CIAO.git \
@@ -82,13 +100,13 @@ RUN cd /tmp \
             ${OPENDDS_BUILD_CONFIG_OPTIONS} \
             ${DDS_SECURITY} \
             --cmake=/opt/cmake/bin/ \
-			--ace=$ACE_ROOT \
-			--tao=$TAO_ROOT \
-			--mpc=$MPC_ROOT \
-			--mpcopts="-workers 4" --features=uses_wchar=1 \
+            --ace=$ACE_ROOT \
+            --tao=$TAO_ROOT \
+            --mpc=$MPC_ROOT \
+            --mpcopts="-workers 4" --features=uses_wchar=1 \
     && ./tools/scripts/show_build_config.pl || true \
-    && make \
-    && make install
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1
 
 ENV ACE_TAO_ROOT=$DDS_BASE_DIR/ACE_TAO
 ENV ACE_ROOT=$ACE_TAO_ROOT/ACE
@@ -107,8 +125,8 @@ RUN cd /tmp \
     && cd XSC \
     && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 2 XSC.mwc \
     && mkdir -pv ${DDS_BASE_DIR}/XSC \
-    && make \
-    && DESTDIR=${DDS_BASE_DIR}/XSC make install
+    && make > /dev/null 2>&1 \
+    && DESTDIR=${DDS_BASE_DIR}/XSC make install > /dev/null 2>&1
 
 RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-rtps.git \ 
@@ -131,9 +149,9 @@ RUN cd /tmp \
     # && git clone --depth=1 --recursive https://github.com/objectcomputing/mFAST.git \
     # && cd mFAST \
     # && cmake -E make_directory build \
-    # && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
-    # && cmake --build build --target all --clean-first \
-    # && cmake --build build --target install \
+    # && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+    # && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+    # && cmake --build build --target install > /dev/null 2>&1 \
     # && cd /tmp
 
 #ENV ACE_ROOT=/usr/local/share/ace \
@@ -147,6 +165,7 @@ RUN cd /tmp \
 #    && cd liquibook/ \
 #    && git submodule init \
 #    && git submodule update \
+#    &&  . ./env.sh \
 #    && mwc.pl -type make liquibook.mwc \
 #    && make depend \
 #    && make all

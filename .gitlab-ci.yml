@@ -21,6 +21,12 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# sudo usermod -a -G sudo gitlab-runner
+# sudo visudo or sudo vi /etc/sudoers
+# %gitlab-runner ALL=(ALL) NOPASSWD: ALL # All members of gitlab-runner to run sudo w/o pwd
+# gitlab-runner ALL=(ALL) NOPASSWD: ALL # run sudo w/o password
+# gitlab-runner ALL=(ALL) NOPASSWD: /usr/bin/apt
+
 stages:
     - Build in docker image
     - Build own dind image
@@ -41,6 +47,12 @@ stages:
 
 variables:
     # CI_DEBUG_TRACE: "true"
+#    GIT_SUBMODULE_STRATEGY: "none"
+#    GET_SOURCES_ATTEMPTS: "3"
+#    ARTIFACT_DOWNLOAD_ATTEMPTS: "2"
+#    GIT_SUBMODULE_STRATEGY: "recursive"
+#    GIT_STRATEGY: "fetch"
+#    GIT_CHECKOUT: "false"
     GET_SOURCES_ATTEMPTS: "3"
     ARTIFACT_DOWNLOAD_ATTEMPTS: "10"
     GIT_DEPTH: "1"

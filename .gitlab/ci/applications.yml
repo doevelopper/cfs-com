@@ -1,0 +1,46 @@
+.variables: &cross-compile
+    CC: ${TRIPLET}-gcc
+    CXX: ${TRIPLET}-g++
+    NM: ${TRIPLET}-nm
+    AR: ${TRIPLET}-ar
+    AS: ${TRIPLET}-as
+    LD: ${TRIPLET}-ld
+    CPP: ${TRIPLET}-cpp
+    OBJDUMP: ${TRIPLET}-objdump
+    OBJCOPY: ${TRIPLET}-objcopy
+    READELF: ${TRIPLET}-readelf
+    RANLIB: ${TRIPLET}-ranlib
+    GDB: ${TRIPLET}-gdb
+    GFORTRAN: ${TRIPLET}-gfortran
+    STRINGS: ${TRIPLET}-strings
+    SIZE: ${TRIPLET}-size
+    GCOV: ${TRIPLET}-gcov
+    STRIP: ${TRIPLET}-strip
+    GPROF: ${TRIPLET}-gprof
+
+# .variables: &build_debug_variables
+#     CMAKE_BUILD_TYPE: "Debug"
+
+# .variables: &build_release_variables
+#     CMAKE_BUILD_TYPE: "Release"
+
+# .variables: &build_coverage_variables
+#     CMAKE_BUILD_TYPE: "Coverage"
+
+# .variables: &build_profiling_variables
+#     CMAKE_BUILD_TYPE: "Profiling"
+
+.aarch32-target-build-template: &aarch32
+    before_script:
+        - export PATH=/opt/arm-linux-gnueabihf/bin/:$PATH
+        - export TRIPLET=arm-linux-gnueabihf
+
+.armv8l-build-template: &armv8l
+    before_script:
+        - export PATH=/opt/armv8l-linux-gnueabihf/bin/:$PATH
+        - export TRIPLET=armv8l-linux-gnueabihf
+
+.aarch64-build-template: &aarch64
+    before_script:
+        - export PATH=/opt/aarch64-linux-gnu/bin/:$PATH
+        - export TRIPLET=aarch64-linux-gnu

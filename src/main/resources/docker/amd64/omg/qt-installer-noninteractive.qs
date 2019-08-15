@@ -23,7 +23,7 @@ Controller.prototype.IntroductionPageCallback = function() {
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
     //gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.value("InstallerDirPath") + "/Qt");
-	gui.currentPageWidget().TargetDirectoryLineEdit.setText("/opt/Qt5.12.0/");
+	gui.currentPageWidget().TargetDirectoryLineEdit.setText("/opt/Qt5.13.0/");
     gui.clickButton(buttons.NextButton);
 }
 

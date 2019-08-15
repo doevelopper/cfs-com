@@ -168,6 +168,16 @@
 
 #  Caching configurations
 
+.push-cache: &push-cache
+    cache:
+        <<: *default-cache
+    policy: push
+
+.pull-cache: &pull-cache
+    cache:
+        <<: *default-cache
+    policy: pull
+
 .per job caching:
     cache:
         key: "$CI_BUILD_NAME"

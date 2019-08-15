@@ -15,3 +15,16 @@ Running Tests by executing one of following commands
 > cmake -E env CTEST_OUTPUT_ON_FAILURE=TRUE cmake --build build --target test
 
 
+ generate:
+    @echo "Generation make build system..."
+    cmake -E make_directory build
+    cmake -E chdir build cmake -DNDDSHOME=/opt/rti_connext_dds-5.3.1 
+       -DCONNEXTDDS_ARCH=x64Linux3gcc5.4.0 -DRTICODEGEN_DIR=$NDDSHOME/bin 
+       -DCMAKE_BUILD_TYPE=DEBUG ..
+
+    cmake -DNDDSHOME=/opt/rti_connext_dds-5.3.1 -DCONNEXTDDS_ARCH=x64Linux3gcc5.4.0 
+      -DRTICODEGEN_DIR=$NDDSHOME/bin -DCMAKE_BUILD_TYPE=DEBUG ..
+
+    cmake -G"Unix Makefiles" -Bbuild -DNDDSHOME=/opt/rti_connext_dds-5.3.1 
+        -DCONNEXTDDS_ARCH=x64Linux3gcc5.4.0 -DRTICODEGEN_DIR=$NDDSHOME/bin 
+    -DCMAKE_BUILD_TYPE=DEBUG  -H.

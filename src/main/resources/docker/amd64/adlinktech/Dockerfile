@@ -54,11 +54,11 @@ RUN cd /tmp \
     && unzip gsoap_${GSOAP_VERSION}.zip \
     && cd gsoap-${GSOAP_MAJOR_VERSION} \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
-    && ./configure --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
+    && ./configure --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ > /dev/null 2>&1\
     && make clean \
     && cp -v ./gsoap/stdsoap2.c /usr/include \
-    && make  \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp \
     && rm -rf  gsoap-${GSOAP_MAJOR_VERSION} gsoap_${GSOAP_VERSION}.zip
 
@@ -66,7 +66,7 @@ ENV GSOAPHOME /usr
 
 RUN cd /tmp \
     && wget --no-check-certificate https://www.jacorb.org/releases/2.3.1/jacorb-2.3.1-bin.zip \
-    && unzip jacorb-2.3.1-bin.zip \
+    && unzip jacorb-2.3.1-bin.zip > /dev/null 2>&1 \
     && mv -v jacorb-2.3.1 /opt/ \
     && rm -rf jacorb-2.3.1-bin.zip
 
@@ -79,8 +79,8 @@ RUN cd /tmp \
     && chmod +x  ./envs-x86_64.linux-release.sh \
     #    && /bin/bash -c "source envs-x86_64.linux-release.sh" \
     && . ./envs-x86_64.linux-release.sh \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cp -Rv install/HDE /opt/ \
     && cp -Rv install/RTS /opt/ \
     && cd /tmp \

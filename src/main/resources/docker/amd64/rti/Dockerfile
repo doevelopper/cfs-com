@@ -346,5 +346,10 @@ RUN useradd -ms /bin/bash $ACCOUNT
 RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
 USER $ACCOUNT
 WORKDIR /home/$ACCOUNT
+
+# ENTRYPOINT rtilauncher
+# ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
+# CMD ["-cfgFile","/config.xml","-cfgName","gets_persistence"]
+
 CMD ["/bin/bash"]
 

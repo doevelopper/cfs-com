@@ -27,3 +27,5 @@ docker:clean::none:
     script:
         - if yes | docker system prune; then echo "Success"; fi
     when: always
+
+# docker system prune --all --force --volumes
