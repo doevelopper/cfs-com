@@ -1,4 +1,3 @@
-.DEFAULT_GOAL:=help
 # %W% %G% %U%
 #        cfs-com/Makefile
 #
@@ -23,29 +22,16 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-PROJECT_NAME        ?= $(shell basename $(CURDIR))
-DTR_NAMESPACE      	?= doelopper
-#  jfrog.io - docker.io - registry.gitlab.com - artifactory.io
-DOCKER_TRUSTED_REGISTRY ?= docker.io
-ARCH                ?= amd64
-PLATFORM            =
-BASE_IMAGE          =
-GOAL                ?= build
-DIND                ?= docker.io/doevelopper/dind:0.0.2
+VERSIONFILE         = VERSION_FILE
+VERSION             = $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
+PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
+PREVIOUS_VERSION    =  $(shell [ -n "$(PREVIOUS_VERSIONFILE_COMMIT)" ] && git show $(PREVIOUS_VERSIONFILE_COMMIT)^:$(CURDIR)$(VERSIONFILE) )
 
-ifneq ($(DOCKER_TRUSTED_REGISTRY),)
-    ifneq ($(ARCH),)
-        BASE_IMAGE := $(ARCH)/ubuntu:19.04
-        ifeq ($(PLATFORM),RTI)
-        	BASE_IMAGE := $(ARCH)/ubuntu:18.04
-        endif
-    else
-        $(error ERROR - unsupported value $(ARCH) for target arch!)
-    endif
-else
-    $(error ERROR - DTR not defined)
-endif
-
-include $(shell pwd -P)/src/main/resources/docker/makefiles/common-variables.mk
-include $(shell pwd -P)/src/main/resources/docker/makefiles/git-variables.mk
-include $(shell pwd -P)/src/main/resources/docker/makefiles/target-coordinator.mk
+MAJOR               = $(shell echo $(VERSION) | sed "s/^\([0-9]*\).*/\1/")
+MINOR               = $(shell echo $(VERSION) | sed "s/[0-9]*\.\([0-9]*\).*/\1/")
+PATCH               = $(shell echo $(VERSION) | sed "s/[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/")
+STAGE               = $(PATCH:$(VERSION)=0)
+BUILD               = $(shell git log --oneline | wc -l | sed -e "s/[ \t]*//g")
+NEXT_MAJOR_VERSION  = $(shell expr $(MAJOR) + 1).0.0-b$(BUILD)
+NEXT_MINOR_VERSION  = $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
+NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)

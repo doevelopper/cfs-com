@@ -49,10 +49,6 @@ NEXT_MINOR_VERSION  = $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
 NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)
 
 TOP_LEVEL_DIR       := $(shell git rev-parse --show-toplevel)
-TARGETS             ?= linux/amd64 linux/arm64 windows/amd64
-SHELL               = /usr/bin/env bash
-DOCKER_SHELL        := /bin/sh
-DOCKER              = docker
 DOCKER_LABEL        := --label org.label-schema.maintainer=$(DTR_NAMESPACE)
 DOCKER_LABEL        += --label org.label-schema.title="C++ Dev env"
 DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
