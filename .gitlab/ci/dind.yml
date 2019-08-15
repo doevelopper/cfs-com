@@ -41,7 +41,7 @@ docker:build:docker-base:
     script:
         - echo " Building ${ROOT_IMG_IMAGE}-dind:${VERSION}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        - echo "make ${BUILD_OPTIONS} VERSION=${VERSION} GOAL=build dind"
+        - make ${BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE} VERSION=${VERSION} GOAL=build dind
     # only:
        # refs:
            # - schedules
