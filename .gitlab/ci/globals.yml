@@ -155,7 +155,7 @@
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
         - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
-        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+        - echo make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
 
 
 .deploy_functions: &deploy_functions |
