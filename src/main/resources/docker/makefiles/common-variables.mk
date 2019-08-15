@@ -42,50 +42,49 @@ ifeq (0,${MAKELEVEL})
 	# MAKE := ${MAKE} host-type=${host-type} whoami=${whoami}
 endif
 
-EMPTY               =
-SPACE               = $(EMPTY) $(EMPTY)
-MAKEDIR             = mkdir -p
-DOCKER              = docker
-RM                  = -rm -rf
-BIN                 := /usr/bin
-SHELL               = $(BIN)/env bash
-DOCKER_SHELL        := $(BIN)/sh
-PRINTF              := $(BIN)/printf
-DF                  := $(BIN)/df
-AWK                 := $(BIN)/awk
-PERL                := $(BIN)/perl
-PYTHON              := $(BIN)/python
-PYTHON2             := $(BIN)/python2
-PYTHON3             := $(BIN)/python3
-
-DISPLAY             := @bash -c '  $(PRINTF) $(YELLOW); echo "=> $$1";  $(PRINTF) $(NC)'
-UNAME_OS            := $(shell uname -s)
-HOST_RYPE           := $(shell arch)
-DATE              	:= $(shell date -u "+%b-%d-%Y")
-CWD               	:= $(shell pwd -P)
-TARGETS             ?= linux/amd64 linux/arm64v8 windows/amd64
+export EMPTY               =
+export SPACE               = $(EMPTY) $(EMPTY)
+export MAKEDIR             = mkdir -p
+export DOCKER              = docker
+export RM                  = -rm -rf
+export BIN                 := /usr/bin
+export SHELL               = $(BIN)/env bash
+export DOCKER_SHELL        := $(BIN)/sh
+export PRINTF              := $(BIN)/printf
+export DF                  := $(BIN)/df
+export AWK                 := $(BIN)/awk
+export PERL                := $(BIN)/perl
+export PYTHON              := $(BIN)/python
+export PYTHON2             := $(BIN)/python2
+export PYTHON3             := $(BIN)/python3
+export DISPLAY             := @bash -c '  $(PRINTF) $(YELLOW); echo "=> $$1";  $(PRINTF) $(NC)'
+export UNAME_OS            := $(shell uname -s)
+export HOST_RYPE           := $(shell arch)
+export DATE              	:= $(shell date -u "+%b-%d-%Y")
+export CWD               	:= $(shell pwd -P)
+export TARGETS             ?= linux/amd64 linux/arm64v8 windows/amd64
 # Define colors for console output
 
-SH_DEFAULT          := $(shell echo '\033[00m')
-SH_RED              := $(shell echo '\033[31m')
-SH_GREEN            := $(shell echo '\033[32m')
-SH_YELLOW           := $(shell echo '\033[33m')
-SH_BLUE             := $(shell echo '\033[34m')
-SH_PURPLE           := $(shell echo '\033[35m')
-SH_CYAN             := $(shell echo '\033[36m')
+export SH_DEFAULT          := $(shell echo '\033[00m')
+export SH_RED              := $(shell echo '\033[31m')
+export SH_GREEN            := $(shell echo '\033[32m')
+export SH_YELLOW           := $(shell echo '\033[33m')
+export SH_BLUE             := $(shell echo '\033[34m')
+export SH_PURPLE           := $(shell echo '\033[35m')
+export SH_CYAN             := $(shell echo '\033[36m')
 
-UNDERLINE           = $(shell tput smul)
-STANDOUT            = $(shell tput smso)
-BOLD                = $(shell tput bold)
-BLACK               = $(shell tput setaf 0)
-RED                 = $(shell tput setaf 1)
-GREEN               = $(shell tput setaf 2)
-YELLOW              = $(shell tput setaf 3)
-BLUR                = $(shell tput setaf 4)
-MAGENTA             = $(shell tput setaf 5)
-CYAN                = $(shell tput setaf 6)
-WHITE               = $(shell tput setaf 7)
-RESET               = $(shell tput sgr0)
+export UNDERLINE           = $(shell tput smul)
+export STANDOUT            = $(shell tput smso)
+export BOLD                = $(shell tput bold)
+export BLACK               = $(shell tput setaf 0)
+export RED                 = $(shell tput setaf 1)
+export GREEN               = $(shell tput setaf 2)
+export YELLOW              = $(shell tput setaf 3)
+export BLUR                = $(shell tput setaf 4)
+export MAGENTA             = $(shell tput setaf 5)
+export CYAN                = $(shell tput setaf 6)
+export WHITE               = $(shell tput setaf 7)
+export RESET               = $(shell tput sgr0)
 
 define blue
 	@tput setaf 4
