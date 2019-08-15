@@ -28,30 +28,6 @@
         GOAL: run
         MODULE: "dds-base"
 
-.docker:test:omg-opendds:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-omg-opendds-dev:0.0.1
-    stage: Test docker image
-    variables:
-        GOAL: run
-        MODULE: "omg-opendds"
-
-.docker:test:adlinkist-vortex:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-dev:0.0.1    
-    stage: Test docker image
-    variables:
-        VERSION: 0.0.1
-        MODULE: "vortex-opensplice"
-
-.docker:test:eprosima-rtps:
-    <<: *build-docker-container
-    image: docker.io/doevelopper/cfs-com-dev:0.0.1
-    stage: Test docker image
-    variables:
-        VERSION: 0.0.1
-        MODULE: "fast-rtps"
-
 .docker:test:rti-dds-base:
     stage: Test docker image
     <<: *build-docker-container

@@ -23,6 +23,6 @@
 
 docker:clean::none:
     stage: Clean local artifacts
-    <<: *build-docker-container
+    extends: .create-docker-container
     script:
         - if yes | docker system prune; then echo "Success"; fi
