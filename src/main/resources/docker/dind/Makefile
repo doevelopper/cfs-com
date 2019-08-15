@@ -25,31 +25,21 @@
 
 include $(CWD)/src/main/resources/docker/makefiles/semver-variables.mk
 
+CONTAINER_IMAGE      = ${DTR_NS}-$(shell basename $(CURDIR))
+
 DOCKER_LABEL        := --label org.label-schema.title="Dind docker-compose make git"
 DOCKER_LABEL        += --label org.label-schema.description="Docker in docker for running container usin CI"
-DOCKER_LABEL        += --label org.label-schema.name=$(IMAGE)
-DOCKER_LABEL        += --label org.label-schema.schema-version="$(IMAGE):$(VERSION)"
+DOCKER_LABEL        += --label org.label-schema.name=$(CONTAINER_IMAGE)
+DOCKER_LABEL        += --label org.label-schema.schema-version="$(CONTAINER_IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
 DOCKER_LABEL        += --label org.label-schema.usage="running using gitlab-ci"
 DOCKER_LABEL        += --label org.label-schema.docker.cmd="make ${PROJECT_NAME}$(shell basename $(CURDIR)) run"
 DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
-#$(IMAGE)-dev
-CONTAINER_IMAGE      = ${DTR_NS}-$(shell basename $(CURDIR))
 
 # FQIN - fully qualified image name
 # Builder - Contains all the build artifacts and depedencies
 # Runtime - Contains only the minimum necessary artifacts to run the microservice
 BUILDER_FQIN        := $(CONTAINER_IMAGE)
 RUNTIME_FQIN        := $(IMAGE):$(VERSION)
-
-BUILD_ARGS          = --build-arg MAKEFLAGS="$(DK_MKFALGS)"
-
-ifneq ($(PROXY_URL),)
-    BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
-    BUILD_ARGS      += --build-arg https_proxy=$(PROXY_URL)
-    BUILD_ARGS      += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
-else
-    BUILD_ARGS      +=
-endif
 
 include $(CWD)/src/main/resources/docker/makefiles/common-goals.mk

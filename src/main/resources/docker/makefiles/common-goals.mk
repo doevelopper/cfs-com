@@ -49,6 +49,15 @@ DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering
 DOCKER_LABEL        += --label org.label-schema.documentation=$(GIT_REPOS_URL)
 DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+BUILD_ARGS          = --build-arg MAKEFLAGS="$(DK_MKFALGS)"
+
+ifneq ($(PROXY_URL),)
+    BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg https_proxy=$(PROXY_URL)
+    BUILD_ARGS      += --build-arg no_proxy="/var/run/docker.sock,localhost,127.0.0.1,localaddress,.localdomain.com,192.168.*"
+else
+    BUILD_ARGS      +=
+endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
