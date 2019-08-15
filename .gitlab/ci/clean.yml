@@ -26,3 +26,4 @@ docker:clean::none:
     extends: .create-docker-container
     script:
         - if yes | docker system prune; then echo "Success"; fi
+    when: always

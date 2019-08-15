@@ -158,6 +158,13 @@
         - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
 
 
+.deploy_functions: &deploy_functions |
+    [[ "$TRACE" ]] && set -x
+    skipvar="SKIP_$(echo ${CI_JOB_STAGE} | tr 'a-z' 'A-Z')"
+    [ "$(printenv $skipvar)" ] && echo "Skipping stage!" && exit 0
+# before_script:
+#   - *deploy_functions
+
 
 #  Caching configurations
 
@@ -175,3 +182,8 @@
     cache:
         key: "$CI_BUILD_STAGE/$CI_BUILD_REF_NAME"
         untracked: true
+
+.weekly build:
+    only:
+        variables:
+            - $SCHEDULE_TYPE == "weekly"

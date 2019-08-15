@@ -21,7 +21,9 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
 
-FROM doevelopper/cfs-com-dev:0.0.1
+ARG BASE_IMAGE
+FROM BASE_IMAGE ${BASE_IMAGE:-doevelopper}
+# FROM doevelopper/cfs-com-dev:0.0.1
 
 ARG OPENDDS_BUILD_OPTIONS="-std=c++11 --ipv6 --openssl --xerces3=/usr/local --java --rapidjson --glib --boost=/usr"
 ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --features=versioned_namespace=1 --macros=c++11=1 --no-debug --optimize"

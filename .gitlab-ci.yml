@@ -80,3 +80,10 @@ Fake Job :
         - echo 'script'
     after_script:
         - echo 'overwrite'
+
+# deploy:
+#     when: env.key?(:DO_DEPLOY) and env[:DO_DEPLOY]
+#     script:
+#         - echo "script content"
+#     only:
+#         - master@org/repo
