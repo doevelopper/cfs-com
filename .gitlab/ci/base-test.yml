@@ -21,16 +21,16 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-.docker:test:dds-base:
+docker:test:dds-base:
     stage: Test docker image
-    <<: *build-docker-container
+    extends: .create-docker-container
     variables:
         GOAL: run
         MODULE: "dds-base"
 
-.docker:test:rti-dds-base:
+docker:test:rti-dds-base:
     stage: Test docker image
-    <<: *build-docker-container
+    extends: .create-docker-container
     variables:
         VERSION: 5.3.3
         MODULE: "rti-connext-dds"
