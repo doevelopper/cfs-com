@@ -66,15 +66,15 @@ RUN cd /tmp \
     && export DANCE_ROOT=/tmp/DAnCE \
     && export MPC_ROOT=/tmp/MPC \
     && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
-	&& echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h; \
+	&& echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
 	&& echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
-	&& echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
-	&& echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
-	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
-	&& echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
-	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features; \
-	&& echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
-	&& echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU; \
+	&& echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	&& echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	&& echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	&& echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	&& echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
     && cd OpenDDS \
     && ./configure --help \
     && ./configure --prefix=${DDS_BASE_DIR} \

@@ -41,6 +41,7 @@ docker:build:adlinkist-vortex:
     # image: docker.io/doevelopper/cfs-com-dev:0.0.1    
     # stage: Build docker image
     variables:
+        GOAL: build
         VERSION: 6.9.0
         MODULE: "vortex-opensplice"
         IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
@@ -55,6 +56,7 @@ docker:build:eprosima-rtps:
     # image: docker.io/doevelopper/cfs-com-dev:0.0.1
     # stage: Build docker image
     variables:
+        GOAL: build
         VERSION: 1.9.0
         MODULE: "fast-rtps"
         IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
