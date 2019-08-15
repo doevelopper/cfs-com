@@ -123,13 +123,13 @@
         BUILD_OPTIONS: ${DOCKER_BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE}
 
 .docker-hub-dind:
+    image: docker:19.03.0
+    services:
+        - docker:19.03.0-dind
     stage: Build in docker image
     extends: 
         - .agent-who
         - .dind_hub_variables
-    image: docker:19.03.0
-    services:
-        - docker:19.03.0-dind
 
 .docker:
     services:
