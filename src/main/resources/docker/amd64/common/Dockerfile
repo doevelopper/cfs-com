@@ -11,7 +11,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         perl-base perl-modules zlib1g-dev \
         libxml2-dev libxml2-utils python3-setuptools python-setuptools \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-        mesa-common-dev libglu1-mesa-dev libpcap-dev \
+        mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 \
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \

@@ -19,10 +19,10 @@
 #        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# 
+#
 
 ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
-FROM $BASE_IMAGE 
+FROM $BASE_IMAGE
 
 ARG OPENDDS_BUILD_OPTIONS="-std=c++11 --ipv6 --openssl --xerces3=/usr/local --java --rapidjson --glib --boost=/usr"
 ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --macros=c++11=1 --no-debug --optimize"
@@ -45,21 +45,31 @@ RUN git config --global url."https://".insteadOf git://
 
 USER root
 
+# Core libraries
+RUN apt-get -qq install -y \
+    libglu1-mesa-dev libxrender1 libxkbcommon-x11-0
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \ 
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install --assume-yes --no-install-recommends nodejs
 
-ENV QT_MAJOR_VERSION ${QT_MAJOR_VERSION:-5.13}
-ENV QT_VERSION ${QT_VERSION:-${QT_MAJOR_VERSION}.0}
-ENV QT_VERSION_STR ${QT_MAJOR_VERSION}.${QT_VERSION}
+ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
+ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+
+COPY qt-installer-noninteractive.qs /tmp
 
 RUN cd /tmp\
-    && wget http://download.qt.io/official_releases/qt/${QT_MAJOR_VERSION}/${QT_VERSION_STR}/qt-opensource-linux-x64-${QT_VERSION_STR}.run
+    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
+    && chmod +x qt-opensource-linux-x64-${Q_VERSION}.run \
+    && ./qt-opensource-linux-x64-${Q_VERSION}.run --script qt-installer-noninteractive.qs \
+    && rm -vf qt-opensource-linux-x64-${Q_VERSION}.run
 
+ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
+ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
+ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
+    # && export CMAKE_PREFIX_PATH=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64:$CMAKE_PREFIX_PATH \
+    # && export QTDIR=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64 \
 RUN cd /tmp \
-    && export CMAKE_PREFIX_PATH=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64:$CMAKE_PREFIX_PATH \ 
-    && export QTDIR=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64 \
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \ 
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \
     && cd wireshark \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} \
@@ -73,10 +83,10 @@ ENV DDS_BASE_DIR=/opt/dds
 
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/DOCGroup/CIAO.git \
-    && git clone --depth=1 https://github.com/DOCGroup/DAnCE.git \ 
+    && git clone --depth=1 https://github.com/DOCGroup/DAnCE.git \
     && git clone --depth=1 https://github.com/DOCGroup/MPC.git \
     && git clone --depth=1 git://github.com/DOCGroup/ACE_TAO.git \
-    && git clone --depth=1 --recurse-submodules https://github.com/objectcomputing/OpenDDS.git \ 
+    && git clone --depth=1 --recurse-submodules https://github.com/objectcomputing/OpenDDS.git \
     && export ACE_TAO_ROOT=/tmp/ACE_TAO \
     && export ACE_ROOT=$ACE_TAO_ROOT/ACE \
     && export TAO_ROOT=$ACE_TAO_ROOT/TAO \
@@ -129,8 +139,8 @@ RUN cd /tmp \
     && DESTDIR=${DDS_BASE_DIR}/XSC make install > /dev/null 2>&1
 
 RUN cd /tmp \
-    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-rtps.git \ 
-    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-xtypes.git \ 
+    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-rtps.git \
+    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-xtypes.git \
     && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-security.git \
     && cd dds-security
 

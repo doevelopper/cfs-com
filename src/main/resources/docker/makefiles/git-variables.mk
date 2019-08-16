@@ -29,7 +29,8 @@ SHORT_SHA1        	:= $(shell git rev-parse --short=5 HEAD)
 GIT_STATUS        	:= $(shell git status --porcelain)
 GIT_BRANCH        	:= $(shell git rev-parse --abbrev-ref HEAD)
 GIT_BRANCH_STR    	:= $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
-GIT_REPO          	:= $(shell git config --local remote.origin.url | sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
+GIT_REPO          	:= $(shell git config --local remote.origin.url | \
+                        sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
 GIT_REPOS_URL     	:= $(shell git config --get remote.origin.url)
 CURRENT_BRANCH      := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_BRANCHES        := $(shell git for-each-ref --format='%(refname:short)' refs/heads/ | xargs echo)
@@ -37,4 +38,10 @@ GIT_REMOTES         := $(shell git remote | xargs echo )
 GIT_ROOTDIR         := $(shell git rev-parse --show-toplevel)
 GIT_DIRTY           := $(shell git diff --shortstat 2> /dev/null | tail -n1 )
 LAST_TAG_COMMIT     := $(shell git rev-list --tags --max-count=1)
+GIT_COMMITS         := $(shell git log --oneline ${LAST_TAG}..HEAD | wc -l | tr -d ' ')
+GIT_REVISION        := $(shell git rev-parse --short=8 HEAD || echo unknown)
 # LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
+GIT_LAST_TAG        := $(git log --first-parent --pretty="%d" | \
+                         grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]+(\)|,)" -o | \
+                         grep "v[0-9]*\.[0-9]*\.[0-9]*" -o | head -n 1)
+

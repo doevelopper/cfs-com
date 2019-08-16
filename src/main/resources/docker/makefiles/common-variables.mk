@@ -22,19 +22,25 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-ifeq ($(KBUILD_VERBOSE),1)
-  quiet =
-  Q =
-else
-  quiet=quiet_
-  Q = @
+ifeq ("$(origin V)", "command line")
+    KBUILD_VERBOSE = $(V)
+endif
+ifndef KBUILD_VERBOSE
+    KBUILD_VERBOSE = 0
 endif
 
-# ifdef VERBOSE
-#     Q :=
-# else
-#     Q := @
-# endif
+ifeq ($(KBUILD_VERBOSE),1)
+    quiet =
+    Q =
+else
+    quiet=quiet_
+    Q = @
+endif
+
+ifneq ($(findstring s,$(filter-out --%,$(MAKEFLAGS))),)
+    quiet=silent_
+    tools_silent=s
+endif
 
 ifeq (0,${MAKELEVEL})
 	whoami    := $(shell whoami)
@@ -42,6 +48,7 @@ ifeq (0,${MAKELEVEL})
 	# MAKE := ${MAKE} host-type=${host-type} whoami=${whoami}
 endif
 
+export quiet Q KBUILD_VERBOSE
 export EMPTY               =
 export SPACE               = $(EMPTY) $(EMPTY)
 export MAKEDIR             = mkdir -p

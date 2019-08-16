@@ -21,14 +21,6 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # 
 
-ifeq ($(KBUILD_VERBOSE),1)
-  quiet =
-  Q =
-else
-  quiet=quiet_
-  Q = @
-endif
-
 DOCKER_LABEL        += --label org.label-schema.maintainer=$(DTR_NAMESPACE)
 DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 DOCKER_LABEL        += --label org.label-schema.license="Licence · Apache-2.0"
@@ -102,11 +94,15 @@ run-image : build-image
         --volume ${HOME}/.conan:/home/developer/.conan \
         --volume ${HOME}/.ssh:/home/developer/.ssh \
         --volume ${HOME}/.m2:/home/developer/.m2 \
+        --volume /etc/passwd:/etc/passwd:ro \
         --volume $(CWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
         --volume $(CWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
         --volume $(CWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
         --volume $(CWD):/home/developer/workspace \
-        --volume /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY}  \
+        --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
+        -e DISPLAY=unix${DISPLAY} \
+        -e LANG=C.UTF-8 \
+        -e LC_ALL=C.UTF-8 \
         --tty --interactive $(BUILDER_FQIN):$(VERSION)  
         # || exit $?
 

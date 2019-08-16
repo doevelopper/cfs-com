@@ -19,10 +19,10 @@
 #        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# 
+#
 
 ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
-FROM $BASE_IMAGE 
+FROM $BASE_IMAGE
 
 USER root
 
@@ -33,12 +33,21 @@ USER root
 #RUN apt-get install -y oracle-java8-installer
 #RUN rm -rf /var/cache/oracle-jdk8-installer
 
+RUN cd /tmp \
+    && git clone --depth=1 --recurse-submodules https://github.com/foonathan/memory.git \
+    && cd memory \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic" -DCMAKE_INSTALL_PREFIX=/usr/eprosima \
+    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
+    && cd /tmp \
+    && rm -rf memory
 
 RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules https://github.com/eProsima/Fast-RTPS.git \
     && cd Fast-RTPS \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DTHIRDPARTY=ON -DPERFORMANCE_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/eprosima \
+    && cmake -E chdir build cmake .. -DTHIRDPARTY=ON -DPERFORMANCE_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/eprosima -DBUILD_SHARED_LIBS=ON \
     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
     && cd /tmp \
