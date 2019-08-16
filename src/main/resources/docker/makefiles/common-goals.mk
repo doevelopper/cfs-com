@@ -93,6 +93,7 @@ run-image : build-image
         --hostname="docker-dev-build" \
         --volume ${HOME}/.conan:/home/developer/.conan \
         --volume ${HOME}/.ssh:/home/developer/.ssh \
+        --volume ${HOME}/.Xauthority:/root/.Xauthority\
         --volume ${HOME}/.m2:/home/developer/.m2 \
         --volume /etc/passwd:/etc/passwd:ro \
         --volume $(CWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \

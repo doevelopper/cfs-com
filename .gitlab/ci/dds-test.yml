@@ -1,4 +1,4 @@
-#         cfs-com/.gitlab/ci/dds.yml
+#         cfs-com/.gitlab/ci/dds-test.yml
 #
 #               Copyright (c) 2014-2018 A.H.L
 #
@@ -38,6 +38,14 @@ docker:test:adlinkist-vortex:
         MODULE: "vortex-opensplice"
 
 docker:test:eprosima-rtps:
+    extends: .create-docker-container
+    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    stage: Test docker image
+    variables:
+        VERSION: 0.0.1
+        MODULE: "fast-rtps"
+
+docker:test:rti-connextDDS:
     extends: .create-docker-container
     # image: docker.io/doevelopper/cfs-com-dev:0.0.1
     stage: Test docker image

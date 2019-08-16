@@ -34,7 +34,7 @@ ARG DDS_BUILD_MACRO="--macros=c++11=1"
 ARG DDS_BUILD_MACRO_1="--macros=CPPFLAGS+=-Wno-deprecated -Wno-unused-result"
 ARG DDS_BUILD_MACRO_2="--macros=CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result"
 ARG DDS_BUILD_SECURITY_OPTIONS="--security --safety-profile=base"
-ARG DDS_BUILD_QT_OPTIONS="--qt --wireshark=/usr/include/wireshark/"
+ARG DDS_BUILD_QT_OPTIONS="--qt --wireshark=/usr/local/include/wireshark/"
 
 ARG GET_DDS_VERSION="DDS-3.13-2"
 ARG DDS_SRCS_LINUX="https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.13.2/OpenDDS-3.13.2.tar.gz"
@@ -59,20 +59,21 @@ COPY qt-installer-noninteractive.qs /tmp
 
 RUN cd /tmp\
     && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x qt-opensource-linux-x64-${Q_VERSION}.run \
+    && chmod +x qt-opensource-linux-x64-${Q_VERSION}.run
+
+RUN cd /tmp\
     && ./qt-opensource-linux-x64-${Q_VERSION}.run --script qt-installer-noninteractive.qs \
     && rm -vf qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
-    # && export CMAKE_PREFIX_PATH=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64:$CMAKE_PREFIX_PATH \
-    # && export QTDIR=/opt/Qt${QT_VERSION_STR}/${QT_VERSION_STR}/gcc_64 \
+
 RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \
     && cd wireshark \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
     && cmake --build build --target all --clean-first \
     && cmake --build build --target install \
     cd /tmp \

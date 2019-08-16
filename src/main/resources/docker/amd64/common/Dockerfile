@@ -197,6 +197,26 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf benchmark
 
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/glog.git \
+   && cd glog \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf glog
+
+RUN cd /tmp \
+   && git clone --depth=1 --recurse-submodules https://github.com/google/crc32c.git \
+   && cd crc32c \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf glog
+
 # RUN pip install cmakedoc
 # RUN cd /tmp \
    # && git clone --depth=1 https://github.com/jeaye/stdman.git \
@@ -277,6 +297,62 @@ RUN cd /tmp \
    && cmake --build build --target install \
    && cd /tmp \
    && rm -rf capture-thread
+
+RUN cd /tmp \
+                    
+   && curl -L -O -k http://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz \
+   && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
+   && tar -xvzf afl-2.52b.tgz \
+   && cd afl-2.52b \
+   && make clean && make && make  DESTDIR=/opt/afl BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
+   && cd /tmp \
+   && rm -rf afl-2.52b
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/libcheck/check.git \
+   && cd check \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+   && cmake --build build --target install || true \
+   && cd /tmp \
+   && rm -rf check
+
+# RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/KDAB/hotspot.git \
+#    && cd hotspot \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#    && cmake --build build --target all --clean-first \
+#    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rf hotspot
+	
+# RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/apitrace/apitrace.git \
+#    && cd apitrace \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#    && cmake --build build --target all --clean-first \
+#    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rf apitrace
+
+   # "Building IEEE doubles binary-decimal and decimal-binary ."
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/double-conversion.git  \
+   && cd double-conversion \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+#   - test/cctest/cctest --list | tr -d '<' | xargs test/cctest/cctest \
+   && cmake --build build --target install || true \
+   && cd /tmp \
+   && rm -rf double-conversion
 
 # RUN cd /tmp \
    # && git clone --depth=1 https://github.com/google/statechart.git \
@@ -397,6 +473,19 @@ RUN cd /tmp \
 RUN cd /opt \
    && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
 ENV  PATH /opt/depot_tools:$PATH
+
+# "Building translating between absolute and civil times"
+RUN cd /tmp \
+	&& git clone --depth=1 https://github.com/google/cctz.git \
+	&& cd cctz \
+	&& cmake -E make_directory mybuild \
+	&& cmake -E chdir mybuild cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} .. \
+	&& cmake --build mybuild --target all  --config Release \
+	&& ctest \
+	&& cmake --build mybuild --config Release --target install \
+	&& cmake --build mybuild --target install \
+	&& cd /tmp \
+	&& rm -rf cctz
 
 
 # RUN cd /tmp \
