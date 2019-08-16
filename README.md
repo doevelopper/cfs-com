@@ -22,11 +22,6 @@
 
 # Data distribution Service and Micro Services for linux applications
 
-	Branch   | Gitlab-CI | Travis | Build |  Tests  | Integration Test | Coverage | Documentation |
-|--------|-----------|--------|-------|---------|------------------|----------|---------------|
-|[__master__][cfs-master] | [![pipeline status][cfs-master-shield]][cfs-master] |-|-|-|-|[![coverage report][cfs-cov-master-shield]][cfs-master-shield]| ![tbd](https://img.shields.io/badge/development%20status-active-green.svg)
-|[__develop__][cfs-develop] | [![pipeline status][cfs-develp-shield]][cfs-master] |-|-|-|-| [![coverage report][cfs-cov-develop-shield]][cfs-develop-shield]|
-|[__release__][cfs-release]
 
 # DDS Abstraction Library
 Each DDS implementation can do everything we ask for (and even more), but it will not show you how to achieve that.
