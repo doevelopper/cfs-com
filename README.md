@@ -24,6 +24,9 @@
 
 Branch   | Gitlab-CI | Travis | Build |  Tests  | Integration Test | Coverage | Documentation |
 |--------|-----------|--------|-------|---------|------------------|----------|---------------|
+|[__master__][cfs-master] | [![pipeline status][cfs-master-shield]][cfs-master] |-|-|-|-|[![coverage report][cfs-cov-master-shield]][cfs-master-shield]| ![tbd](https://img.shields.io/badge/development%20status-active-green.svg)
+|[__develop__][cfs-develop] | [![pipeline status][cfs-develop-shield]][cfs-develop] |-|-|-|-| [![coverage report][cfs-cov-develop-shield]][cfs-develop-shield]|
+|[__release__][cfs-release]
 
 
 # DDS Abstraction Library
