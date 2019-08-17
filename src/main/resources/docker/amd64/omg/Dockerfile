@@ -46,14 +46,6 @@ RUN git config --global url."https://".insteadOf git://
 
 USER root
 
-# RUN apt-get -qq update && apt-get -qq install -y libxcb-keysyms1-dev libxcb-image0-dev \
-#     libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
-#     libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-#     libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev libxfixes-dev \
-#     libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
-#     xauth build-essential mesa-common-dev libglu1-mesa-dev libxkbcommon-dev \
-#     libxcb-xkb-dev libxslt1-dev libgstreamer-plugins-base0.10-dev
-
 # Core libraries ==> should go to common
 RUN apt-get -qq install -y \
     libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1 
@@ -68,15 +60,14 @@ ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
 COPY qt-installer-noninteractive.qs /tmp
 
-RUN cd /tmp\
+RUN cd /tmp \
     && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x qt-opensource-linux-x64-${Q_VERSION}.run
-
-RUN cd /tmp\
+    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run  \
+# RUN cd /tmp \
 ## xhost +local:docker #QStandardPaths: XDG_RUNTIME_DIR not set Docker
 #   # && xhost +
-    && xvfb-run --auto-servernum --error-file=/dev/stderr qt-opensource-linux-x64-${Q_VERSION}.run --verbose --script qt-installer-noninteractive.qs \
-    && rm -vf qt-opensource-linux-x64-${Q_VERSION}.run
+    && xvfb-run --auto-servernum --error-file=/dev/stderr /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose --script qt-installer-noninteractive.qs \
+    && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
 #   # && xhost -
 
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64

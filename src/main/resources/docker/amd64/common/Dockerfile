@@ -5,11 +5,11 @@ ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
    && apt-get -qq install --assume-yes --no-install-recommends libtool apt-transport-https  \
-      ca-certificates autotools-dev\
-      git xz-utils unzip wget curl openssh-server  openssh-client  automake \
+      ca-certificates autotools-dev autopoint autoconf libpthread-stubs0-dev \
+      git xz-utils unzip wget curl openssh-server openssh-client  automake \
       bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
       python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-      perl-base perl-modules zlib1g-dev \
+      perl-base perl-modules zlib1g-dev libglib2.0-dev \
       libxml2-dev libxml2-utils python3-setuptools python-setuptools \
       libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
       mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 \
@@ -28,9 +28,16 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
    && rm -rf /usr/share/man/
 
-        # libcairo2 libfontconfig1 libnss3 libxtst6 libglib2.0-bin \
-        # libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
-        # software-properties-common autogen libnotify-bin \
+# RUN apt-get -qq update && apt-get -qq install -y libxcb-keysyms1-dev libxcb-image0-dev \
+#     libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
+#     libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
+#     libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev libxfixes-dev \
+#     libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
+#     xauth build-essential mesa-common-dev libglu1-mesa-dev libxkbcommon-dev \
+#     libxcb-xkb-dev libxslt1-dev libgstreamer-plugins-base0.10-dev
+#     libcairo2 libfontconfig1 libnss3 libxtst6 libglib2.0-bin \
+#     libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
+#     software-properties-common autogen libnotify-bin \
 
 ARG MAKEFLAGS
 
@@ -487,6 +494,87 @@ RUN cd /tmp \
 	&& cd /tmp \
 	&& rm -rf cctz
 
+# Fetch and build GStreamer
+ARG GST_VERSION=1.14.0
+# RUN cd /tmp \
+#    && git clone -b $GST_VERSION --depth 1 git://anongit.freedesktop.org/git/gstreamer/gstreamer \
+#    && cd gstreamer \
+#    && git checkout ${GST_VERSION} \
+#    && ./autogen.sh --prefix=/usr --disable-gtk-doc \
+#    && make -j`nproc` \
+#    && make install \
+#    && cd /tmp/ \
+#    && rm -rf /gstreamer
+
+
+# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
+    && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gstreamer-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/
+
+# gst-plugins-base
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-base-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/
+
+# libnice
+RUN cd /tmp \
+    && git clone https://github.com/libnice/libnice.git \
+    && cd libnice \
+    && ./autogen.sh --prefix=/usr --with-gstreamer --enable-static --enable-static-plugins --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
+    && make install \
+    && cd /tmp/
+
+# gst-plugins-good
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-good-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/
+
+# gst-plugins-bad
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-bad-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/
+
+# gst-plugins-ugly
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-ugly-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/ 
+
+# gst-rtsp-server
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-rtsp-server-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make \
+    && make install \
+    && cd /tmp/ \
+    rm -rf gst*
 
 # RUN cd /tmp \
 	# && git clone --depth=1 https://github.com/Snaipe/Criterion.git \
