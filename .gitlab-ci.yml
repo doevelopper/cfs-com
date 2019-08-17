@@ -93,13 +93,6 @@ Fake Job :
     after_script:
         - echo 'overwrite'
 
-CI Out :
-    extends: 
-        - .docker-hub-dind
-    <<: *post_shared
-    script:
-        - echo '...'
-
 # deploy:
 #     when: env.key?(:DO_DEPLOY) and env[:DO_DEPLOY]
 #     script:
