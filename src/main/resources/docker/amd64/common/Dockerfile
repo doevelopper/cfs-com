@@ -4,22 +4,23 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
-   && apt-get -qq install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
-        git xz-utils unzip wget curl openssh-server  openssh-client  automake \
-        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
-        python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-        perl-base perl-modules zlib1g-dev \
-        libxml2-dev libxml2-utils python3-setuptools python-setuptools \
-        libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-        mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 \
-        libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
-        unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
-        libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
-        libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  tmux vim-nox \
-        htop libxss1 libasound2 x11-apps dbus gpg \
-        libc6-dev libgtk-3-0 libpango-1.0-0 \
-        htop emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1  > /dev/null 2>&1 \
+   && apt-get -qq install --assume-yes --no-install-recommends libtool apt-transport-https  \
+      ca-certificates autotools-dev\
+      git xz-utils unzip wget curl openssh-server  openssh-client  automake \
+      bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
+      python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
+      perl-base perl-modules zlib1g-dev \
+      libxml2-dev libxml2-utils python3-setuptools python-setuptools \
+      libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
+      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 \
+      libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
+      unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
+      libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
+      libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  tmux vim-nox \
+      htop libxss1 libasound2 x11-apps dbus gpg \
+      libc6-dev libgtk-3-0 libpango-1.0-0 \
+      emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
+      x11-xserver-utils libxkbfile1  > /dev/null 2>&1 \
    && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
@@ -299,7 +300,6 @@ RUN cd /tmp \
    && rm -rf capture-thread
 
 RUN cd /tmp \
-                    
    && curl -L -O -k http://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz \
    && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
    && tar -xvzf afl-2.52b.tgz \
@@ -511,6 +511,17 @@ RUN cd /tmp \
 #    && rm -vf vscode-ext.sh
 
 ARG ACCOUNT=developer
+
+# RUN useradd -m $ACCOUNT \
+#    && echo "$ACCOUNT:$ACCOUNT" | chpasswd \
+#    && usermod --shell /bin/bash $ACCOUNT \
+#    && usermod -aG sudo $ACCOUNT \
+#    && echo "$ACCOUNT ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$ACCOUNT \
+#    && chmod 0440 /etc/sudoers.d/$ACCOUNT \
+#        # Replace 1000 with your user/group id
+#    && usermod  --uid 1000 $ACCOUNT \
+#    && groupmod --gid 1000 $ACCOUNT
+
 # Add a new group '${ACCOUNT}s' with ID 1000
 # Add a new user  '$ACCOUNT' with ID 1000
 # Add $ACCOUNT to sudoers list with no password required
@@ -528,3 +539,4 @@ RUN chmod 1777 -R /tmp
 USER $ACCOUNT
 WORKDIR /home/$ACCOUNT
 CMD ["/bin/bash"]
+

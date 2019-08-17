@@ -77,6 +77,7 @@ RUN cd /tmp \
     && cd opensplice \
     && ./configure x86_64.linux-release --prefix=/usr/local \
     && chmod +x  ./envs-x86_64.linux-release.sh \
+#    && ln -s /opt/gsoap-$GSOAP_MAJ_VER/gsoap/stdsoap2.c /opt/gsoap-$GSOAP_MAJ_VER/usr/include/ \
     #    && /bin/bash -c "source envs-x86_64.linux-release.sh" \
     && . ./envs-x86_64.linux-release.sh \
     && make > /dev/null 2>&1 \

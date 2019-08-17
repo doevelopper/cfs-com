@@ -42,18 +42,29 @@ ARG DDS_REPO="https://github.com/objectcomputing/OpenDDS.git"
 
 RUN git config --global url."https://github.com/".insteadOf "git@github.com:"
 RUN git config --global url."https://".insteadOf git://
+#RUN git config --global url."https".insteadOf "git+https"
 
 USER root
 
-# Core libraries
+# RUN apt-get -qq update && apt-get -qq install -y libxcb-keysyms1-dev libxcb-image0-dev \
+#     libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
+#     libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
+#     libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev libxfixes-dev \
+#     libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
+#     xauth build-essential mesa-common-dev libglu1-mesa-dev libxkbcommon-dev \
+#     libxcb-xkb-dev libxslt1-dev libgstreamer-plugins-base0.10-dev
+
+# Core libraries ==> should go to common
 RUN apt-get -qq install -y \
-    libglu1-mesa-dev libxrender1 libxkbcommon-x11-0
+    libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1 
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install --assume-yes --no-install-recommends nodejs
 
 ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
 ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
+ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
 COPY qt-installer-noninteractive.qs /tmp
 
@@ -62,8 +73,11 @@ RUN cd /tmp\
     && chmod +x qt-opensource-linux-x64-${Q_VERSION}.run
 
 RUN cd /tmp\
-    && ./qt-opensource-linux-x64-${Q_VERSION}.run --script qt-installer-noninteractive.qs \
+## xhost +local:docker #QStandardPaths: XDG_RUNTIME_DIR not set Docker
+#   # && xhost +
+    && xvfb-run --auto-servernum --error-file=/dev/stderr qt-opensource-linux-x64-${Q_VERSION}.run --verbose --script qt-installer-noninteractive.qs \
     && rm -vf qt-opensource-linux-x64-${Q_VERSION}.run
+#   # && xhost -
 
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
@@ -94,28 +108,44 @@ RUN cd /tmp \
     && export CIAO_ROOT=/tmp/CIAO \
     && export DANCE_ROOT=/tmp/DAnCE \
     && export MPC_ROOT=/tmp/MPC \
-    && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
-	&& echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
-	&& echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
-	&& echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	&& echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	&& echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	&& echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	&& echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	&& echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
+	# && echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
+	# && echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
+	# && echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	# && echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	# && echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+	# && echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+	# && echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
     && cd OpenDDS \
     && ./configure --help \
     && ./configure --prefix=${DDS_BASE_DIR} \
-            ${OPENDDS_BUILD_OPTIONS} \
-            ${OPENDDS_BUILD_CONFIG_OPTIONS} \
-            ${DDS_SECURITY} \
+            # ${OPENDDS_BUILD_OPTIONS} \
+            # ${OPENDDS_BUILD_CONFIG_OPTIONS} \
+            # ${DDS_SECURITY} \
+            --std=c++11 --verbose --ipv6 --java --qt --no-tests \
+            --xerces3 --wireshark --glib --rapidjson --boost\
+            --security --openssl --safety-profile=base\
             --cmake=/opt/cmake/bin/ \
+            --wireshark=/usr/local/wireshark/include/ \
             --ace=$ACE_ROOT \
             --tao=$TAO_ROOT \
             --mpc=$MPC_ROOT \
-            --mpcopts="-workers 4" --features=uses_wchar=1 \
+            --configh="#define ACE_FACE_SAFETY_BASE" \
+            --configh="#include \"ace/config-linux.h\"" \
+            --mpcopts="-workers 4" \
+            --features="uses_wchar=1" \
+            --features="versioned_namespace=1" \
+            --features="xerces3=1" \
+            --features="ssl=1" \
+            --macros="xerces3=1" \
+            --macros="ssl=1" \
+            --macros="c++11=1" \
+            --macros="CPPFLAGS+=-Wno-deprecated -Wno-unused-result" \
+            --macros="CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result" \
     && ./tools/scripts/show_build_config.pl || true \
+    && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1
 
@@ -126,7 +156,6 @@ ENV CIAO_ROOT=$DDS_BASE_DIR/CIAO
 ENV DANCE_ROOT=$DDS_BASE_DIR/DAnCE
 ENV MPC_ROOT=$DDS_BASE_DIR/MPC
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ACE_ROOT/lib:$LD_LIBRARY_PATH
-
 ENV PATH="${PATH}:${ACE_ROOT}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 RUN cd /tmp \

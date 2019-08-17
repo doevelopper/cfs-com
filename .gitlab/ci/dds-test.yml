@@ -35,6 +35,7 @@ docker:test:adlinkist-vortex:
     stage: Test docker image
     variables:
         VERSION: 0.0.1
+        GOAL: run
         MODULE: "vortex-opensplice"
 
 docker:test:eprosima-rtps:
@@ -42,6 +43,7 @@ docker:test:eprosima-rtps:
     # image: docker.io/doevelopper/cfs-com-dev:0.0.1
     stage: Test docker image
     variables:
+        GOAL: run
         VERSION: 0.0.1
         MODULE: "fast-rtps"
 
@@ -50,5 +52,6 @@ docker:test:rti-connextDDS:
     # image: docker.io/doevelopper/cfs-com-dev:0.0.1
     stage: Test docker image
     variables:
+        GOAL: run
         VERSION: 0.0.1
         MODULE: "fast-rtps"

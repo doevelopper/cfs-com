@@ -31,18 +31,40 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     var widget = gui.currentPageWidget();
 
     widget.selectAll();
+    widget.deselectComponent('qt.513.src');
 
     // widget.deselectAll();
-    // widget.selectComponent('qt.qt5.12.android_armv7');
-    // widget.selectComponent("qt.512.gcc_64");
-    // widget.selectComponent("qt.512.qtquickcontrols");
+    // widget.selectComponent('qt.qt5.13.android_armv7');
+    // widget.selectComponent("qt.513.gcc_64");
+    // widget.selectComponent("qt.513.qtquickcontrols");
+    // widget.selectComponent("qt.513.gcc_64")
+    // // widget.selectComponent("qt.513.doc")
+    // // widget.selectComponent("qt.513.examples")
+    // widget.selectComponent("qt.513.qtcharts")
+    // widget.selectComponent("qt.513.qtcharts.gcc_64")
+    // widget.selectComponent("qt.513.qtdatavis3d")
+    // widget.selectComponent("qt.513.qtdatavis3d.gcc_64")
+    // widget.selectComponent("qt.513.qtnetworkauth")
+    // widget.selectComponent("qt.513.qtnetworkauth.gcc_64")
+    // widget.selectComponent("qt.513.qtpurchasing")
+    // widget.selectComponent("qt.513.qtpurchasing.gcc_64")
+    // widget.selectComponent("qt.513.qtremoteobjects")
+    // widget.selectComponent("qt.513.qtremoteobjects.gcc_64")
+    // widget.selectComponent("qt.513.qtscript")
+    // widget.selectComponent("qt.513.qtspeech")
+    // widget.selectComponent("qt.513.qtspeech.gcc_64")
+    // widget.selectComponent("qt.513.qtvirtualkeyboard")
+    // widget.selectComponent("qt.513.qtvirtualkeyboard.gcc_64")
+    // widget.selectComponent("qt.513.qtwebengine")
+    // widget.selectComponent("qt.513.qtwebengine.gcc_64")
+    // // widget.selectComponent("qt.513.src")
     // widget.deselectComponent("qt.tools.qtcreator");
-    // widget.deselectComponent("qt.55.qt3d");
-    // widget.deselectComponent("qt.55.qtcanvas3d");
-    // widget.deselectComponent("qt.55.qtlocation");
-    // widget.deselectComponent("qt.55.qtquick1");
-    // widget.deselectComponent("qt.55.qtscript");
-    // widget.deselectComponent("qt.55.qtwebengine");
+    // widget.deselectComponent("qt.513.qt3d");
+    // widget.deselectComponent("qt.513.qtcanvas3d");
+    // widget.deselectComponent("qt.513.qtlocation");
+    // widget.deselectComponent("qt.513.qtquick1");
+    // widget.deselectComponent("qt.513.qtscript");
+    // widget.deselectComponent("qt.513.qtwebengine");
     // widget.deselectComponent("qt.extras");
     // widget.deselectComponent("qt.tools.doc");
     // widget.deselectComponent("qt.tools.examples")

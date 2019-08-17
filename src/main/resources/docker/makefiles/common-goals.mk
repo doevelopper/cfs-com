@@ -135,6 +135,7 @@ image-info: ## Display docker image information.
 	$(Q)$(DOCKER) inspect --format='{{.}} ' $(BUILDER_FQIN)
 	$(Q)$(DOCKER) inspect --format '{{.Repository}}:{{.Tag}}\t\t Built: {{.CreatedSince}}\t\tSize: {{.Size}}'
 	$(Q)$(DOCKER) inspect --format='{{if ne 0.0 .State.ExitCode }}{{.Name}} {{.State.ExitCode}}{{ end }}' $(BUILDER_FQIN)
+	$(Q)$(DOCKER) inspect --format='{{.LogPath}}' $(BUILDER_FQIN)
 
 .PHONY: help
 help: ## Display this help and exits.

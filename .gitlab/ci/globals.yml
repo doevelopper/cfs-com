@@ -105,7 +105,7 @@
         - echo -e "\033[0;31m******... and Continuous Code Quality!******\033[0m"
         - env | sort
 
-.post_shared: &post_shared 
+.post_shared: &post_shared
     after_script:
         - date
         - docker version  || true
@@ -197,3 +197,18 @@
     only:
         variables:
             - $SCHEDULE_TYPE == "weekly"
+
+CI In :
+    extends: 
+        - .docker-hub-dind
+    <<: *pre_shared
+    script:
+        - echo '...'
+
+CI Out :
+    stage: Clean local artifacts
+    extends: 
+        - .docker-hub-dind
+    <<: *post_shared
+    script:
+        - echo '...'

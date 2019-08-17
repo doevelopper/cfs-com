@@ -26,7 +26,7 @@
 
 # docker:dind with docker-compose
 # https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
-.docker:build:docker-base:
+docker:build:docker-base:
     extends: 
         - .docker-hub-dind
     before_script:
