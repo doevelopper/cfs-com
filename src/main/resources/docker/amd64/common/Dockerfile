@@ -4,40 +4,41 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
-   && apt-get -qq install --assume-yes --no-install-recommends libtool apt-transport-https  \
-      ca-certificates autotools-dev autopoint autoconf libpthread-stubs0-dev \
-      git xz-utils unzip wget curl openssh-server openssh-client  automake \
-      bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
+   && apt-get -qq install --assume-yes --no-install-recommends \
+      ca-certificates apt-transport-https \
+      libtool autotools-dev autopoint autoconf automake make \
+      git xz-utils unzip wget curl openssh-server openssh-client \
+      bison flex build-essential libgcrypt20-dev libcrypto++-dev\
+      gawk vim texinfo emacs25 gtk-doc-tools autogen \
       python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-      perl-base perl-modules zlib1g-dev libglib2.0-dev \
       libxml2-dev libxml2-utils python3-setuptools python-setuptools \
+      ruby ruby-dev libnss3-dev libnss3-tools \
+      perl-base perl-modules libpthread-stubs0-dev \
+      zlib1g-dev libglib2.0-dev libglib2.0-bin \
       libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 \
-      libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
+      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 libxtst6 \
+      libldap2-dev libldap-2.4-2 libmysql++-dev libxkbcommon-dev libxext-dev \
       unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
-      libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
-      libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  tmux vim-nox \
+      libghc-uuid-dev libghc-uuid-types-dev libelf-dev  elfutils libelf1 \
+      libpulse-dev  nfs-common  xterm iputils-ping  \
       htop libxss1 libasound2 x11-apps dbus gpg \
       libc6-dev libgtk-3-0 libpango-1.0-0 \
-      emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-      x11-xserver-utils libxkbfile1  > /dev/null 2>&1 \
+      libxcb-keysyms1-dev libxcb-image0-dev \
+      x264 libx264-dev \
+      libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
+      libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
+      libfreetype6-dev libxext-dev libxfixes-dev \
+      libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
+      libxcb-xkb-dev libxslt1-dev \
+      libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
+      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
+      rxvt-unicode-256color valgrind mscgen graphviz > /dev/null 2>&1 \
    && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
    && rm -rf /usr/share/man/
-
-# RUN apt-get -qq update && apt-get -qq install -y libxcb-keysyms1-dev libxcb-image0-dev \
-#     libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
-#     libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-#     libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev libxfixes-dev \
-#     libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
-#     xauth build-essential mesa-common-dev libglu1-mesa-dev libxkbcommon-dev \
-#     libxcb-xkb-dev libxslt1-dev libgstreamer-plugins-base0.10-dev
-#     libcairo2 libfontconfig1 libnss3 libxtst6 libglib2.0-bin \
-#     libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
-#     software-properties-common autogen libnotify-bin \
 
 ARG MAKEFLAGS
 
@@ -506,7 +507,6 @@ ARG GST_VERSION=1.14.0
 #    && cd /tmp/ \
 #    && rm -rf /gstreamer
 
-
 # http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
 RUN cd /tmp \
     && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
@@ -575,6 +575,27 @@ RUN cd /tmp \
     && make install \
     && cd /tmp/ \
     rm -rf gst*
+
+# RUN cd /tmp \
+	# && git clone --depth=1 https://github.com/opencv/opencv.git \
+    # && cd opencv \
+	# && git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
+    # && cmake -E make_directory build \
+    # && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      # -D INSTALL_C_EXAMPLES=ON \
+      # -D INSTALL_PYTHON_EXAMPLES=ON \
+      # -D WITH_TBB=ON \
+      # -D WITH_V4L=ON \
+      # -D OPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
+      # -D WITH_QT=ON \
+      # -D WITH_OPENGL=ON \
+      # -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
+      # -D BUILD_EXAMPLES=ON \
+      # -DCMAKE_INSTALL_PREFIX=/usr/opencv \
+    # && cmake --build build --target all --clean-first \
+    # && cmake --build build --target install || true \
+    # && cd /tmp \
+    # && rm -Rf Criterion
 
 # RUN cd /tmp \
 	# && git clone --depth=1 https://github.com/Snaipe/Criterion.git \

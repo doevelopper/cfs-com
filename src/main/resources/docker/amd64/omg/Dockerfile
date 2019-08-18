@@ -59,17 +59,27 @@ ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
 ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
 COPY qt-installer-noninteractive.qs /tmp
+COPY qt-opensource-linux-x64-5.13.0.run /tmp
 
+RUN apt-get -qq install -y \
+    xserver-common xfonts-base \
+    xfonts-75dpi \
+    xserver-common libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1
+
+    # && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
 RUN cd /tmp \
-    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+    && chmod +x ./qt-installer-noninteractive.qs \ 
+    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QT_INSTALL_DIR=/opt/qt
 
+# RUN cd /tmp \
+#     && ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
+#         --script ./qt-installer-noninteractive.qs
+
 RUN cd /tmp \
-    && xvfb-run --auto-servernum --error-file=/dev/stderr \
-        /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
-        --script qt-installer-noninteractive.qs
+    && xvfb-run --auto-servernum --error-file=/dev/stderr ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose --script ./qt-installer-noninteractive.qs
+
         #   > /dev/null 2>&1 \
     # && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
 ##     xhost local:root

@@ -14,6 +14,9 @@
 [![Language][CPP-shield]][CPP]
 [![Maintenance][Maintenance-shield]][Main-tenance]
 
+[![language][CPP-14-shield]][CPP-14]
+[![license][MIT-license-shield]][MIT-license]
+
 [![Master pipeline][pipeline-status-shield]][pipeline-status]
 [![Coverage report][pipeline-status-shield]][pipeline-status]
 
@@ -202,6 +205,10 @@ for details.
 [ubuntu-18-10]: https://github.com/doevelopper/cfs-com/tree/master
 [CPP-shield]: https://img.shields.io/badge/language-C++-blue.svg
 [CPP]: https://isocpp.org/
+[CPP-14-shield]: https://img.shields.io/badge/language-C%2B%2B14-red.svg
+[MIT-license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
+[CPP-14]: https://en.wikipedia.org/wiki/C%2B%2B14
+[MIT-license]: https://en.wikipedia.org/wiki/MIT_License
 [Maintenance-shield]: https://img.shields.io/badge/Maintained%3F-yes-green.svg
 [Main-tenance]: https://gitlab.com/doevelopper/cppbdd101/tree/develop
 [pipeline-status-shield]: https://gitlab.com/doevelopper/cfs-com/badges/master/pipeline.svg

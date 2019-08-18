@@ -9,23 +9,27 @@ function Controller() {
 }
 
 Controller.prototype.WelcomePageCallback = function() {
-    console.log("Welcome Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Welcome Page component: " + widget);
     gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.CredentialsPageCallback = function() {
-    console.log("Credentials Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Credentials Page component: " + widget);
     gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.IntroductionPageCallback = function() {
-    console.log("Introduction Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Introduction Page component: " + widget);
     gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
-    console.log("Target Directory Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Target Directory Page component: " + widget);
     //gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.value("InstallerDirPath") + "/Qt");
     //gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.environmentVariable("QT_INSTALL_DIR"));
 
@@ -34,8 +38,8 @@ Controller.prototype.TargetDirectoryPageCallback = function()
 }
 
 Controller.prototype.ComponentSelectionPageCallback = function() {
-    console.log("Component Selection Page" component: " + gui.currentPageWidget());
     var widget = gui.currentPageWidget();
+    console.log("Component Selection Page component: " + widget);
 
     widget.selectAll();
     
@@ -82,11 +86,11 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
 }
 
 Controller.prototype.LicenseAgreementPageCallback = function() {
-    console.log("license agreement Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("license agreement Page component: " + widget);
     
     //gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
     
-    var widget = gui.currentPageWidget();
     if (widget != null) {
         widget.AcceptLicenseRadioButton.setChecked(true);
     }    
@@ -94,23 +98,25 @@ Controller.prototype.LicenseAgreementPageCallback = function() {
 }
 
 Controller.prototype.StartMenuDirectoryPageCallback = function() {
-    console.log("Start Menu Directory Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Start Menu Directory Page component: " + widget);
     gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.ReadyForInstallationPageCallback = function()
 {
-    console.log("Ready For Installation Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Ready For Installation Page component: " + widget);
     gui.clickButton(buttons.NextButton),5000;
 }
 
 Controller.prototype.FinishedPageCallback = function() {
-    console.log("Finished Page" component: " + gui.currentPageWidget());
+    var widget = gui.currentPageWidget();
+    console.log("Finished Page component: " + widget);
 //    var checkBoxForm = gui.currentPageWidget().LaunchQtCreatorCheckBoxForm
 //    if (checkBoxForm && checkBoxForm.launchQtCreatorCheckBox) {
 //        checkBoxForm.launchQtCreatorCheckBox.checked = false;
 //    }
-    var widget = gui.currentPageWidget();
     if (widget.LaunchQtCreatorCheckBoxForm) {
         widget.LaunchQtCreatorCheckBoxForm.launchQtCreatorCheckBox.setChecked(false);
     }
