@@ -16,7 +16,7 @@ RUN apt-get update -qq \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
         mesa-common-dev libglu1-mesa-dev libpcap-dev \
         emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1 ibglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1\
+        x11-xserver-utils libxkbfile1 libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1\
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
@@ -27,8 +27,10 @@ RUN apt-get update -qq \
     && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
     && rm -rf /usr/share/man/
 
+ARG MAKEFLAGS
+
 RUN cd /tmp \
-   && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure > /dev/null 2>&1 \
@@ -44,6 +46,7 @@ RUN cd /tmp \
    && tar -xzf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null 2>&1 \
    && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
    && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
+
 RUN  cd /tmp \
    && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
    && unzip ninja-linux.zip > /dev/null 2>&1 \
@@ -465,31 +468,31 @@ ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
 COPY qt-installer-noninteractive.qs /tmp
 
-RUN cd /tmp \
-    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+# RUN cd /tmp \
+#     && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
+#     && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
 
-ENV QT_INSTALL_DIR=/opt/qt
-
-RUN cd /tmp \
-    && xvfb-run --auto-servernum --error-file=/dev/stderr \
-        /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
-        --script qt-installer-noninteractive.qs
-
-ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
-ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
-ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
+# ENV QT_INSTALL_DIR=/opt/qt
 
 # RUN cd /tmp \
-#    && git clone --depth=1 --recurse-submodules https://github.com/KDAB/hotspot.git \
-#    && cd hotspot \
-#    && cmake -E make_directory build \
-#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-#    && cmake --build build --target all --clean-first \
-#    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
-#    && cmake --build build --target install \
-#    && cd /tmp \
-#    && rm -rf hotspot
+#     && xvfb-run --auto-servernum --error-file=/dev/stderr \
+#         /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
+#         --script qt-installer-noninteractive.qs
+
+# ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
+# ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
+# ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
+
+RUN cd /tmp \
+   && git clone --depth=1 --recurse-submodules https://github.com/KDAB/hotspot.git \
+   && cd hotspot \
+   && cmake -E make_directory build-hotspot \
+   && cmake -E chdir build-hotspot cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build-hotspot --target all --clean-first \
+   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build-hotspot --target test || true \
+   && cmake --build build-hotspot --target install \
+   && cd /tmp \
+   && rm -rf hotspot
 	
 # RUN cd /tmp \
 #    && git clone --depth=1 --recurse-submodules https://github.com/apitrace/apitrace.git \

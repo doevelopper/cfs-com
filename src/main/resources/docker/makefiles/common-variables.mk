@@ -79,36 +79,35 @@ COLOR_SUPPORT              := $(shell which tput > /dev/null && tput colors)
 COLOR                      := $(shell test -n "${COLOR_SUPPORT}")
 COLOR_RANGG                := $(shell test ${COLOR_SUPPORT} -ge 8)
 
-ifeq ($(shell test -t 1),)
+# ifeq ($(shell test -t 1),)
 
-    export SH_DEFAULT          := $(shell echo '\033[00m')
-    export SH_RED              := $(shell echo '\033[31m')
-    export SH_GREEN            := $(shell echo '\033[32m')
-    export SH_YELLOW           := $(shell echo '\033[33m')
-    export SH_BLUE             := $(shell echo '\033[34m')
-    export SH_PURPLE           := $(shell echo '\033[35m')
-    export SH_CYAN             := $(shell echo '\033[36m')
+#     export SH_DEFAULT          := $(shell echo '\033[00m')
+#     export SH_RED              := $(shell echo '\033[31m')
+#     export SH_GREEN            := $(shell echo '\033[32m')
+#     export SH_YELLOW           := $(shell echo '\033[33m')
+#     export SH_BLUE             := $(shell echo '\033[34m')
+#     export SH_PURPLE           := $(shell echo '\033[35m')
+#     export SH_CYAN             := $(shell echo '\033[36m')
 
-    ifeq ($(shell test -n "${COLOR_SUPPORT}" && test ${COLOR_SUPPORT} -ge 8),)
+#     ifeq ($(shell test -n "${COLOR_SUPPORT}" && test ${COLOR_SUPPORT} -ge 8),)
 
-        export TERMCOLS           = $(shell tput cols)
-        export UNDERLINE          = $(shell tput smul)
-        export STANDOUT           = $(shell tput smso)
-        export BOLD               = $(shell tput bold)
-        export RESET              = $(shell tput sgr0)
-        export BLACK              = $(shell tput setaf 0)
-        export RED                = $(shell tput setaf 1)
-        export GREEN              = $(shell tput setaf 2)
-        export YELLOW             = $(shell tput setaf 3)
-        export BLUR               = $(shell tput setaf 4)
-        export MAGENTA            = $(shell tput setaf 5)
-        export CYAN               = $(shell tput setaf 6)
-        export WHITE              = $(shell tput setaf 7)
+#         export TERMCOLS           = $(shell tput cols)
+#         export UNDERLINE          = $(shell tput smul)
+#         export STANDOUT           = $(shell tput smso)
+#         export BOLD               = $(shell tput bold)
+#         export RESET              = $(shell tput sgr0)
+#         export BLACK              = $(shell tput setaf 0)
+#         export RED                = $(shell tput setaf 1)
+#         export GREEN              = $(shell tput setaf 2)
+#         export YELLOW             = $(shell tput setaf 3)
+#         export BLUR               = $(shell tput setaf 4)
+#         export MAGENTA            = $(shell tput setaf 5)
+#         export CYAN               = $(shell tput setaf 6)
+#         export WHITE              = $(shell tput setaf 7)
 
-    endif
+#     endif
 
-endif
-
+# endif
 
 define blue
 	@tput setaf 4

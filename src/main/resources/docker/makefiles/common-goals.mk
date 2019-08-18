@@ -104,6 +104,13 @@ run-image : build-image
         -e DISPLAY=unix${DISPLAY} \
         -e LANG=C.UTF-8 \
         -e LC_ALL=C.UTF-8 \
+        --log-opt max-size=50m \
+        --memory=$(($(head -n 1 /proc/meminfo | awk '{print $2}') * 4 / 5))k \
+        --cpus=$((`nproc` - 1)) \
+        -e DOCKER_USER=`id -un` \
+        -e DOCKER_USER_ID=`id -u` \
+        -e DOCKER_PASSWORD=`id -un` \
+        -e DOCKER_GROUP_ID=`id -g` \
         --tty --interactive $(BUILDER_FQIN):$(VERSION)  
         # || exit $?
 

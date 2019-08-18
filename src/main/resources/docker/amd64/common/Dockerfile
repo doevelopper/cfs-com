@@ -43,12 +43,12 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
 ARG MAKEFLAGS
 
 RUN cd /tmp \
-   && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
-   && ./configure > /dev/null 2>&1 \
-   && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && ./configure\
+   && make\
+   && make install \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -61,7 +61,7 @@ RUN cd /tmp \
    && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
 RUN  cd /tmp \
-   && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
+   && curl -L -O -k  https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
    && unzip ninja-linux.zip > /dev/null 2>&1 \
    && mv ninja /usr/bin/ninja \
    && rm ninja-linux.zip
@@ -575,6 +575,11 @@ RUN cd /tmp \
     && make install \
     && cd /tmp/ \
     rm -rf gst*
+
+# https://github.com/cisco/herisson.git
+# https://github.com/cisco/mlspp.git
+# https://github.com/cisco/openh264.git
+# https://github.com/cisco/libsrtp.git
 
 # RUN cd /tmp \
 	# && git clone --depth=1 https://github.com/opencv/opencv.git \
