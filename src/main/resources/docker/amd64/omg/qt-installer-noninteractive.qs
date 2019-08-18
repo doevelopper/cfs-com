@@ -4,35 +4,45 @@ function Controller() {
     installer.autoRejectMessageBoxes();
     installer.setMessageBoxAutomaticAnswer("OverwriteTargetDirectory", QMessageBox.Yes);
     installer.installationFinished.connect(function() {
-        gui.clickButton(buttons.NextButton);
+        gui.clickButton(buttons.NextButton,5000);
     })
 }
 
 Controller.prototype.WelcomePageCallback = function() {
-    gui.clickButton(buttons.NextButton,3000);
+    console.log("Welcome Page" component: " + gui.currentPageWidget());
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.CredentialsPageCallback = function() {
-    gui.clickButton(buttons.NextButton);
+    console.log("Credentials Page" component: " + gui.currentPageWidget());
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.IntroductionPageCallback = function() {
-    gui.clickButton(buttons.NextButton);
+    console.log("Introduction Page" component: " + gui.currentPageWidget());
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
+    console.log("Target Directory Page" component: " + gui.currentPageWidget());
     //gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.value("InstallerDirPath") + "/Qt");
-	gui.currentPageWidget().TargetDirectoryLineEdit.setText("/opt/Qt5.13.0/");
-    gui.clickButton(buttons.NextButton);
+    //gui.currentPageWidget().TargetDirectoryLineEdit.setText(installer.environmentVariable("QT_INSTALL_DIR"));
+
+	gui.currentPageWidget().TargetDirectoryLineEdit.setText("/opt/Qt");
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.ComponentSelectionPageCallback = function() {
+    console.log("Component Selection Page" component: " + gui.currentPageWidget());
     var widget = gui.currentPageWidget();
 
     widget.selectAll();
-    widget.deselectComponent('qt.513.src');
+    
+    //widget.selectComponent("qt.qt5.5130");
+    //widget.selectComponent("qt.qt5.5130.gcc_64");
 
+    //widget.deselectComponent('qt.5130.src');
     // widget.deselectAll();
     // widget.selectComponent('qt.qt5.13.android_armv7');
     // widget.selectComponent("qt.513.gcc_64");
@@ -68,27 +78,41 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     // widget.deselectComponent("qt.extras");
     // widget.deselectComponent("qt.tools.doc");
     // widget.deselectComponent("qt.tools.examples")
-    gui.clickButton(buttons.NextButton);
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.LicenseAgreementPageCallback = function() {
-    gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
-    gui.clickButton(buttons.NextButton);
+    console.log("license agreement Page" component: " + gui.currentPageWidget());
+    
+    //gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
+    
+    var widget = gui.currentPageWidget();
+    if (widget != null) {
+        widget.AcceptLicenseRadioButton.setChecked(true);
+    }    
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.StartMenuDirectoryPageCallback = function() {
-    gui.clickButton(buttons.NextButton);
+    console.log("Start Menu Directory Page" component: " + gui.currentPageWidget());
+    gui.clickButton(buttons.NextButton,5000);
 }
 
 Controller.prototype.ReadyForInstallationPageCallback = function()
 {
-    gui.clickButton(buttons.NextButton);
+    console.log("Ready For Installation Page" component: " + gui.currentPageWidget());
+    gui.clickButton(buttons.NextButton),5000;
 }
 
 Controller.prototype.FinishedPageCallback = function() {
-var checkBoxForm = gui.currentPageWidget().LaunchQtCreatorCheckBoxForm
-if (checkBoxForm && checkBoxForm.launchQtCreatorCheckBox) {
-    checkBoxForm.launchQtCreatorCheckBox.checked = false;
-}
-    gui.clickButton(buttons.FinishButton);
+    console.log("Finished Page" component: " + gui.currentPageWidget());
+//    var checkBoxForm = gui.currentPageWidget().LaunchQtCreatorCheckBoxForm
+//    if (checkBoxForm && checkBoxForm.launchQtCreatorCheckBox) {
+//        checkBoxForm.launchQtCreatorCheckBox.checked = false;
+//    }
+    var widget = gui.currentPageWidget();
+    if (widget.LaunchQtCreatorCheckBoxForm) {
+        widget.LaunchQtCreatorCheckBoxForm.launchQtCreatorCheckBox.setChecked(false);
+    }
+    gui.clickButton(buttons.FinishButton,5000);
 }

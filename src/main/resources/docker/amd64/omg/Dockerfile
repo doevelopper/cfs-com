@@ -48,7 +48,7 @@ USER root
 
 # Core libraries ==> should go to common
 RUN apt-get -qq install -y \
-    libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1 
+    libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install --assume-yes --no-install-recommends nodejs
@@ -62,12 +62,20 @@ COPY qt-installer-noninteractive.qs /tmp
 
 RUN cd /tmp \
     && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run  \
-# RUN cd /tmp \
+    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+
+ENV QT_INSTALL_DIR=/opt/qt
+
+RUN cd /tmp \
+    && xvfb-run --auto-servernum --error-file=/dev/stderr \
+        /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
+        --script qt-installer-noninteractive.qs
+        #   > /dev/null 2>&1 \
+    # && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+##     xhost local:root
 ## xhost +local:docker #QStandardPaths: XDG_RUNTIME_DIR not set Docker
 #   # && xhost +
-    && xvfb-run --auto-servernum --error-file=/dev/stderr /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose --script qt-installer-noninteractive.qs \
-    && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+#     && xvfb-run
 #   # && xhost -
 
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
@@ -79,8 +87,8 @@ RUN cd /tmp \
     && cd wireshark \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && cmake --build build --target all --clean-first \
-    && cmake --build build --target install \
+    && cmake --build build --target all --clean-first > /dev/null \
+    && cmake --build build --target install > /dev/null \
     cd /tmp \
     rm -Rf wireshark
 
@@ -165,25 +173,24 @@ RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-security.git \
     && cd dds-security
 
-# ENV ACE_ROOT=/usr/local/share/ace \
-    # TAO_ROOT=/usr/local/share/tao \
-    # DDS_ROOT=/usr/local/share/dds \
-    # LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
-
-
 #https://github.com/RemedyIT/dancex11.git
 #https://github.com/RemedyIT/ciaox11.git
 #    && export CMAKE_INSTALL_PREFIX=/usr/
 #    && export QTDIR: /opt/Qt5.11.2/5.11.2/gcc_64
 
-# RUN cd /tmp \
-    # && git clone --depth=1 --recursive https://github.com/objectcomputing/mFAST.git \
-    # && cd mFAST \
-    # && cmake -E make_directory build \
-    # && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
-    # && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-    # && cmake --build build --target install > /dev/null 2>&1 \
-    # && cd /tmp
+RUN cd /tmp \
+    && git clone --depth=1 --recursive https://github.com/objectcomputing/mFAST.git \
+    && cd mFAST \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
+    && cd /tmp
+
+# ENV ACE_ROOT=/usr/local/share/ace \
+    # TAO_ROOT=/usr/local/share/tao \
+    # DDS_ROOT=/usr/local/share/dds \
+    # LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
 
 #ENV ACE_ROOT=/usr/local/share/ace \
 #    TAO_ROOT=/usr/local/share/tao \
@@ -247,6 +254,12 @@ RUN cd /tmp \
 	# && cd $TAO_ROOT \
 	# && make \
 	# && cd ..
+
+# setup virtual X server
+# RUN mkdir /tmp/.X11-unix \
+# 	&& chmod 1777 /tmp/.X11-unix \
+# 	&& chown -R root:root /tmp/.X11-unix
+# ENV DISPLAY :99
 
 ARG ACCOUNT
 ENV ACCOUNT ${ACCOUNT:-developer}

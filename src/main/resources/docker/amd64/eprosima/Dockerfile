@@ -33,6 +33,9 @@ USER root
 #RUN apt-get install -y oracle-java8-installer
 #RUN rm -rf /var/cache/oracle-jdk8-installer
 
+RUN apt-get -qq install -y \
+    gtk-doc-tools 
+
 RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules https://github.com/foonathan/memory.git \
     && cd memory \
@@ -56,8 +59,8 @@ RUN cd /tmp \
     && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
     && cd gstreamer-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/
 
 # gst-plugins-base
@@ -66,8 +69,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-base-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/
 
 # libnice
@@ -75,7 +78,7 @@ RUN cd /tmp \
     && git clone https://github.com/libnice/libnice.git \
     && cd libnice \
     && ./autogen.sh --prefix=/usr --with-gstreamer --enable-static --enable-static-plugins --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
-    && make install \
+    && make install > /dev/null \
     && cd /tmp/
 
 # gst-plugins-good
@@ -84,8 +87,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-good-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/
 
 # gst-plugins-bad
@@ -94,8 +97,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-bad-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/
 
 # gst-plugins-ugly
@@ -104,8 +107,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-ugly-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/ 
 
 # gst-rtsp-server
@@ -114,8 +117,8 @@ RUN cd /tmp \
     && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-rtsp-server-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null \
+    && make install > /dev/null \
     && cd /tmp/ \
     rm -rf gst*
 
@@ -129,16 +132,20 @@ RUN cd /tmp \
         -DTHIRDPARTY=ON -DBUILD_JAVA=ON -DPERFORMANCE_TESTS=ON  \
         -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_SHARED_LIBS=ON  \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON\
-    && cmake --build build --target all --clean-first \
-    && cmake --build build --target install
-    # && cd /tmp \
-    # && rm -rf Fast-RTPS
+    && cmake --build build --target all --clean-first > /dev/null \
+    && cmake --build build --target install > /dev/null \
+    && cd /tmp \
+    && rm -rf Fast-RTPS
 
 # Clone and install Micro XRCE-DDS Agent
-#RUN git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git agent \
-#    && mkdir agent/build && cd agent/build \
-#    && cmake -DTHIRDPARTY=ON -DVERBOSE=ON -DCMAKE_INSTALL_PREFIX=/usr/dds-qgent .. \
-#    && make -j `nproc` install
+RUN cd /tmp \
+    && git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git agent \
+    && cd agent \
+    && cmake -E make_directory build \
+    && cmake -DTHIRDPARTY=ON -DVERBOSE=ON -DCMAKE_INSTALL_PREFIX=/usr/dds-qgent .. \
+    && make -j `nproc` install > /dev/null \
+    && cd /tmp \
+    && rm -rf agent
 
 ARG ACCOUNT
 ENV ACCOUNT ${ACCOUNT:-developer}

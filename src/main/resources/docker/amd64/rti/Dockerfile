@@ -1,26 +1,22 @@
 
-FROM amd64/ubuntu:16.04
-
-ARG PMC="Adrien H."
-
-MAINTAINER $PMC
+FROM amd64/ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-ARG IMAGE_VERSION
-ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
-
-RUN apt-get update \
-    && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
+RUN apt-get update -qq \
+    && apt-get  -qq install --assume-yes --no-install-recommends libtool apt-transport-https \
+         ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-        perl-base perl-modules zlib1g-dev \
+        perl-base perl-modules zlib1g-dev gtk-doc-tools\
         libxml2-dev libxml2-utils python3-setuptools python-setuptools \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
         mesa-common-dev libglu1-mesa-dev libpcap-dev \
+        emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
+        x11-xserver-utils libxkbfile1 \
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
@@ -31,25 +27,49 @@ RUN apt-get update \
     && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
     && rm -rf /usr/share/man/
 
-ARG CMAKE_MAJOR=3.15
-ARG CMAKE_MINOR=1
+RUN cd /tmp \
+   && wget http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   && tar -xzf gdb-8.3.tar.gz \
+   && cd gdb-8.3 \
+   && ./configure > /dev/null 2>&1 \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf gdb-8.3.tar.gz gdb-8.3
 
-RUN curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64.tar.gz \
-    && tar -xvf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64.tar.gz > /dev/null \
-    && rm -v cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64.tar.gz \
-    && mv -v cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}-Linux-x86_64 /opt/cmake
-
-#RUN  cd /tmp \
-#    && wget --no-cookies --no-check-certificate \
-#       --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"\
-#       "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-x64.tar.gz" \
-#    && tar -xvzf jdk-8u202-linux-x64.tar.gz -C /opt/ \
-#    && rm -v jdk-8u202-linux-x64.tar.gz
-
-COPY src/main/resources/docker/jdk-8u212-linux-x64.tar.gz /tmp
+ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
+ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
+RUN cd /tmp \
+   && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && tar -xzf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null 2>&1 \
+   && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 RUN  cd /tmp \
-    && tar -xvzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
-    && rm -v jdk-8u212-linux-x64.tar.gz
+   && wget --no-check-certificate https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
+   && unzip ninja-linux.zip > /dev/null 2>&1 \
+   && mv ninja /usr/bin/ninja \
+   && rm ninja-linux.zip
+
+RUN  cd /tmp \
+   && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
+   && tar -xzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+   && rm jdk-8u212-linux-x64.tar.gz
+
+ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
+RUN cd /tmp \
+   &&  wget --no-check-certificate \
+   https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
+   && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
+
+ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
+RUN cd /tmp \
+   && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+   && mkdir -pv /opt/gradle \
+   && unzip gradle-${GRADLE_VERSION}-bin.zip > /dev/null 2>&1 \
+   && mv gradle-${GRADLE_VERSION}  /opt/gradle/ \
+   && rm -f gradle-${GRADLE_VERSION}-bin.zip
 
 ENV JAVA_HOME /opt/jdk1.8.0_212
 ENV JRE_HOME /opt/jdk1.8.0_212/jre
@@ -62,32 +82,22 @@ RUN cd /tmp \
     && mv apache-maven-${MAVEN_VERSION}/ /opt/apache-maven \
     && rm -v apache-maven-${MAVEN_VERSION}-bin.tar.gz
 
-ARG GRADLE_VERSION=5.5.1
-
-RUN cd /tmp \
-    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-    && mkdir -pv /opt/gradle \
-#    && unzip -d /opt/gradle gradle-5.2.1-bin.zip \
-    && unzip gradle-${GRADLE_VERSION}-bin.zip \
-    && mv -v gradle-${GRADLE_VERSION}  /opt/gradle/ \
-    && rm -vf gradle-${GRADLE_VERSION}-bin.zip
+ENV JAVA_HOME /opt/jdk1.8.0_212
+ENV JRE_HOME /opt/jdk1.8.0_212/jre
+ENV M2_HOME /opt/apache-maven/
+ENV M2 $M2_HOME/bin
+ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
+        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=512M"
+ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin:/opt/cmake/bin
+ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
 ARG BAZEL_VERSION
 ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
 RUN cd /tmp \
-    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
-    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
-    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
-
-
-ENV M2_HOME /opt/apache-maven/
-ENV M2 $M2_HOME/bin
-ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
-        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
-
-ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_22/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
-ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
+   && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+   && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
+   && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh > /dev/null 2>&1 \
+   && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 
 RUN cmake --version \
     && make --version \
@@ -95,13 +105,11 @@ RUN cmake --version \
     && java -version \
     && mvn --version \
     && gradle -v \
-    && bazel version
+    && bazel version \
+    && conan --version || true
 
-RUN cd /tmp \
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://github.com/conan-io/conan.git \
-    && cd conan  \
-    && pip3 install --upgrade pip \
-    && pip install -r conans/requirements.txt
+RUN pip install -q --no-cache-dir conan \
+   && pip install --upgrade conan_package_tools
 
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
@@ -154,6 +162,26 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -rvf benchmark
 
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/glog.git \
+   && cd glog \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf glog
+
+RUN cd /tmp \
+   && git clone --depth=1 --recurse-submodules https://github.com/google/crc32c.git \
+   && cd crc32c \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf glog
+
 RUN pip install cmakedoc
 
 RUN cd /tmp \
@@ -182,6 +210,20 @@ RUN cd /tmp \
     && ./b2 install \
     && cd /tmp \
     && rm -rvf boost_1_69_0 boost_1_69_0.tar.gz
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
+   && cd protobuf \
+   && ./autogen.sh \
+#    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
+   && ./configure --prefix=/usr/ > /dev/null 2>&1 \
+   && make clean \ 
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf protobuf
+
+ENV PROTOBUF_HOME /usr
 
 #sml requires GCC >= 6.0.0
 #RUN if [ "$(gcc --version | head -n1 | cut -d" " -f4)" -lt 6.0.0 ]; then  \
@@ -260,6 +302,203 @@ RUN cd /home \
     && cd /home \
     && rm -rvf logging-log4cxx
 
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/double-conversion.git \
+   && cd double-conversion \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf double-conversion
+
+# "Building translating between absolute and civil times"
+RUN cd /tmp \
+	&& git clone --depth=1 https://github.com/google/cctz.git \
+	&& cd cctz \
+	&& cmake -E make_directory mybuild \
+	&& cmake -E chdir mybuild cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+	&& cmake --build mybuild --target all  --config Release \
+	&& ctest \
+	&& cmake --build mybuild --config Release --target install \
+	&& cmake --build mybuild --target install \
+	&& cd /tmp \
+	&& rm -rf cctz
+
+# Fetch and build GStreamer
+ARG GST_VERSION=1.14.0
+# RUN cd /tmp \
+#    && git clone -b $GST_VERSION --depth 1 git://anongit.freedesktop.org/git/gstreamer/gstreamer \
+#    && cd gstreamer \
+#    && git checkout ${GST_VERSION} \
+#    && ./autogen.sh --prefix=/usr --disable-gtk-doc \
+#    && make -j`nproc` \
+#    && make install \
+#    && cd /tmp/ \
+#    && rm -rf /gstreamer
+
+ARG GST_VERSION=1.14.0
+
+# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
+    && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gstreamer-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/
+
+# gst-plugins-base
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-base-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/
+
+# libnice
+RUN cd /tmp \
+    && git clone https://github.com/libnice/libnice.git \
+    && cd libnice \
+    && ./autogen.sh --prefix=/usr --with-gstreamer --enable-static --enable-static-plugins --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
+    && make install > /dev/null \
+    && cd /tmp/
+
+# gst-plugins-good
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-good-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/
+
+# gst-plugins-bad
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-bad-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/
+
+# gst-plugins-ugly
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-ugly-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/ 
+
+# gst-rtsp-server
+RUN cd /tmp \
+    && wget https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-rtsp-server-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make > /dev/null \
+    && make install > /dev/null \
+    && cd /tmp/ \
+    rm -rf gst*
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/capture-thread.git \
+   && cd capture-thread \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install \
+   && cd /tmp \
+   && rm -rf capture-thread
+
+RUN cd /tmp \
+   && curl -L -O -k http://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz \
+   && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
+   && tar -xvzf afl-2.52b.tgz \
+   && cd afl-2.52b \
+   && make clean && make && make  DESTDIR=/opt/afl BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
+   && cd /tmp \
+   && rm -rf afl-2.52b
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/libcheck/check.git \
+   && cd check \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake --build build --target all --clean-first \
+   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+   && cmake --build build --target install || true \
+   && cd /tmp \
+   && rm -rf check
+
+RUN cd /tmp \
+	&& git clone --depth=1 https://github.com/catchorg/Catch2.git \
+	&& cd Catch2 \
+	&& cmake -E make_directory build \
+	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+	&& cmake --build build --target install || true \
+	&& cd /tmp \
+	&& rm -Rf Catch2
+
+RUN cd /tmp \
+	&& git clone --depth=1 https://github.com/google/breakpad.git \
+	&& cd breakpad \
+	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
+	&& ./configure --prefix=/usr/local > /dev/null 2>&1 \
+	&& make > /dev/null 2>&1 \
+	&& make install \
+	&& cd /tmp \
+	&& rm -Rf breakpad
+
+# RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/KDAB/hotspot.git \
+#    && cd hotspot \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#    && cmake --build build --target all --clean-first \
+#    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rf hotspot
+	
+# RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/apitrace/apitrace.git \
+#    && cd apitrace \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#    && cmake --build build --target all --clean-first \
+#    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rf apitrace
+
+# RUN cd /tmp \
+   # && git clone --depth=1 https://github.com/google/statechart.git \
+   # && cd statechart \
+   # && bazel build //statechart/... \
+   # && bazel test //statechart/... \
+   # && bazel run //statechart/example:microwave_example_main -- --alsologtostderr \
+   # && cd /tmp
+#   && rm -rvf statechart
+
+# RUN cd /tmp \
+	# && git clone --depth=1 https://github.com/Snaipe/Criterion.git \
+    # && cd Criterion \
+    # && cmake -E make_directory build \
+    # && cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
+    # && cmake --build build --target all --clean-first \
+    # && cmake --build build --target install || true \
+    # && cd /tmp \
+    # && rm -Rf Criterion
+
 ARG RTI_DDS_VERSION=6.0.0
 
 COPY src/main/resources/docker/amd64/rti/packages/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run /tmp/
@@ -331,21 +570,27 @@ RUN cd /tmp/ \
   # && dpkg -i vscode-amd64.deb \
   # &&  rm vscode-amd64.deb
 
-ENV BULLSEYE_VERSION ${BULLSEYE:-8.15.31}
-RUN cd /tmp/ \
-    && curl -Lk http://www.bullseye.com/download/BullseyeCoverage-$BULLSEYE_VERSION-Linux-x64.tar | tar x -C /opt \
+# ENV BULLSEYE_VERSION ${BULLSEYE:-8.15.31}
+# RUN cd /tmp/ \
+    # && curl -Lk http://www.bullseye.com/download/BullseyeCoverage-$BULLSEYE_VERSION-Linux-x64.tar | tar x -C /opt \
    ##&&  echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 4ChKeY0AX2Et3CDftN2cqkhg0NUEf03o4gQX \
-    && echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 2Ct8nh2WOwHc2t4gvl1IYzzX1uGCW82sERqr \
-    && rm -rf /opt/BullseyeCoverage-$BULLSEYE_VERSION*
+    # && echo | /opt/BullseyeCoverage-$BULLSEYE_VERSION/install --key 2Ct8nh2WOwHc2t4gvl1IYzzX1uGCW82sERqr \
+    # && rm -rf /opt/BullseyeCoverage-$BULLSEYE_VERSION*
 
- ENV PATH /opt/BullseyeCoverage/bin:$PATH
+#  ENV PATH /opt/BullseyeCoverage/bin:$PATH
 #export COVFILE=$HOME/bullseye.cov && cov01 --on && cov01 --status && make -j12 && cov01 --off
 
-ARG  ACCOUNT=happyman
-RUN useradd -ms /bin/bash $ACCOUNT
-RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
-USER $ACCOUNT
-WORKDIR /home/$ACCOUNT
+ARG ACCOUNT=developer
+
+RUN useradd -m $ACCOUNT \
+   && echo "$ACCOUNT:$ACCOUNT" | chpasswd \
+   && usermod --shell /bin/bash $ACCOUNT \
+   && usermod -aG sudo $ACCOUNT \
+   && echo "$ACCOUNT ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$ACCOUNT \
+   && chmod 0440 /etc/sudoers.d/$ACCOUNT \
+#        # Replace 1000 with your user/group id
+   && usermod  --uid 1000 $ACCOUNT \
+   && groupmod --gid 1000 $ACCOUNT
 
 # ENTRYPOINT rtilauncher
 # ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
