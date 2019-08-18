@@ -16,7 +16,7 @@ RUN apt-get update -qq \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
         mesa-common-dev libglu1-mesa-dev libpcap-dev \
         emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1 \
+        x11-xserver-utils libxkbfile1 ibglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1\
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
@@ -457,6 +457,28 @@ RUN cd /tmp \
 	&& make install \
 	&& cd /tmp \
 	&& rm -Rf breakpad
+
+ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
+ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
+ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
+
+COPY qt-installer-noninteractive.qs /tmp
+
+RUN cd /tmp \
+    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
+    && chmod +x /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+
+ENV QT_INSTALL_DIR=/opt/qt
+
+RUN cd /tmp \
+    && xvfb-run --auto-servernum --error-file=/dev/stderr \
+        /tmp/qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
+        --script qt-installer-noninteractive.qs
+
+ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
+ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
+ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
 
 # RUN cd /tmp \
 #    && git clone --depth=1 --recurse-submodules https://github.com/KDAB/hotspot.git \
