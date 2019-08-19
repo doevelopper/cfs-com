@@ -1,19 +1,32 @@
-#docker build -t doevelopper/foss-dds-dev -f src/main/resources/containers/amd64/foss.Dockerfile .
+# %W% %G% %U%
+#        cfs-com/src/main/resources/docker/aarch64/common/Dockerfile
+#
+#               Copyright (c) 2014-2018 A.H.L
+#
+#        Permission is hereby granted, free of charge, to any person obtaining
+#        a copy of this software and associated documentation files (the
+#        "Software"), to deal in the Software without restriction, including
+#        without limitation the rights to use, copy, modify, merge, publish,
+#        distribute, sublicense, and/or sell copies of the Software, and to
+#        permit persons to whom the Software is furnished to do so, subject to
+#        the following conditions:
+#
+#        The above copyright notice and this permission notice shall be
+#        included in all copies or substantial portions of the Software.
+#
+#        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#
 
-# ARG BASE_IMAGE=amd64/ubuntu:16.04 ##registry access issue
-# FROM $BASE_IMAGE
-FROM amd64/ubuntu:18.10
-
-ARG PMC="Adrien H."
-
-MAINTAINER $PMC
-
+FROM docker.io/doevelopper/dind:0.0.2
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-ARG IMAGE_VERSION
-ENV IMAGE_VERSION ${IMAGE_VERSION:-0.0.1}
 ENV AARCH64_DESTDIR /opt/aarch64
 
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
@@ -35,54 +48,71 @@ RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
     && rm -rf /usr/share/man/
 
-RUN curl -L -O -k https://cmake.org/files/v3.14/cmake-3.14.0-Linux-x86_64.tar.gz \
-    && tar -xvf cmake-3.14.0-Linux-x86_64.tar.gz > /dev/null \
-    && rm -v cmake-3.14.0-Linux-x86_64.tar.gz \
-    && mv -v cmake-3.14.0-Linux-x86_64 /opt/cmake
+ARG MAKEFLAGS
+
+ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
+ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
+RUN cd /tmp \
+   && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && tar -xzf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null 2>&1 \
+   && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+   && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
 RUN  cd /tmp \
-    && wget --no-cookies --no-check-certificate \
-       --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"\
-       "https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-x64.tar.gz" \
-    && tar -xvzf jdk-8u202-linux-x64.tar.gz -C /opt/ \
-    && rm -v jdk-8u202-linux-x64.tar.gz
+   && curl -L -O -k  https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
+   && unzip ninja-linux.zip > /dev/null 2>&1 \
+   && mv ninja /usr/bin/ninja \
+   && rm ninja-linux.zip
 
+RUN  cd /tmp \
+   && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
+   && tar -xzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
+   && rm jdk-8u212-linux-x64.tar.gz
+
+ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
-    &&  wget --no-check-certificate https://www-eu.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz \
-    && tar -xvzf apache-maven-3.6.0-bin.tar.gz \
-    && mv apache-maven-3.6.0/ /opt/apache-maven \
-    && rm -v apache-maven-3.6.0-bin.tar.gz
+   &&  wget --no-check-certificate \
+   https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
+   && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
+ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
 RUN cd /tmp \
-    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-5.2.1-bin.zip \
-    && mkdir -pv /opt/gradle \
-#    && unzip -d /opt/gradle gradle-5.2.1-bin.zip \
-    && unzip gradle-5.2.1-bin.zip \
-    && mv -v gradle-5.2.1  /opt/gradle/ \
-    && rm -vf gradle-5.2.1-bin.zip
+   && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+   && mkdir -pv /opt/gradle \
+   && unzip gradle-${GRADLE_VERSION}-bin.zip > /dev/null 2>&1 \
+   && mv gradle-${GRADLE_VERSION}  /opt/gradle/ \
+   && rm -f gradle-${GRADLE_VERSION}-bin.zip
 
-ENV JAVA_HOME /opt/jdk1.8.0_202
-ENV JRE_HOME /opt/jdk1.8.0_202/jre
+ENV JAVA_HOME /opt/jdk1.8.0_212
+ENV JRE_HOME /opt/jdk1.8.0_212/jre
 ENV M2_HOME /opt/apache-maven/
 ENV M2 $M2_HOME/bin
 ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.warning=bold,yellow \
-        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=312M"
+        -Dstyle.mojo=bold,cyan -Xmx1048m -Xms256m -XX:MaxPermSize=512M"
+ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin:/opt/cmake/bin
+ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
-ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_202/bin:/opt/jdk1.8.0_202/jre/bin:/opt/cmake/bin
-ENV PATH $PATH:/opt/gradle/gradle-5.2.1/bin
+ARG BAZEL_VERSION
+ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
+RUN cd /tmp \
+   && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
+   && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
+   && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh > /dev/null 2>&1 \
+   && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
+
+RUN pip install -q --no-cache-dir conan \
+   && pip install --upgrade conan_package_tools
 
 RUN cmake --version \
-    && make --version \
-    && gcc --version \
-    && java -version \
-    && mvn --version \
-    && gradle -v
-
-RUN cd /tmp \
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://github.com/conan-io/conan.git \
-    && cd conan  \
-    && pip3 install --upgrade pip \
-    && pip install -r conans/requirements.txt
+   && make --version \
+   && gcc --version \
+   && java -version \
+   && mvn --version \
+   && gradle -v \
+   && bazel version \
+   && conan --version || true
 
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
@@ -135,11 +165,13 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -rvf benchmark
 
+ARG TOOLCHAIN_VERSION=8.3-2019.03
+
 RUN cd /tmp \
-	&& wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/8.2-2019.01/gcc-arm-8.2-2019.01-x86_64-aarch64-linux-gnu.tar.xz \
-	&& tar xfj gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu.tar.xz > /dev/null \
-	&& mv --verbose gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu /opt/ \
-	&& rm -vf gcc-arm-8.2-2018.08-x86_64-aarch64-linux-gnu.tar.xz
+	&& wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/${TOOLCHAIN_VERSION}/gcc-arm-8.2-2019.01-x86_64-aarch64-linux-gnu.tar.xz \
+	&& tar xfj gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz > /dev/null \
+	&& mv --verbose gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu /opt/ \
+	&& rm -vf gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz
 
 
 RUN cd /tmp \
