@@ -23,15 +23,15 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-PROJECT_NAME        ?= $(shell basename $(CURDIR))
-DTR_NAMESPACE      	?= doelopper
+export PROJECT_NAME        ?= $(shell basename $(CURDIR))
+export DTR_NAMESPACE      	?= doelopper
 #  jfrog.io - docker.io - registry.gitlab.com - artifactory.io
-DOCKER_TRUSTED_REGISTRY ?= docker.io
-ARCH                ?= amd64
-PLATFORM            =
-BASE_IMAGE          =
-GOAL                ?= build
-DIND                ?= docker.io/doevelopper/dind:0.0.2
+export DOCKER_TRUSTED_REGISTRY ?= docker.io
+export ARCH                ?= amd64
+export PLATFORM            =
+export BASE_IMAGE          =
+export GOAL                ?= build
+export APP_BASE_IMAGE_NAME = ${DOCKER_TRUSTED_REGISTRY}/${DTR_NAMESPACE}/${PROJECT_NAME}
 
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
@@ -47,5 +47,8 @@ else
 endif
 
 include $(shell pwd -P)/src/main/resources/docker/makefiles/common-variables.mk
-include $(shell pwd -P)/src/main/resources/docker/makefiles/git-variables.mk
 include $(shell pwd -P)/src/main/resources/docker/makefiles/target-coordinator.mk
+
+# from cli
+# make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 GOAL=build PLATFORM=RTI  rti-connext-dds
+# make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 GOAL=build omg-opendds

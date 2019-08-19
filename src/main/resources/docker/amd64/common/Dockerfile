@@ -13,27 +13,35 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
       libxml2-dev libxml2-utils python3-setuptools python-setuptools \
       ruby ruby-dev libnss3-dev libnss3-tools \
-      perl-base perl-modules libpthread-stubs0-dev \
+      perl perl-base perl-modules libpthread-stubs0-dev \
       zlib1g-dev libglib2.0-dev libglib2.0-bin \
       libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxkbcommon-x11-0 libxtst6 \
+      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxrender-dev libxkbcommon-x11-0 libxtst6 \
       libldap2-dev libldap-2.4-2 libmysql++-dev libxkbcommon-dev libxext-dev \
       unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
       libghc-uuid-dev libghc-uuid-types-dev libelf-dev  elfutils libelf1 \
       libpulse-dev  nfs-common  xterm iputils-ping  \
       htop libxss1 libasound2 x11-apps dbus gpg \
       libc6-dev libgtk-3-0 libpango-1.0-0 \
-      libxcb-keysyms1-dev libxcb-image0-dev \
+      libfreetype6-dev libxfixes-dev \
       x264 libx264-dev \
+      libxcb-keysyms1-dev libxcb-image0-dev \
       libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
       libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-      libfreetype6-dev libxext-dev libxfixes-dev \
-      libxi-dev libxrender-dev libxcb1-dev libx11-xcb-dev libxcb-glx0-dev x11vnc \
-      libxcb-xkb-dev libxslt1-dev \
-      libcanberra-gtk-module libgl1-mesa-glx gettext libstdc++6 \
-      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
-      rxvt-unicode-256color valgrind mscgen graphviz > /dev/null 2>&1 \
-   && mkdir -pv /var/run/dbus \
+      libxcb1-dev libxcb-glx0-dev  libxcb-xkb-dev \
+      libxslt1-dev x11vnc libxi-dev \
+      libcanberra-gtk-module libgl1-mesa-glx gettext \
+      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-xcb-dev  libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
+      rxvt-unicode-256color valgrind mscgen graphviz\
+      '^libxcb.*-dev' libxcb-xinerama0-dev \
+      gperf libicu-dev libxslt-dev libasound2-dev\
+      libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-dev \
+      libcap-dev libxtst-dev libudev-dev libpci-dev \
+      libxss-dev libegl1-mesa-dev xserver-common xfonts-base twm xfonts-75dpi yasm\
+      libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libavutil-dev \
+      libgl-dev  \
+      > /dev/null 2>&1 
+   # && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \

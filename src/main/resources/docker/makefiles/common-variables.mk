@@ -64,14 +64,79 @@ export PERL                := $(BIN)/perl
 export PYTHON              := $(BIN)/python
 export PYTHON2             := $(BIN)/python2
 export PYTHON3             := $(BIN)/python3
-export DISPLAY             := @bash -c '  $(PRINTF) $(YELLOW); echo "=> $$1";  $(PRINTF) $(NC)'
+export MSG                 := @bash -c '  $(PRINTF) $(YELLOW); echo "=> $$1";  $(PRINTF) $(NC)'
 export UNAME_OS            := $(shell uname -s)
 export HOST_RYPE           := $(shell arch)
-export DATE              	:= $(shell date -u "+%b-%d-%Y")
-export CWD               	:= $(shell pwd -P)
+export DATE                := $(shell date -u "+%b-%d-%Y")
+export CWD                 := $(shell pwd -P)
 export TARGETS             ?= linux/amd64 linux/arm64v8 windows/amd64
 
+export VERSION             := $(shell git describe --tags --long --dirty --always | \
+                        sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)-\?.*-\([0-9]*\)-\(.*\)/\1 \2 \3 \4 \5/g')
+export SHA1              	:= $(shell git rev-parse HEAD)
+export SHORT_SHA1        	:= $(shell git rev-parse --short=5 HEAD)
+export GIT_STATUS        	:= $(shell git status --porcelain)
+export GIT_BRANCH        	:= $(shell git rev-parse --abbrev-ref HEAD)
+export GIT_BRANCH_STR    	:= $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
+export GIT_REPO          	:= $(shell git config --local remote.origin.url | \
+                        			sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
+export GIT_REPOS_URL     	:= $(shell git config --get remote.origin.url)
+export CURRENT_BRANCH      	:= $(shell git rev-parse --abbrev-ref HEAD)
+export GIT_BRANCHES        	:= $(shell git for-each-ref --format='%(refname:short)' refs/heads/ | xargs echo)
+export GIT_REMOTES         	:= $(shell git remote | xargs echo )
+export GIT_ROOTDIR         	:= $(shell git rev-parse --show-toplevel)
+export GIT_DIRTY           	:= $(shell git diff --shortstat 2> /dev/null | tail -n1 )
+export LAST_TAG_COMMIT     	:= $(shell git rev-list --tags --max-count=1)
+export GIT_COMMITS         	:= $(shell git log --oneline ${LAST_TAG}..HEAD | wc -l | tr -d ' ')
+export GIT_REVISION        	:= $(shell git rev-parse --short=8 HEAD || echo unknown)
+#export  LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
+export GIT_LAST_TAG        	:= $(git log --first-parent --pretty="%d" | \
+                         			grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]+(\)|,)" -o | \
+									grep "v[0-9]*\.[0-9]*\.[0-9]*" -o | head -n 1)
 
+export DK_MKFALGS           = --no-print-directory -j$(shell nproc --all) --silent
+
+VERSIONFILE         = VERSION_FILE
+export SEM_VERSION             = $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
+export PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
+export PREVIOUS_VERSION    =  $(shell [ -n "$(PREVIOUS_VERSIONFILE_COMMIT)" ] && git show $(PREVIOUS_VERSIONFILE_COMMIT)^:$(CURDIR)$(VERSIONFILE) )
+
+export MAJOR               = $(shell echo $(SEM_VERSION) | sed "s/^\([0-9]*\).*/\1/")
+export MINOR               = $(shell echo $(SEM_VERSION) | sed "s/[0-9]*\.\([0-9]*\).*/\1/")
+export PATCH               = $(shell echo $(SEM_VERSION) | sed "s/[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/")
+export STAGE               = $(PATCH:$(SEM_VERSION)=0)
+export BUILD               = $(shell git log --oneline | wc -l | sed -e "s/[ \t]*//g")
+export NEXT_MAJOR_VERSION  = $(shell expr $(MAJOR) + 1).0.0-b$(BUILD)
+export NEXT_MINOR_VERSION  = $(MAJOR).$(shell expr $(MINOR) + 1).0-b$(BUILD)
+export NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUILD)
+
+DK_RUN_STD_ARG      = run --rm
+# DK_RUN_STD_ARG      += --memory=$(($(head -n 1 /proc/meminfo | awk '{print $2}') * 4 / 5))k
+# DK_RUN_STD_ARG      += --cpus=$((`nproc` - 1))
+DK_RUN_STD_ARG      += --log-opt max-size=50m
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR):/home/developer/workspace
+DK_RUN_STD_ARG      += --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
+DK_RUN_STD_ARG      += --volume ${HOME}/.conan:/home/developer/.conan
+DK_RUN_STD_ARG      += --volume ${HOME}/.ssh:/home/developer/.ssh
+DK_RUN_STD_ARG      += --volume ${HOME}/.Xauthority:/root/.Xauthority
+DK_RUN_STD_ARG      += --volume ${HOME}/.m2:/home/developer/.m2
+DK_RUN_STD_ARG      += --volume /etc/passwd:/etc/passwd:ro
+DK_RUN_STD_ARG      += --env DISPLAY=unix${DISPLAY}
+DK_RUN_STD_ARG      += --env LANG=C.UTF-8
+DK_RUN_STD_ARG      += --env LC_ALL=C.UTF-8
+DK_RUN_STD_ARG      += --env DOCKER_USER=`id -un`
+DK_RUN_STD_ARG      += --env DOCKER_USER_ID=`id -u`
+DK_RUN_STD_ARG      += --env DOCKER_PASSWORD=`id -un`
+DK_RUN_STD_ARG      += --env DOCKER_GROUP_ID=`id -g`
+
+export DK_RUN_STD_ARG
+
+export RND_NS       = $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 # Define colors for console output
 # courtesy to https://deb.nodesource.com/setup_12.x
 IF_TERMINAL                := $(shell test -t 1)

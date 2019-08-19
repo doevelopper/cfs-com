@@ -29,7 +29,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get update \
-    && apt-get install curl git make wget locales \ 
+    && apt-get install curl git make wget locales git-flow\ 
         software-properties-common apt-transport-https ca-certificates \ 
         gnupg2 lsb-release --assume-yes \
     && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - \

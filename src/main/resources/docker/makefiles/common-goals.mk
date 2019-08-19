@@ -27,11 +27,11 @@ DOCKER_LABEL        += --label org.label-schema.license="Licence · Apache-2.0"
 ifeq ($(GIT_BRANCH),master)
     DOCKER_LABEL    += --label org.label-schema.is-beta="no"
     DOCKER_LABEL    += --label org.label-schema.is-production="yes"
-    CONTAINER_IMAGE ?= $(IMAGE)-image-deploy
+    CONTAINER_IMAGE ?= $(APP_BASE_IMAGE_NAME)-image-deploy
 else
     DOCKER_LABEL    += --label org.label-schema.is-production="no"
     DOCKER_LABEL    += --label org.label-schema.is-beta="yes"
-    CONTAINER_IMAGE ?= $(IMAGE)-dev
+    CONTAINER_IMAGE ?= $(APP_BASE_IMAGE_NAME)-dev
 endif
 DOCKER_LABEL        += --label org.label-schema.url="$(GIT_REPOS_URL)"
 DOCKER_LABEL        += --label org.label-schema.vcs-ref="$(SHORT_SHA1)"
@@ -41,7 +41,7 @@ DOCKER_LABEL        += --label org.label-schema.vendor="Acme Systems Engineering
 DOCKER_LABEL        += --label org.label-schema.documentation=$(GIT_REPOS_URL)
 DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-BUILD_ARGS          = --build-arg MAKEFLAGS="$(DK_MKFALGS)"
+BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
 
 ifneq ($(PROXY_URL),)
     BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)
@@ -53,7 +53,7 @@ endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
-	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+	# echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
 
 .PHONY: dtr-logout
 dtr-logout: ## Logout from DTR
@@ -65,7 +65,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
+	# $(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
 	$(Q)echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
 
 .PHONY: push
@@ -74,45 +74,25 @@ build-image:
 .PHONY: push-image
 push-image:
 	$(Q)echo "$(SH_BLUE) Apply tag [$(VERSION)|latest] on $(BUILDER_FQIN)  $(SH_DEFAULT)"
-	$(Q)$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	# $(Q)$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
 	$(Q)echo
 	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"
-	$(Q)$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
-	$(Q)$(DOCKER) push $(BUILDER_FQIN):latest
-	$(Q)echo "$(VERSION)" > $(VERSIONFILE)
+	# $(Q)$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
+	# $(Q)$(DOCKER) push $(BUILDER_FQIN):latest
+	# $(Q)echo "$(VERSION)" > $(VERSIONFILE)
 	$(Q)echo "$(SH_GREEN) Images $(BUILDER_FQIN):[$(VERSION)|latest] pushed to DTR$(SH_DEFAULT)"
 
 .PHONY: run
 run : run-image ## Run docker image.
 
 .PHONY: run-image
-run-image : build-image
+run-image :
 	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
-	$(Q)$(DOCKER) run --rm \
-        --name="dev-build" \
-        --hostname="docker-dev-build" \
-        --volume ${HOME}/.conan:/home/developer/.conan \
-        --volume ${HOME}/.ssh:/home/developer/.ssh \
-        --volume ${HOME}/.Xauthority:/root/.Xauthority\
-        --volume ${HOME}/.m2:/home/developer/.m2 \
-        --volume /etc/passwd:/etc/passwd:ro \
-        --volume $(CWD)/src/main/resources/dotfiles/.vim:/home/developer/.vim \
-        --volume $(CWD)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc \
-        --volume $(CWD)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc \
-        --volume $(CWD):/home/developer/workspace \
-        --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
-        -e DISPLAY=unix${DISPLAY} \
-        -e LANG=C.UTF-8 \
-        -e LC_ALL=C.UTF-8 \
-        --log-opt max-size=50m \
-        --memory=$(($(head -n 1 /proc/meminfo | awk '{print $2}') * 4 / 5))k \
-        --cpus=$((`nproc` - 1)) \
-        -e DOCKER_USER=`id -un` \
-        -e DOCKER_USER_ID=`id -u` \
-        -e DOCKER_PASSWORD=`id -un` \
-        -e DOCKER_GROUP_ID=`id -g` \
-        --tty --interactive $(BUILDER_FQIN):$(VERSION)  
-        # || exit $?
+	# $(Q)$(DOCKER) ${DK_RUN_STD_ARG}  --name="$(shell basename $(CURDIR))-$(RND_NS)" --hostname="$(shell basename $(CURDIR))-$(RND_NS)" --tty --interactive $(BUILDER_FQIN):$(VERSION)
+
+.PHONY: exec-in
+exec-in :  ## Run a command inside a docker image.
+	# || exit $?
 
 .PHONY: versioninfo
 versioninfo: ## Display informations about the image.
