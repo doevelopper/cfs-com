@@ -45,15 +45,15 @@ docker:build:docker-base:
         # fi
 
     script:
-        - echo " Building ${ROOT_IMG_IMAGE}-dind:${VERSION}"
+        - echo " Building ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${VERSION}) ] || echo "already exists" &&  exit 0
+        # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}) ] || echo "already exists" &&  exit 0
         - |
-            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${VERSION}) ]]; then
-                echo "== ${ROOT_IMG_IMAGE}-dind:${VERSION} already exists =="
+            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}) ]]; then
+                echo "== ${ROOT_IMG_IMAGE}-dind:${CI_VERSION} already exists =="
                 exit 0
             fi
-        - make ${BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE} VERSION=${VERSION} GOAL=build dind
+        - make ${BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE} GOAL=build dind
     # only:
        # refs:
            # - schedules
