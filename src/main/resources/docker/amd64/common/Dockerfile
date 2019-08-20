@@ -49,10 +49,10 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       libc6-dev libgtk-3-0 libpango-1.0-0 \
       libfreetype6-dev libxfixes-dev \
       x264 libx264-dev \
-      libxcb-keysyms1-dev libxcb-image0-dev \
-      libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
-      libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-      libxcb1-dev libxcb-glx0-dev  libxcb-xkb-dev \
+      # libxcb-keysyms1-dev libxcb-image0-dev \
+      # libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
+      # libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
+      # libxcb1-dev libxcb-glx0-dev  libxcb-xkb-dev \
       libxslt1-dev x11vnc libxi-dev \
       libcanberra-gtk-module libgl1-mesa-glx gettext \
       xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-xcb-dev  libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
@@ -64,7 +64,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       libxss-dev libegl1-mesa-dev xserver-common xfonts-base twm xfonts-75dpi yasm\
       libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libavutil-dev \
       libgl-dev  \
-      > /dev/null 2>&1 
+      > /dev/null 2>&1 \
    # && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \

@@ -28,8 +28,8 @@ CONTAINER_IMAGE      = ${APP_BASE_IMAGE_NAME}-$(shell basename $(CURDIR))
 DOCKER_LABEL        := --label org.label-schema.title="Dind docker-compose make git"
 DOCKER_LABEL        += --label org.label-schema.description="Docker in docker for running container usin CI"
 DOCKER_LABEL        += --label org.label-schema.name=$(CONTAINER_IMAGE)
-DOCKER_LABEL        += --label org.label-schema.schema-version="$(CONTAINER_IMAGE):$(VERSION)"
-DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
+DOCKER_LABEL        += --label org.label-schema.schema-version="$(CONTAINER_IMAGE):$(SEM_VERSION)"
+DOCKER_LABEL        += --label org.label-schema.version=$(SEM_VERSION)
 DOCKER_LABEL        += --label org.label-schema.usage="Image used by gitlab-ci to build and run c++ app"
 DOCKER_LABEL        += --label org.label-schema.docker.cmd="make $(shell basename $(CURDIR)) run"
 DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
@@ -38,7 +38,7 @@ DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
 # Builder - Contains all the build artifacts and depedencies
 # Runtime - Contains only the minimum necessary artifacts to run the microservice
 BUILDER_FQIN        := $(CONTAINER_IMAGE)
-RUNTIME_FQIN        := $(IMAGE):$(VERSION)
+RUNTIME_FQIN        := $(IMAGE):$(SEM_VERSION)
 
 include $(CWD)/src/main/resources/docker/makefiles/common-goals.mk
 

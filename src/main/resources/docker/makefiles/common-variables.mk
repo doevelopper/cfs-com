@@ -49,6 +49,7 @@ ifeq (0,${MAKELEVEL})
 endif
 
 export quiet Q KBUILD_VERBOSE
+
 export EMPTY               =
 export SPACE               = $(EMPTY) $(EMPTY)
 export MAKEDIR             = mkdir -p
@@ -97,11 +98,11 @@ export GIT_LAST_TAG        := $(git log --first-parent --pretty="%d" | \
 export DK_MKFALGS          ="--no-print-directory -j$(shell nproc --all) --silent"
 
 ifneq ($(CI_VERSION),)
-	export SEM_VERSION         := $${CI_VERSION}
+    export SEM_VERSION         := $${CI_VERSION}
 else
     $(warning  VERSION not defined)
-	export VERSIONFILE         = VERSION_FILE
-	export SEM_VERSION         := $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
+    export VERSIONFILE         = VERSION_FILE
+    export SEM_VERSION         := $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
 endif
 
 export PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
