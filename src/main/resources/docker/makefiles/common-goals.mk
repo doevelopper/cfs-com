@@ -53,7 +53,7 @@ endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
-	# echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
 
 .PHONY: dtr-logout
 dtr-logout: ## Logout from DTR
@@ -65,22 +65,22 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	# $(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(VERSION) --file Dockerfile .
-	$(Q)echo "Build of $(BUILDER_FQIN):$(VERSION) finished."
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile .
+	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push
  push: push-image ## Push docker image to DTR.
 
 .PHONY: push-image
 push-image:
-	$(Q)echo "$(SH_BLUE) Apply tag [$(VERSION)|latest] on $(BUILDER_FQIN)  $(SH_DEFAULT)"
-	# $(Q)$(DOCKER) tag $(BUILDER_FQIN):$(VERSION) $(BUILDER_FQIN):latest
+	$(Q)echo "$(SH_BLUE) Apply tag [$(SEM_VERSION)|latest] on $(BUILDER_FQIN)  $(SH_DEFAULT)"
+	$(Q)$(DOCKER) tag $(BUILDER_FQIN):$(SEM_VERSION) $(BUILDER_FQIN):latest
 	$(Q)echo
-	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"
-	# $(Q)$(DOCKER) push $(BUILDER_FQIN):$(VERSION)
-	# $(Q)$(DOCKER) push $(BUILDER_FQIN):latest
-	# $(Q)echo "$(VERSION)" > $(VERSIONFILE)
-	$(Q)echo "$(SH_GREEN) Images $(BUILDER_FQIN):[$(VERSION)|latest] pushed to DTR$(SH_DEFAULT)"
+	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(SEM_VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"
+	$(Q)$(DOCKER) push $(BUILDER_FQIN):$(SEM_VERSION)
+	$(Q)$(DOCKER) push $(BUILDER_FQIN):latest
+	# $(Q)echo "$(SEM_VERSION)" > $(VERSIONFILE)
+	$(Q)echo "$(SH_GREEN) Images $(BUILDER_FQIN):[$(SEM_VERSION)|latest] pushed to DTR$(SH_DEFAULT)"
 
 .PHONY: run
 run : run-image ## Run docker image.
@@ -97,7 +97,7 @@ exec-in :  ## Run a command inside a docker image.
 .PHONY: versioninfo
 versioninfo: ## Display informations about the image.
 	$(Q)echo "Version file: $(VERSIONFILE)"
-	$(Q)echo "Current version: $(VERSION)"
+	$(Q)echo "Current version: $(SEM_VERSION)"
 	$(Q)echo "(major: $(MAJOR), minor: $(MINOR), patch: $(PATCH))"
 	$(Q)echo "Last tag: $(LAST_TAG)"
 	$(Q)echo "Build: $(BUILD) (total number of commits)"

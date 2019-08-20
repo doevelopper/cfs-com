@@ -35,8 +35,8 @@ docker:build:docker-base:
         - export DOCKER_FILE=src/main/resources/docker/dind/Dockerfile
         - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
-        - export SEMVER=$(head src/main/resources/docker/dind/VERSION_FILE)
-        - export VERSION=0.0.1
+        - export SEM_VERSION=$(head src/main/resources/docker/dind/VERSION_FILE)
+        - export CI_VERSION=0.0.1
         - apk add bash make git
 
         # if [complicated logic] ; then
@@ -47,6 +47,12 @@ docker:build:docker-base:
     script:
         - echo " Building ${ROOT_IMG_IMAGE}-dind:${VERSION}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
+        # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${VERSION}) ] || echo "already exists" &&  exit 0
+        - |
+            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${VERSION}) ]]; then
+                echo "== ${ROOT_IMG_IMAGE}-dind:${VERSION} already exists =="
+                exit 0
+            fi
         - make ${BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE} VERSION=${VERSION} GOAL=build dind
     # only:
        # refs:

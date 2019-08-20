@@ -21,6 +21,21 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+.Log files: &log_files  [./*.log, ./build/logs/]
+
+# .Build logs: &save_build_logs
+#     artifacts:
+#         name: log
+#         when: always
+#         paths: 
+#             <<: *log_file
+
+.Git Untracked files: &save_untracked_files
+    artifacts:
+        name: untracked
+        paths: [$(pwd)]
+        expire_in: 3h45min
+
 .agent-who:
     retry: 
         max: 1

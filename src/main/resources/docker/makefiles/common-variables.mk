@@ -72,32 +72,38 @@ export CWD                 := $(shell pwd -P)
 export TARGETS             ?= linux/amd64 linux/arm64v8 windows/amd64
 
 export VERSION             := $(shell git describe --tags --long --dirty --always | \
-                        sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)-\?.*-\([0-9]*\)-\(.*\)/\1 \2 \3 \4 \5/g')
-export SHA1              	:= $(shell git rev-parse HEAD)
-export SHORT_SHA1        	:= $(shell git rev-parse --short=5 HEAD)
-export GIT_STATUS        	:= $(shell git status --porcelain)
-export GIT_BRANCH        	:= $(shell git rev-parse --abbrev-ref HEAD)
-export GIT_BRANCH_STR    	:= $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
-export GIT_REPO          	:= $(shell git config --local remote.origin.url | \
-                        			sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
-export GIT_REPOS_URL     	:= $(shell git config --get remote.origin.url)
-export CURRENT_BRANCH      	:= $(shell git rev-parse --abbrev-ref HEAD)
-export GIT_BRANCHES        	:= $(shell git for-each-ref --format='%(refname:short)' refs/heads/ | xargs echo)
-export GIT_REMOTES         	:= $(shell git remote | xargs echo )
-export GIT_ROOTDIR         	:= $(shell git rev-parse --show-toplevel)
-export GIT_DIRTY           	:= $(shell git diff --shortstat 2> /dev/null | tail -n1 )
-export LAST_TAG_COMMIT     	:= $(shell git rev-list --tags --max-count=1)
-export GIT_COMMITS         	:= $(shell git log --oneline ${LAST_TAG}..HEAD | wc -l | tr -d ' ')
-export GIT_REVISION        	:= $(shell git rev-parse --short=8 HEAD || echo unknown)
-#export  LAST_TAG            := $(shell git describe --tags $(LAST_TAG_COMMIT) )
-export GIT_LAST_TAG        	:= $(git log --first-parent --pretty="%d" | \
-                         			grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]+(\)|,)" -o | \
-									grep "v[0-9]*\.[0-9]*\.[0-9]*" -o | head -n 1)
+                                sed 's/v\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)-\?.*-\([0-9]*\)-\(.*\)/\1 \2 \3 \4 \5/g')
+export SHA1                := $(shell git rev-parse HEAD)
+export SHORT_SHA1          := $(shell git rev-parse --short=5 HEAD)
+export GIT_STATUS          := $(shell git status --porcelain)
+export GIT_BRANCH          := $(shell git rev-parse --abbrev-ref HEAD)
+export GIT_BRANCH_STR      := $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
+export GIT_REPO            := $(shell git config --local remote.origin.url | \
+                                sed -e 's/.git//g' -e 's/^.*\.com[:/]//g' | tr '/' '_' 2> /dev/null)
+export GIT_REPOS_URL       := $(shell git config --get remote.origin.url)
+export CURRENT_BRANCH      := $(shell git rev-parse --abbrev-ref HEAD)
+export GIT_BRANCHES        := $(shell git for-each-ref --format='%(refname:short)' refs/heads/ | xargs echo)
+export GIT_REMOTES         := $(shell git remote | xargs echo )
+export GIT_ROOTDIR         := $(shell git rev-parse --show-toplevel)
+export GIT_DIRTY           := $(shell git diff --shortstat 2> /dev/null | tail -n1 )
+export LAST_TAG_COMMIT     := $(shell git rev-list --tags --max-count=1)
+export GIT_COMMITS         := $(shell git log --oneline ${LAST_TAG}..HEAD | wc -l | tr -d ' ')
+export GIT_REVISION        := $(shell git rev-parse --short=8 HEAD || echo unknown)
+#export  LAST_TAG          := $(shell git describe --tags $(LAST_TAG_COMMIT) )
+export GIT_LAST_TAG        := $(git log --first-parent --pretty="%d" | \
+                                grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]+(\)|,)" -o | \
+                                grep "v[0-9]*\.[0-9]*\.[0-9]*" -o | head -n 1)
 
-export DK_MKFALGS           = --no-print-directory -j$(shell nproc --all) --silent
+export DK_MKFALGS          ="--no-print-directory -j$(shell nproc --all) --silent"
 
-VERSIONFILE         = VERSION_FILE
-export SEM_VERSION             = $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
+ifneq ($(CI_VERSION),)
+	export SEM_VERSION         := $${CI_VERSION}
+else
+    $(warning  VERSION not defined)
+	export VERSIONFILE         = VERSION_FILE
+	export SEM_VERSION         := $(shell [ -f $(VERSIONFILE) ] && head $(VERSIONFILE) || echo "0.0.1")
+endif
+
 export PREVIOUS_VERSIONFILE_COMMIT = $(shell git log -1 --pretty=%h $(VERSIONFILE) 2>/dev/null )
 export PREVIOUS_VERSION    =  $(shell [ -n "$(PREVIOUS_VERSIONFILE_COMMIT)" ] && git show $(PREVIOUS_VERSIONFILE_COMMIT)^:$(CURDIR)$(VERSIONFILE) )
 
@@ -169,15 +175,5 @@ COLOR_RANGG                := $(shell test ${COLOR_SUPPORT} -ge 8)
 #         export MAGENTA            = $(shell tput setaf 5)
 #         export CYAN               = $(shell tput setaf 6)
 #         export WHITE              = $(shell tput setaf 7)
-
 #     endif
-
 # endif
-
-define blue
-	@tput setaf 4
-	@echo " "
-	@echo $1
-	@echo " "
-	@tput sgr0
-endef

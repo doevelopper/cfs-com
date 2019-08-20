@@ -24,7 +24,7 @@
 #
 
 export PROJECT_NAME        ?= $(shell basename $(CURDIR))
-export DTR_NAMESPACE      	?= doelopper
+export DTR_NAMESPACE      	?= doevelopper
 #  jfrog.io - docker.io - registry.gitlab.com - artifactory.io
 export DOCKER_TRUSTED_REGISTRY ?= docker.io
 export ARCH                ?= amd64
