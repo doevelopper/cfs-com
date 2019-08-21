@@ -46,63 +46,6 @@ RUN git config --global url."https://".insteadOf git://
 
 # USER root
 
-# Core libraries ==> should go to common
-RUN apt-get -qq install -y \
-    '^libxcb.*-dev' libxcb-xinerama0-dev libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev \
-    gperf libicu-dev libxslt-dev libasound2-dev\
-    libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-dev \
-    libfontconfig1-dev libcap-dev libxtst-dev libpulse-dev libudev-dev libpci-dev libnss3-dev \
-    libasound2-dev libxss-dev libegl1-mesa-dev gperf bison \
-    xserver-common xfonts-base x11vnc twm xfonts-75dpi \
-    xserver-common libglu1-mesa-dev libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1  yasm\
-    libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libavutil-dev \
-    libgl-dev perl python git wget
-
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-    && apt-get install --assume-yes --no-install-recommends nodejs
-
-ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
-ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
-ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
-ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
-
-COPY qt-installer-noninteractive.qs /tmp
-# COPY qt-opensource-linux-x64-5.13.0.run /tmp
-
- 
-RUN cd /tmp \
-    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x ./qt-installer-noninteractive.qs \ 
-    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
-
-ENV QT_INSTALL_DIR=/opt/qt
-
-# RUN cd /tmp \
-#     && xhost +si:developer:root \
-#     && ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
-#         --script ./qt-installer-noninteractive.qs
-# --auto-servernum --error-file=/dev/stderr  
-RUN cd /tmp \
-    && xvfb-run \
-        ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose  \
-        --script ./qt-installer-noninteractive.qs
-
-RUN cd /tmp \
-    && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
-
-        #   > /dev/null 2>&1 \
-##     xhost local:root
-## xhost +local:docker #QStandardPaths: XDG_RUNTIME_DIR not set Docker
-#   # && xhost +
-#     && xvfb-run
-#   # && xhost -
-
-ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
-ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
-ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
-ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH 
-ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-
 RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \
     && cd wireshark \

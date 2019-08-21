@@ -14,6 +14,7 @@
 [![Language][CPP-shield]][CPP]
 [![Maintenance][Maintenance-shield]][Main-tenance]
 
+[![Python][Python-version-shield]][Python-version]
 [![language][CPP-14-shield]][CPP-14]
 [![license][MIT-license-shield]][MIT-license]
 
@@ -206,8 +207,10 @@ for details.
 [CPP-shield]: https://img.shields.io/badge/language-C++-blue.svg
 [CPP]: https://isocpp.org/
 [CPP-14-shield]: https://img.shields.io/badge/language-C%2B%2B14-red.svg
-[MIT-license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [CPP-14]: https://en.wikipedia.org/wiki/C%2B%2B14
+[Python-version-shield]: https://img.shields.io/pypi/pyversions/cpplint.svg
+[Python-version]: https://www.python.org/
+[MIT-license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [MIT-license]: https://en.wikipedia.org/wiki/MIT_License
 [Maintenance-shield]: https://img.shields.io/badge/Maintained%3F-yes-green.svg
 [Main-tenance]: https://gitlab.com/doevelopper/cppbdd101/tree/develop

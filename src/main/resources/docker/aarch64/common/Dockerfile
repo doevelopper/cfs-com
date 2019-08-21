@@ -105,6 +105,14 @@ RUN cd /tmp \
 RUN pip install -q --no-cache-dir conan \
    && pip install --upgrade conan_package_tools
 
+ARG TOOLCHAIN_VERSION=8.3-2019.03
+
+RUN cd /tmp \
+	&& wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/${TOOLCHAIN_VERSION}/gcc-arm-8.2-2019.01-x86_64-aarch64-linux-gnu.tar.xz \
+	&& tar xfj gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz > /dev/null \
+	&& mv --verbose gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu /opt/ \
+	&& rm -vf gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz
+
 RUN cmake --version \
    && make --version \
    && gcc --version \
@@ -149,7 +157,11 @@ RUN cd /tmp \
     && git clone --depth=1 https://github.com/google/googletest.git \
     && cd googletest \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${AARCH64_DESTDIR} \
+    && cmake -E chdir build cmake ..  \
+        CXX=aarch64-linux-gnu-g++ \
+        CC=aarch64-linux-gnu-gcc \
+        CXX_FLAGS="${CXX_FLAGS} -fPIE -fPIC" \
+        -DCMAKE_INSTALL_PREFIX=${AARCH64_DESTDIR} \
     && cmake --build build --target all --clean-first  \
     && cmake --build build --target install \
     && cd /tmp \
@@ -159,20 +171,14 @@ RUN cd /tmp \
     && git clone --depth=1 https://github.com/google/benchmark.git \
     && cd benchmark \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${AARCH64_DESTDIR} \
+    && cmake -E chdir build cmake .. \
+        CXX=aarch64-linux-gnu-g++ \
+        CC=aarch64-linux-gnu-gcc \
+    -DCMAKE_INSTALL_PREFIX=${AARCH64_DESTDIR} \
     && cmake --build build --target all --clean-first  \
     && cmake --build build --target install \
     && cd /tmp \
     && rm -rvf benchmark
-
-ARG TOOLCHAIN_VERSION=8.3-2019.03
-
-RUN cd /tmp \
-	&& wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/${TOOLCHAIN_VERSION}/gcc-arm-8.2-2019.01-x86_64-aarch64-linux-gnu.tar.xz \
-	&& tar xfj gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz > /dev/null \
-	&& mv --verbose gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu /opt/ \
-	&& rm -vf gcc-arm-${TOOLCHAIN_VERSION}-x86_64-aarch64-linux-gnu.tar.xz
-
 
 RUN cd /tmp \
     && curl -L -O -k https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz \
@@ -180,7 +186,7 @@ RUN cd /tmp \
     && cd boost_1_69_0 \
     && ./bootstrap.sh --prefix=${AARCH64_DESTDIR} \
     && ./b2 --help \
-    && ./b2 link=shared threading=multi variant=release address-model=64 -j `nproc` \
+    && ./b2 toolset=gcc-arm link=static cxxflags=-fPIC threading=multi variant=release address-model=64 -j `nproc` \
     && ./b2 install \
     && cd /tmp \
     && rm -rvf boost_1_69_0 boost_1_69_0.tar.gz

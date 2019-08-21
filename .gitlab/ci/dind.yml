@@ -38,6 +38,7 @@ docker:build:docker-base:
         - export SEM_VERSION=$(head src/main/resources/docker/dind/VERSION_FILE)
         - export CI_VERSION=0.0.1
         - apk add bash make git
+        - "[ -f ./version ] && export VERSION=$(cat ./version)"
 
         # if [complicated logic] ; then
         #     echo "No new build required. Skipping this job!"

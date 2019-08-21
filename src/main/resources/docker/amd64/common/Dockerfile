@@ -22,7 +22,9 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-FROM docker.io/doevelopper/dind:0.0.2
+ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dind:0.0.1
+FROM $BASE_IMAGE
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -142,7 +144,16 @@ RUN cd /tmp \
    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 
 RUN pip install -q --no-cache-dir conan \
-   && pip install --upgrade conan_package_tools
+   && pip install --upgrade conan_package_tools \
+   && pip install cpplint \
+   && pip install cpplint-junit \
+   && pip install cppcheck-junit \
+   && pip install semver \
+   && pip install semver-tool \
+   && pip install lizard \
+   && pip install cpp-demangle \
+   && pip install polysquare-cmake-linter \
+   && pip install cpp-coveralls
 
 #RUN cd /tmp \
 #    && wget --no-check-certificate https://github.com/conan-io/conan/releases/download/1.18.1/conan-ubuntu-64_1_18_1.deb
@@ -169,7 +180,7 @@ RUN pip install -q --no-cache-dir conan \
     # && pip install -r conans/requirements.txt
 
 # Configure the remote.  
-#RUN conan remote add artifactory https://devcloud.swcoe.ge.com/artifactory/api/conan/GRIDIQ-CONAN
+#RUN conan remote add artifactory https://jfrog.io/artifactory/api/conan/POM-CONAN
 #RUN conan user -p ${ARTIFACTORY_PSW} -r artifactory ${ARTIFACTORY_USR}
 #RUN conan create --update -e ARTIFACTORY_USR=${ARTIFACTORY_USR} -e ARTIFACTORY_PSW=${ARTIFACTORY_PSW} -e AIMMS_HOME=/opt/aimms/ -s build_type=${BUILD_TYPE} . gridiq/dev
 ## Run deploy if configured to do so.  
@@ -318,17 +329,6 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf double-conversion
 
-#RUN cd /tmp \
-#   && git clone --depth=1 https://github.com/google/cctz.git \
-#   && cd cctz \
-#   && cmake -E make_directory build \
-#   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local \
-#   && cmake --build build --target all --config Release --clean-first > /dev/null 2>&1 \
-#   && ctest \
-#   && cmake --build build --config Release --target install \
-#   && cd /tmp \
-#   && rm -rf cctz
-
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/capture-thread.git \
    && cd capture-thread \
@@ -414,6 +414,28 @@ RUN cd /tmp \
    && make install \
    && cd /tmp \
    && rm -rf openssl
+
+# install protobuf first, then grpc
+ENV GRPC_RELEASE_TAG v1.22.x
+RUN cd /tmp \
+   && git clone -b ${GRPC_RELEASE_TAG} https://github.com/grpc/grpc  \
+   && cd grpc \
+   && git submodule update --init \
+   && echo "--- installing protobuf ---" \
+   && cd third_party/protobuf \
+      ./autogen.sh \ 
+   && ./configure --enable-shared \
+   && make -j$(nproc) \
+   && make -j$(nproc) check \
+   && make install \
+   && make clean  \
+   && ldconfig \
+   && echo "--- installing grpc ---" \
+   && cd /tmp/grpc \
+   && make -j$(nproc) \
+   && make install \
+   && make clean \
+   && ldconfig
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
@@ -607,6 +629,51 @@ RUN cd /tmp \
     && make install \
     && cd /tmp/ \
     rm -rf gst*
+
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get install --assume-yes --no-install-recommends nodejs
+
+ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
+ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
+ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
+
+COPY qt-installer-noninteractive.qs /tmp
+# COPY qt-opensource-linux-x64-5.13.0.run /tmp
+
+ 
+RUN cd /tmp \
+    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
+    && chmod +x ./qt-installer-noninteractive.qs \ 
+    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
+
+ENV QT_INSTALL_DIR=/opt/qt
+
+# RUN cd /tmp \
+#     && xhost +si:developer:root \
+#     && ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
+#         --script ./qt-installer-noninteractive.qs
+# --auto-servernum --error-file=/dev/stderr  
+RUN cd /tmp \
+    && xvfb-run \
+        ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose  \
+        --script ./qt-installer-noninteractive.qs
+
+RUN cd /tmp \
+    && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+
+        #   > /dev/null 2>&1 \
+##     xhost local:root
+## xhost +local:docker #QStandardPaths: XDG_RUNTIME_DIR not set Docker
+#   # && xhost +
+#     && xvfb-run
+#   # && xhost -
+
+ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
+ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
+ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
+ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH 
+ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # https://github.com/cisco/herisson.git
 # https://github.com/cisco/mlspp.git
