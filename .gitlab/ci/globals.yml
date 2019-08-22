@@ -175,11 +175,11 @@
 .docker:
     stage: Build docker image
     services:
-        - docker:dind
+        - docker:19.03.0-dind
     extends: .dind_hub_variables
 
 .docker-app-prerequisities:
-    image: docker.io/doevelopper/dind:0.0.2
+    image: ${ROOT_IMG_IMAGE}-dind:0.0.2
     extends: .docker
     # only:
         # refs:
@@ -197,7 +197,9 @@
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
         - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
-        - make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}
+        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+    after_script:        
+        - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 
 
 .deploy_functions: &deploy_functions |

@@ -38,10 +38,6 @@ docker:build:docker-base:
         - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
         - apk add bash make git
-        # if [complicated logic] ; then
-        #     echo "No new build required. Skipping this job!"
-        #     exit 0
-        # fi
 
     script:
         - echo " Building ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}"
