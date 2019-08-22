@@ -54,7 +54,7 @@ docker:build:docker-base:
                 echo "== ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} already exists =="
                 exit 0
             fi
-        - echo make DOCKER_FILE=${DOCKER_FILE} GOAL=build dind
+        - make DOCKER_FILE=${DOCKER_FILE} GOAL=build dind
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
     # only:
        # refs:
