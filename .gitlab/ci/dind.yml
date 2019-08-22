@@ -32,8 +32,8 @@ docker:build:docker-base:
     before_script:
         - export GOAL=build
         - export MODULE=dind
-        - export DOCKER_FILE="src/main/resources/docker/dind/Dockerfile"
-        - export VERSIONFILE="src/main/resources/docker/dind/VERSION_FILE"
+        - export DOCKER_FILE=src/main/resources/docker/dind/Dockerfile
+        - export VERSIONFILE=${CI_PROJECT_DIR}/src/main/resources/docker/dind/VERSION_FILE
         - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1" 
         - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
@@ -45,7 +45,8 @@ docker:build:docker-base:
 
     script:
         - echo " Building ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}"
-        - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
+        - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${DOCKER_TRUSTED_REGISTRY}"
+        - echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
         # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ] || echo "already exists" &&  exit 0
         - |
             if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ]]; then
@@ -53,6 +54,7 @@ docker:build:docker-base:
                 exit 0
             fi
         - echo "make DOCKER_FILE=${DOCKER_FILE} GOAL=build dind"
+        - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
     # only:
        # refs:
            # - schedules

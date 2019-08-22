@@ -139,7 +139,7 @@
     LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
     CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
     STAGING_REGISTRY: "docker.io"
-    DTR_NAMESPACE: doevelopper
+    DTR_NAMESPACE: $CI_PROJECT_NAMESPACE
     PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
     PROJECT_NAME: $CI_PROJECT_NAME
     TAG: $CI_BUILD_REF_NAME
@@ -150,7 +150,8 @@
     OS_VERS_LONG: $(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
     BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
     COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
-    MAKE_DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH}
+    DOCKER_TRUSTED_REGISTRY: ${STAGING_REGISTRY} 
+    DTR_NAMESPACE: ${DTR_NAMESPACE}
 
 .dind_hub_variables:
     variables:
@@ -161,7 +162,7 @@
         DOCKER_TLS_CERTDIR: "/certs"
         DOCKER_CERT_PATH: "/certs/client"
         ROOT_IMG_IMAGE: ${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}
-        DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH} IMG_NAME=${ROOT_IMG_IMAGE}
+        IMG_NAME: ${ROOT_IMG_IMAGE}
 
 .docker-hub-dind:
     image: docker:19.03.0
