@@ -126,8 +126,35 @@
         - docker version  || true
         - docker logout docker.io || true
 
+.variables: &common_variables
+#    CI_DEBUG_TRACE: "true"
+#    GIT_SUBMODULE_STRATEGY: "none"
+#    GIT_SUBMODULE_STRATEGY: "recursive"
+#    GIT_STRATEGY: "fetch"
+#    GIT_CHECKOUT: "false"
+    GET_SOURCES_ATTEMPTS: "3"
+    ARTIFACT_DOWNLOAD_ATTEMPTS: "2"
+    GIT_DEPTH: "1"
+    LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
+    LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
+    CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
+    STAGING_REGISTRY: "docker.io"
+    DTR_NAMESPACE: doevelopper
+    PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
+    PROJECT_NAME: $CI_PROJECT_NAME
+    TAG: $CI_BUILD_REF_NAME
+    ARCH: amd64
+    COMMIT_ID: ${CI_COMMIT_SHA:0:8}
+    CCACHE_BASEDIR: $CI_PROJECT_DIR
+    OS_NAME: $(lsb_release -is) || true
+    OS_VERS_LONG: $(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
+    BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
+    COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
+    MAKE_DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH}
+
 .dind_hub_variables:
     variables:
+        <<: *common_variables
         DOCKER_DIRVER: overlay2
         DOCKER_HOST: tcp://docker:2376
         DOCKER_TLS_VERIFY: 1
@@ -180,31 +207,6 @@
 # before_script:
 #   - *deploy_functions
 
-.variables: &common_variables
-#    CI_DEBUG_TRACE: "true"
-#    GIT_SUBMODULE_STRATEGY: "none"
-#    GIT_SUBMODULE_STRATEGY: "recursive"
-#    GIT_STRATEGY: "fetch"
-#    GIT_CHECKOUT: "false"
-    GET_SOURCES_ATTEMPTS: "3"
-    ARTIFACT_DOWNLOAD_ATTEMPTS: "2"
-    GIT_DEPTH: "1"
-    LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
-    LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
-    CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
-    STAGING_REGISTRY: "docker.io"
-    DTR_NAMESPACE: doevelopper
-    PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
-    PROJECT_NAME: $CI_PROJECT_NAME
-    TAG: $CI_BUILD_REF_NAME
-    ARCH: amd64
-    COMMIT_ID: ${CI_COMMIT_SHA:0:8}
-    CCACHE_BASEDIR: $CI_PROJECT_DIR
-    OS_NAME: $(lsb_release -is) || true
-    OS_VERS_LONG: $(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
-    BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
-    COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
-    MAKE_DOCKER_BUILD_OPTIONS: DOCKER_TRUSTED_REGISTRY=${STAGING_REGISTRY} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH}
 
 #  Caching configurations
 
