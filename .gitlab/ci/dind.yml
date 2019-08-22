@@ -49,7 +49,8 @@ docker:build:docker-base:
         - echo "$DOCKER_PASSWORD" | docker login -u "${CI_PROJECT_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
         # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ] || echo "already exists" &&  exit 0
         - |
-            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ]]; then
+            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} >/dev/null; then
+                # if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ]]; then
                 echo "== ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} already exists =="
                 exit 0
             fi
