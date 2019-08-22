@@ -32,29 +32,27 @@ docker:build:docker-base:
     before_script:
         - export GOAL=build
         - export MODULE=dind
-        - export DOCKER_FILE=src/main/resources/docker/dind/Dockerfile
+        - export DOCKER_FILE="src/main/resources/docker/dind/Dockerfile"
+        - export VERSIONFILE="src/main/resources/docker/dind/VERSION_FILE"
+        - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1" 
         - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/dind.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
-        - export SEM_VERSION=$(head src/main/resources/docker/dind/VERSION_FILE)
-        - export CI_VERSION=0.0.1
         - apk add bash make git
-        - "[ -f ./version ] && export VERSION=$(cat ./version)"
-
         # if [complicated logic] ; then
         #     echo "No new build required. Skipping this job!"
         #     exit 0
         # fi
 
     script:
-        - echo " Building ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}"
+        - echo " Building ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}"
         - echo " ${CI_JOB_TOKEN} ${STAGING_REGISTRY} ${DTR_NAMESPACE} ${CI_PROJECT_NAMESPACE}"
-        # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}) ] || echo "already exists" &&  exit 0
+        # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ] || echo "already exists" &&  exit 0
         - |
-            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${CI_VERSION}) ]]; then
-                echo "== ${ROOT_IMG_IMAGE}-dind:${CI_VERSION} already exists =="
+            if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ]]; then
+                echo "== ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} already exists =="
                 exit 0
             fi
-        - make ${BUILD_OPTIONS} DOCKER_FILE=${DOCKER_FILE} GOAL=build dind
+        - echo "make DOCKER_FILE=${DOCKER_FILE} GOAL=build dind"
     # only:
        # refs:
            # - schedules

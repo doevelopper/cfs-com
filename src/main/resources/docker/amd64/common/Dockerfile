@@ -50,7 +50,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       htop libxss1 libasound2 x11-apps dbus gpg \
       libc6-dev libgtk-3-0 libpango-1.0-0 \
       libfreetype6-dev libxfixes-dev \
-      x264 libx264-dev \
+      x264 libx264-dev pkg-config libjq-dev jq \
       # libxcb-keysyms1-dev libxcb-image0-dev \
       # libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
       # libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
@@ -170,25 +170,25 @@ RUN pip install -q --no-cache-dir conan \
 #    && pip install -r conans/requirements_server.txt \
 #    && pip install -r conans/requirements_dev.txt
 
-    # && pip3 install --upgrade pip 
-    # && pip install -e . 
-    # && conan remote add conan-center https://conan.bintray.com 
+    # && pip3 install --upgrade pip
+    # && pip install -e .
+    # && conan remote add conan-center https://conan.bintray.com
     # && conan remote update conan-center https://api.bintray.com/conan/conan/conan-center False \
-    # && conan remote add conan-community https://api.bintray.com/conan/conan-community/conan 
+    # && conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
     # && conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan False
     # && conan remote add conan-transit https://api.bintray.com/conan/conan/conan-transit True
     # && pip install -r conans/requirements.txt
 
-# Configure the remote.  
+# Configure the remote.
 #RUN conan remote add artifactory https://jfrog.io/artifactory/api/conan/POM-CONAN
 #RUN conan user -p ${ARTIFACTORY_PSW} -r artifactory ${ARTIFACTORY_USR}
 #RUN conan create --update -e ARTIFACTORY_USR=${ARTIFACTORY_USR} -e ARTIFACTORY_PSW=${ARTIFACTORY_PSW} -e AIMMS_HOME=/opt/aimms/ -s build_type=${BUILD_TYPE} . gridiq/dev
-## Run deploy if configured to do so.  
+## Run deploy if configured to do so.
 #RUN if [ "${BUILD_GOAL}" = "deploy" ]; then conan upload --all --force -c -r=artifactory KoshCpp/*; fi
 #RUN conan install . -s os=Linux -s os_build=Linux -s arch=x86_64 -s arch_build=x86_64 -s compiler=gcc -s compiler.version=7 -s compiler.libcxx=libstdc++11 && \
 #    mkdir build && cd build && \
 #    cmake .. -G "Unix Makefiles"
-    
+
 RUN cmake --version \
    && make --version \
    && gcc --version \
@@ -369,7 +369,7 @@ RUN cd /tmp \
 #    && cmake --build build --target install \
 #    && cd /tmp \
 #    && rm -rf hotspot
-	
+
 # RUN cd /tmp \
 #    && git clone --depth=1 --recurse-submodules https://github.com/apitrace/apitrace.git \
 #    && cd apitrace \
@@ -423,7 +423,7 @@ RUN cd /tmp \
    && git submodule update --init \
    && echo "--- installing protobuf ---" \
    && cd third_party/protobuf \
-      ./autogen.sh \ 
+      ./autogen.sh \
    && ./configure --enable-shared \
    && make -j$(nproc) \
    && make -j$(nproc) check \
@@ -443,7 +443,7 @@ RUN cd /tmp \
    && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
    && ./configure --prefix=/usr/ > /dev/null 2>&1 \
-   && make clean \ 
+   && make clean \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
    && cd /tmp \
@@ -506,8 +506,8 @@ RUN cd /tmp \
    && ./autogen.sh \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8 > /dev/null 2>&1 \
-   && make clean \ 
-   && make > /dev/null 2>&1 \ 
+   && make clean \
+   && make > /dev/null 2>&1 \
    && make install  \
    && cd /tmp \
    && rm -rf logging-log4cxx
@@ -617,7 +617,7 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make \
     && make install \
-    && cd /tmp/ 
+    && cd /tmp/
 
 # gst-rtsp-server
 RUN cd /tmp \
@@ -641,10 +641,10 @@ ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 COPY qt-installer-noninteractive.qs /tmp
 # COPY qt-opensource-linux-x64-5.13.0.run /tmp
 
- 
+
 RUN cd /tmp \
     && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x ./qt-installer-noninteractive.qs \ 
+    && chmod +x ./qt-installer-noninteractive.qs \
     && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QT_INSTALL_DIR=/opt/qt
@@ -653,7 +653,7 @@ ENV QT_INSTALL_DIR=/opt/qt
 #     && xhost +si:developer:root \
 #     && ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
 #         --script ./qt-installer-noninteractive.qs
-# --auto-servernum --error-file=/dev/stderr  
+# --auto-servernum --error-file=/dev/stderr
 RUN cd /tmp \
     && xvfb-run \
         ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose  \
@@ -672,7 +672,7 @@ RUN cd /tmp \
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
-ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH 
+ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # https://github.com/cisco/herisson.git
@@ -719,8 +719,8 @@ ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 #ADD ./src/main/resources/docker/amd64/vscode-ext.sh /tmp/
 
 #RUN cd /tmp \
-#    && chmod +x vscode-ext.sh\ 
-#    && ./vscode-ext.sh \ 
+#    && chmod +x vscode-ext.sh\
+#    && ./vscode-ext.sh \
 #    && rm -vf vscode-ext.sh
 
 ARG ACCOUNT=developer
