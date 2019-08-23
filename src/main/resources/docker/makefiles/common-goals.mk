@@ -19,7 +19,7 @@
 #        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# 
+#
 
 DOCKER_LABEL        += --label org.label-schema.maintainer=$(DTR_NAMESPACE)
 DOCKER_LABEL        += --label org.label-schema.build-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -43,11 +43,12 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 
 BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
 BUILD_ARGS          += --build-arg DDS_BASE_IMAGE=$(BASE_IMAGE)
+BUILD_ARGS          += --build-arg ACCUNT=$(DTR_NAMESPACE)
 
 ifneq ($(DDS_DEV_IMAGE),)
     BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
 else
-    $(error Base images for specific DDS dev env not defined!)
+    $(error DDS_DEV_IMAGE base images for specific DDS dev env not defined!)
 endif
 
 ifneq ($(PROXY_URL),)

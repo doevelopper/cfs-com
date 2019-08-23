@@ -197,13 +197,12 @@
         - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1" 
         - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
-        - |
-            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-cfs-com-common:latest >/dev/null; then
-                export DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-cfs-com-common:latest
-            fi
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
-        - make GOAL=${GOAL} ${MODULE}
+        - |
+            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-cfs-com-common:latest >/dev/null; then
+                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-cfs-com-common:latest GOAL=${GOAL} ${MODULE}
+            fi
     after_script:        
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 

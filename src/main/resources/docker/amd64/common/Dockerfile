@@ -22,6 +22,7 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
+ARG ACCOUNT=developer
 ARG BASE_IMAGE=amd64/ubuntu:19.04
 FROM $BASE_IMAGE
 
@@ -42,7 +43,8 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       perl perl-base perl-modules libpthread-stubs0-dev \
       zlib1g-dev libglib2.0-dev libglib2.0-bin \
       libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxrender-dev libxkbcommon-x11-0 libxtst6 \
+      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxrender-dev \
+      libxkbcommon-x11-0 libxtst6 \
       libldap2-dev libldap-2.4-2 libmysql++-dev libxkbcommon-dev libxext-dev \
       unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
       libghc-uuid-dev libghc-uuid-types-dev libelf-dev  elfutils libelf1 \
@@ -57,11 +59,13 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       # libxcb1-dev libxcb-glx0-dev  libxcb-xkb-dev \
       libxslt1-dev x11vnc libxi-dev \
       libcanberra-gtk-module libgl1-mesa-glx gettext \
-      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-xcb-dev  libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
+      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-xcb-dev \
+      libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
       rxvt-unicode-256color valgrind mscgen graphviz\
       '^libxcb.*-dev' libxcb-xinerama0-dev \
       gperf libicu-dev libxslt-dev libasound2-dev\
-      libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-dev \
+      libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-3 \
+      libdbus-1-3 libdbus-1-dev \
       libcap-dev libxtst-dev libudev-dev libpci-dev \
       libxss-dev libegl1-mesa-dev xserver-common xfonts-base twm xfonts-75dpi yasm\
       libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libavutil-dev \
@@ -117,7 +121,7 @@ RUN cd /tmp \
    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
-ENV GRADLE_VERSION ${GRADLE_VERSION:-5.5.1}
+ENV GRADLE_VERSION ${GRADLE_VERSION:-5.6}
 RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
@@ -153,6 +157,7 @@ RUN pip install -q --no-cache-dir conan \
    && pip install lizard \
    && pip install cpp-demangle \
    && pip install polysquare-cmake-linter \
+   && pip install cmakedoc \
    && pip install cpp-coveralls
 
 #RUN cd /tmp \
@@ -184,7 +189,7 @@ RUN pip install -q --no-cache-dir conan \
 #RUN conan user -p ${ARTIFACTORY_PSW} -r artifactory ${ARTIFACTORY_USR}
 #RUN conan create --update -e ARTIFACTORY_USR=${ARTIFACTORY_USR} -e ARTIFACTORY_PSW=${ARTIFACTORY_PSW} -e AIMMS_HOME=/opt/aimms/ -s build_type=${BUILD_TYPE} . gridiq/dev
 ## Run deploy if configured to do so.
-#RUN if [ "${BUILD_GOAL}" = "deploy" ]; then conan upload --all --force -c -r=artifactory KoshCpp/*; fi
+#RUN if [ "${BUILD_GOAL}" = "deploy" ]; then conan upload --all --force -c -r=artifactory src/main/cpp/*; fi
 #RUN conan install . -s os=Linux -s os_build=Linux -s arch=x86_64 -s arch_build=x86_64 -s compiler=gcc -s compiler.version=7 -s compiler.libcxx=libstdc++11 && \
 #    mkdir build && cd build && \
 #    cmake .. -G "Unix Makefiles"
@@ -269,19 +274,18 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf glog
 
-# RUN pip install cmakedoc
-# RUN cd /tmp \
-   # && git clone --depth=1 https://github.com/jeaye/stdman.git \
-   # && cd stdman \
-   # && ./configure --prefix=/usr \
-   # && make install \
-   # && cd /tmp \
-   # && rm -Rf stdman
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/jeaye/stdman.git \
+   && cd stdman \
+   && ./configure --prefix=/usr/local \
+   && make install \
+   && cd /tmp \
+   && rm -Rf stdman
 
 ENV MANPATH=${MANPATH}:/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
 ARG BOOST_VERSION_MAJ=1
-ARG BOOST_VERSION_MIN=69
+ARG BOOST_VERSION_MIN=71
 ARG BOOST_VERSION_PATCH=0
 ARG BOOST_VERSION=1.69.0
 ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
@@ -344,7 +348,12 @@ RUN cd /tmp \
    && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
    && tar -xvzf afl-2.52b.tgz \
    && cd afl-2.52b \
-   && make clean && make && make  DESTDIR=/opt/afl BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
+   && make clean \
+   && make \
+   && make DESTDIR=/opt/afl  \
+         BINDIR=/opt/afl/bin  \
+         DATAROOTDIR=/opt/afl/share \
+         LIBDIR=/opt/afl/lib install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf afl-2.52b
 
@@ -353,8 +362,8 @@ RUN cd /tmp \
    && cd check \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first \
-   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test  > /dev/null 2>&1 \
    && cmake --build build --target install || true \
    && cd /tmp \
    && rm -rf check
@@ -388,7 +397,7 @@ RUN cd /tmp \
    && cd double-conversion \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first \
+   && cmake --build build --target all --clean-first  > /dev/null 2>&1 \
 #   - test/cctest/cctest --list | tr -d '<' | xargs test/cctest/cctest \
    && cmake --build build --target install || true \
    && cd /tmp \
@@ -424,30 +433,31 @@ RUN cd /tmp \
    && echo "--- installing protobuf ---" \
    && cd third_party/protobuf \
       ./autogen.sh \
-   && ./configure --enable-shared \
-   && make -j$(nproc) \
-   && make -j$(nproc) check \
+   && ./configure --enable-shared --prefix=/usr/ > /dev/null 2>&1 \
+   && make > /dev/null 2>&1\
+   && make check > /dev/null 2>&1\
    && make install \
    && make clean  \
    && ldconfig \
    && echo "--- installing grpc ---" \
    && cd /tmp/grpc \
-   && make -j$(nproc) \
-   && make install \
+   && make > /dev/null 2>&1\
+   && make install > /dev/null 2>&1\
    && make clean \
-   && ldconfig
+   && ldconfig \
+   && rm -Rf /tmp/grpc
 
-RUN cd /tmp \
-   && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
-   && cd protobuf \
-   && ./autogen.sh \
+# RUN cd /tmp \
+   # && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
+   # && cd protobuf \
+   # && ./autogen.sh \
 #    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
-   && ./configure --prefix=/usr/ > /dev/null 2>&1 \
-   && make clean \
-   && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
-   && cd /tmp \
-   && rm -rf protobuf
+   # && ./configure --prefix=/usr/ > /dev/null 2>&1 \
+   # && make clean \
+   # && make > /dev/null 2>&1 \
+   # && make install > /dev/null 2>&1 \
+   # && cd /tmp \
+   # && rm -rf protobuf
 
 ENV PROTOBUF_HOME /usr
 
@@ -541,10 +551,12 @@ RUN cd /tmp \
 	&& git clone --depth=1 https://github.com/google/cctz.git \
 	&& cd cctz \
 	&& cmake -E make_directory mybuild \
-	&& cmake -E chdir mybuild cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} .. \
-	&& cmake --build mybuild --target all  --config Release \
+	&& cmake -E chdir mybuild cmake .. -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR} \
+      > /dev/null 2>&1 \
+	&& cmake --build mybuild --target all  --clean-first \
 	&& ctest \
-	&& cmake --build mybuild --config Release --target install \
+	# && cmake --build mybuild --config Release --target install \
 	&& cmake --build mybuild --target install \
 	&& cd /tmp \
 	&& rm -rf cctz
@@ -577,16 +589,18 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-base-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # libnice
 RUN cd /tmp \
     && git clone https://github.com/libnice/libnice.git \
     && cd libnice \
-    && ./autogen.sh --prefix=/usr --with-gstreamer --enable-static --enable-static-plugins --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
-    && make install \
+    && ./autogen.sh --prefix=/usr \
+      --with-gstreamer --enable-static --enable-static-plugins \
+      --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-good
@@ -595,8 +609,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-good-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-bad
@@ -605,8 +619,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-bad-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-ugly
@@ -615,8 +629,8 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-ugly-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-rtsp-server
@@ -625,8 +639,8 @@ RUN cd /tmp \
     && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-rtsp-server-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     rm -rf gst*
 
@@ -639,28 +653,33 @@ ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
 ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
 COPY qt-installer-noninteractive.qs /tmp
+COPY qt-installer-script.qs /tmp
 # COPY qt-opensource-linux-x64-5.13.0.run /tmp
 
 
 RUN cd /tmp \
-    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-    && chmod +x ./qt-installer-noninteractive.qs \
-    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
+   && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
+   && chmod +x ./qt-installer-noninteractive.qs \
+   && chmod +x ./qt-installer-script.qs \
+   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
+   && xvfb-run --script ./qt-installer-script.qs --platform minimal --verbose \
+   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QT_INSTALL_DIR=/opt/qt
+
 
 # RUN cd /tmp \
 #     && xhost +si:developer:root \
 #     && ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose \
 #         --script ./qt-installer-noninteractive.qs
 # --auto-servernum --error-file=/dev/stderr
-RUN cd /tmp \
-    && xvfb-run \
-        ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose  \
-        --script ./qt-installer-noninteractive.qs
+# RUN cd /tmp \
+   #  && xvfb-run \
+      #   ./qt-opensource-linux-x64-${Q_VERSION}.run --verbose  \
+      #   --script ./qt-installer-noninteractive.qs
 
-RUN cd /tmp \
-    && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
+# RUN cd /tmp \
+   #  && rm -vf /tmp/qt-opensource-linux-x64-${Q_VERSION}.run
 
         #   > /dev/null 2>&1 \
 ##     xhost local:root
@@ -672,8 +691,8 @@ RUN cd /tmp \
 ENV QTDIR=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=/opt/Qt${Q_VERSION}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:/opt/Qt${Q_VERSION}/Tools/QtCreator/bin:${PATH}"
-ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
-ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+# ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
+# ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 # https://github.com/cisco/herisson.git
 # https://github.com/cisco/mlspp.git
@@ -723,7 +742,6 @@ ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 #    && ./vscode-ext.sh \
 #    && rm -vf vscode-ext.sh
 
-ARG ACCOUNT=developer
 
 # RUN useradd -m $ACCOUNT \
 #    && echo "$ACCOUNT:$ACCOUNT" | chpasswd \
