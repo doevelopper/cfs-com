@@ -43,6 +43,7 @@ docker:build:rti-dds-base:
     extends:
         - .create-docker-container
     variables:
+        GOAL: build
         VERSION: 5.3.3
         MODULE: "rti-connext-dds"
         IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}

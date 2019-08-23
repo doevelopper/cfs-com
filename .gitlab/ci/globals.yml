@@ -199,7 +199,7 @@
         - export DTR_PASSWORD=$DOCKER_PASSWORD
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
-        - echo make GOAL=${GOAL} ${MODULE}
+        - make GOAL=${GOAL} ${MODULE}
     after_script:        
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 
