@@ -43,7 +43,12 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 
 BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
 BUILD_ARGS          += --build-arg DDS_BASE_IMAGE=$(BASE_IMAGE)
-BUILD_ARGS          += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
+
+ifneq ($(DDS_DEV_IMAGE),)
+    BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
+else
+    $(error Base images for specific DDS dev env not defined!)
+endif
 
 ifneq ($(PROXY_URL),)
     BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)

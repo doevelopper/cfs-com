@@ -28,6 +28,7 @@
 # gitlab-runner ALL=(ALL) NOPASSWD: /usr/bin/apt
 
 stages:
+    - Intro
     - Build in docker image
     - Build own dind image
     - Build docker image
@@ -44,6 +45,7 @@ stages:
     - web site generation
     - Deploy artifacts to staging repositories
     - Clean local artifacts
+    - Outro
 
 include:
     - local: .gitlab/ci/globals.yml

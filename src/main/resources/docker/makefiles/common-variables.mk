@@ -98,7 +98,7 @@ export GIT_LAST_TAG        := $(git log --first-parent --pretty="%d" | \
 export DK_MKFALGS          ="--no-print-directory -j$(shell nproc --all) --silent"
 
 ifneq ($(CI_VERSION),)
-    export SEM_VERSION     := $${CI_VERSION}
+    export SEM_VERSION     := ${CI_VERSION}
 else
     $(warning  VERSION not defined)
     export VERSIONFILE     = VERSION_FILE
@@ -146,10 +146,10 @@ export DK_RUN_STD_ARG
 export RND_NS       = $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 # Define colors for console output
 # courtesy to https://deb.nodesource.com/setup_12.x
-IF_TERMINAL                := $(shell test -t 1)
-COLOR_SUPPORT              := $(shell which tput > /dev/null && tput colors)
-COLOR                      := $(shell test -n "${COLOR_SUPPORT}")
-COLOR_RANGG                := $(shell test ${COLOR_SUPPORT} -ge 8)
+# IF_TERMINAL                := $(shell test -t 1)
+# COLOR_SUPPORT              := $(shell which tput > /dev/null && tput colors)
+# COLOR                      := $(shell test -n "${COLOR_SUPPORT}")
+# COLOR_RANGG                := $(shell test ${COLOR_SUPPORT} -ge 8)
 
 # ifeq ($(shell test -t 1),)
 
