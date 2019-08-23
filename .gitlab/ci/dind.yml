@@ -40,7 +40,7 @@ docker:build:docker-base:
         - apk add bash make git
 
     script:
-        - echo " Building ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}"
+        - echo " ${GOAL}ing ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}"
         - echo " ${CI_JOB_TOKEN} ${DOCKER_TRUSTED_REGISTRY} ${CI_PROJECT_NAMESPACE} ${DOCKER_TRUSTED_REGISTRY}"
         - echo "$DOCKER_PASSWORD" | docker login -u "${CI_PROJECT_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
         # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ] || echo "already exists" &&  exit 0
@@ -50,7 +50,7 @@ docker:build:docker-base:
                 echo "== ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} already exists =="
                 exit 0
             fi
-        - make DOCKER_FILE=${DOCKER_FILE} GOAL=build dind
+        - make DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE} 
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
     # only:
        # refs:

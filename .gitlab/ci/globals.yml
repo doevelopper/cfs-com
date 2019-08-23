@@ -193,6 +193,9 @@
         - .docker-app-prerequisities
     before_script:
         - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
+        - export VERSIONFILE=${CI_PROJECT_DIR}/src/main/resources/docker/${ARCH}/${MODULE_DIR}/VERSION_FILE
+        - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1" 
+        - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log"
         - export DTR_PASSWORD=$DOCKER_PASSWORD
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:

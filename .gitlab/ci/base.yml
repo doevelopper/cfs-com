@@ -31,7 +31,8 @@ docker:build:dds-base:
         MODULE: "dds-base"
         IMAGE_NAME: ${CONTAINER_IMAGE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/common/Dockerfile
+        MODULE_DIR: common
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
         # DOCKER_TLS_CERTDIR: ""
         # DOCKER_HOST: tcp://docker:2375
     # only:
@@ -46,7 +47,8 @@ docker:build:rti-dds-base:
         MODULE: "rti-connext-dds"
         IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
         IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/rti/Dockerfile
+        MODULE_DIR: rti
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
     # only:
     #    variables:
     #        - $BASE == "yes"
