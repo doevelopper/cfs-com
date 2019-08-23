@@ -22,7 +22,9 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-FROM docker.io/doevelopper/dind:0.0.2
+ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dind:0.0.1
+FROM $BASE_IMAGE
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8

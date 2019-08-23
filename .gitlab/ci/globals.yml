@@ -179,7 +179,7 @@
     extends: .dind_hub_variables
 
 .docker-app-prerequisities:
-    image: ${ROOT_IMG_IMAGE}-dind:0.0.2
+    image: ${ROOT_IMG_IMAGE}-dind:0.0.1
     extends: .docker
     # only:
         # refs:

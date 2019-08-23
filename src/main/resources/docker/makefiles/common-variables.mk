@@ -119,19 +119,19 @@ export NEXT_PATCH_VERSION  = $(MAJOR).$(MINOR).$(shell expr $(PATCH) + 1)-b$(BUI
 
 DK_RUN_STD_ARG      = run --rm
 # DK_RUN_STD_ARG      += --memory=$(($(head -n 1 /proc/meminfo | awk '{print $2}') * 4 / 5))k
-# DK_RUN_STD_ARG      += --cpus=$((`nproc` - 1))
+# DK_RUN_STD_ARG      += --cpus=$((`nproc` - 1)) ${}
 DK_RUN_STD_ARG      += --log-opt max-size=50m
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/developer/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vimrc:/home/developer/.vimrc
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.bashrc:/home/developer/.bashrc
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR):/home/developer/workspace
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vimrc:/home/devel${DTR_NAMESPACE}oper/.vimrc
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.bashrc:/home/${DTR_NAMESPACE}/.bashrc
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR):/home/${DTR_NAMESPACE}/workspace
 DK_RUN_STD_ARG      += --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
-DK_RUN_STD_ARG      += --volume ${HOME}/.conan:/home/developer/.conan
-DK_RUN_STD_ARG      += --volume ${HOME}/.ssh:/home/developer/.ssh
+DK_RUN_STD_ARG      += --volume ${HOME}/.conan:/home/${DTR_NAMESPACE}/.conan
+DK_RUN_STD_ARG      += --volume ${HOME}/.ssh:/home/${DTR_NAMESPACE}/.ssh
 DK_RUN_STD_ARG      += --volume ${HOME}/.Xauthority:/root/.Xauthority
-DK_RUN_STD_ARG      += --volume ${HOME}/.m2:/home/developer/.m2
+DK_RUN_STD_ARG      += --volume ${HOME}/.m2:/home/${DTR_NAMESPACE}/.m2
 DK_RUN_STD_ARG      += --volume /etc/passwd:/etc/passwd:ro
 DK_RUN_STD_ARG      += --env DISPLAY=unix${DISPLAY}
 DK_RUN_STD_ARG      += --env LANG=C.UTF-8

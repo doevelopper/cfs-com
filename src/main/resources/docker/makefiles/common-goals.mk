@@ -42,6 +42,8 @@ DOCKER_LABEL        += --label org.label-schema.documentation=$(GIT_REPOS_URL)
 DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
+BUILD_ARGS          += --build-arg DDS_BASE_IMAGE=$(BASE_IMAGE)
+BUILD_ARGS          += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
 
 ifneq ($(PROXY_URL),)
     BUILD_ARGS      += --build-arg http_proxy=$(PROXY_URL)

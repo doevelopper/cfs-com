@@ -22,7 +22,7 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dind:0.0.1
+ARG BASE_IMAGE=amd64/ubuntu:19.04
 FROM $BASE_IMAGE
 
 ENV DEBIAN_FRONTEND noninteractive

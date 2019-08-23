@@ -21,8 +21,8 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-ARG BASE_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
-FROM $BASE_IMAGE
+ARG DDS_DEV_IMAGE=docker.io/doevelopper/cfs-com-dev:0.0.1
+FROM $DDS_DEV_IMAGE 
 
 USER root
 
