@@ -196,11 +196,9 @@
         - export DTR_PASSWORD=$DOCKER_PASSWORD
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
-        - echo "DOCKER_BUILD_OPTIONS ${DOCKER_BUILD_OPTIONS}"
-        - echo "make ${MAKE_DOCKER_BUILD_OPTIONS} GOAL=${GOAL} ${MODULE}"
+        - echo make GOAL=${GOAL} ${MODULE}
     after_script:        
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
-
 
 .deploy_functions: &deploy_functions |
     [[ "$TRACE" ]] && set -x
