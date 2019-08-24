@@ -48,7 +48,7 @@ BUILD_ARGS          += --build-arg ACCUNT=$(DTR_NAMESPACE)
 ifneq ($(DDS_DEV_IMAGE),)
     BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
 else
-    $(error DDS_DEV_IMAGE base images for specific DDS dev env not defined!)
+    $(warning DDS_DEV_IMAGE env not defined! using defaul docker.io/doevelopper/cfs-com-common:latest)
 endif
 
 ifneq ($(PROXY_URL),)

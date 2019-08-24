@@ -200,8 +200,8 @@
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
         - |
-            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-cfs-com-common:latest >/dev/null; then
-                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-cfs-com-common:latest GOAL=${GOAL} ${MODULE}
+            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-common:latest >/dev/null; then
+                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE}
             fi
     after_script:        
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
@@ -246,15 +246,16 @@
         variables:
             - $SCHEDULE_TYPE == "weekly"
 
-CI In :
+Intro CI:
+    stage: Intro
     extends: 
         - .docker-hub-dind
     <<: *pre_shared
     script:
         - echo '...'
 
-CI Out :
-    stage: Clean local artifacts
+Outro CI:
+    stage: Outro
     extends: 
         - .docker-hub-dind
     <<: *post_shared

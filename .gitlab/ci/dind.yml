@@ -46,8 +46,8 @@ docker:build:docker-base:
         # - [ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ] || echo "already exists" &&  exit 0
         - |
             if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} >/dev/null; then
-                # if [[ -z $(docker pull ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION}) ]]; then
                 echo "== ${ROOT_IMG_IMAGE}-dind:${SEM_VERSION} already exists =="
+                echo "== SKipping build =="
                 exit 0
             fi
         - make DOCKER_FILE=${DOCKER_FILE} GOAL=${GOAL} ${MODULE} 

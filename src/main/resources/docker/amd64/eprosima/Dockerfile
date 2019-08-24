@@ -21,7 +21,7 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
 
-ARG DDS_DEV_IMAGE
+ARG DDS_DEV_IMAGE=docker.io/doevelopper/cfs-com-common:latest
 FROM $DDS_DEV_IMAGE 
 
 USER root
