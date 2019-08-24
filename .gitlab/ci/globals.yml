@@ -202,6 +202,8 @@
         - |
             if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-common:latest >/dev/null; then
                  make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE}
+            else
+                make GOAL=${GOAL} ${MODULE}
             fi
     after_script:        
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true

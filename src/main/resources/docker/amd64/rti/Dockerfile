@@ -20,7 +20,7 @@
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
-
+ARG ACCOUNT=developer
 ARG BASE_IMAGE=amd64/ubuntu:18.04
 FROM $BASE_IMAGE
 
@@ -135,7 +135,19 @@ RUN cmake --version \
     && conan --version || true
 
 RUN pip install -q --no-cache-dir conan \
-   && pip install --upgrade conan_package_tools
+   && pip install --upgrade conan_package_tools \
+   && pip install cpplint \
+   # && pip install cpplint-junit \
+   && pip install cppcheck-junit \
+   && pip install semver \
+   && pip install semver-tool \
+   && pip install lizard \
+   && pip install cpp-demangle \
+   && pip install polysquare-cmake-linter \
+   # && pip install cmakedoc \
+   && pip install cpp-coveralls \
+   && pip install coverxygen \
+   && pip install doxygen-junit
 
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
@@ -208,8 +220,6 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf glog
 
-RUN pip install cmakedoc
-
 RUN cd /tmp \
     && git clone --depth=1 https://github.com/jeaye/stdman.git \
     && cd stdman \
@@ -221,21 +231,20 @@ RUN cd /tmp \
 ENV MANPATH=/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
 ARG BOOST_VERSION_MAJ=1
-ARG BOOST_VERSION_MIN=69
+ARG BOOST_VERSION_MIN=71
 ARG BOOST_VERSION_PATCH=0
-ARG BOOST_VERSION=1.69.0
+ARG BOOST_VERSION=${BOOST_VERSION_MAJ}.${BOOST_VERSION_MIN}.${BOOST_VERSION_PATCH}
 ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
-
 RUN cd /tmp \
-    && curl -L -O -k https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz \
-    && tar xfz boost_1_69_0.tar.gz > /dev/null \
-    && cd boost_1_69_0 \
-    && ./bootstrap.sh --prefix=/usr/ \
-    && ./b2 --help \
-    && ./b2 link=shared threading=multi variant=release address-model=64 \
-    && ./b2 install \
-    && cd /tmp \
-    && rm -rvf boost_1_69_0 boost_1_69_0.tar.gz
+   && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
+   && tar xzf boost_${BOOST_RELEASE}.tar.gz \
+   && cd boost_${BOOST_RELEASE} \
+   && ./bootstrap.sh --prefix=/usr/ --with-python=python3 \
+   && ./b2 --help \
+   && ./b2 link=shared threading=multi variant=release address-model=64 > /dev/null 2>&1 \
+   && ./b2 install --prefix=/usr/ > /dev/null 2>&1\
+   && cd /tmp \
+   && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
@@ -547,24 +556,6 @@ RUN cd /tmp \
     # && cd /tmp \
     # && rm -Rf Criterion
 
-ARG RTI_DDS_VERSION=6.0.0
-
-COPY src/main/resources/docker/amd64/rti/packages/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run /tmp/
-
-RUN cd /tmp/ \
-      && chmod +x /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  \
-      && ./rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  --mode unattended --prefix /opt --disable_copy_examples true \
-      && rm -rvf /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run
-
-COPY src/main/resources/docker/amd64/rti/packages/rti_license.dat /opt/rti_connext_dds-${RTI_DDS_VERSION}/
-COPY src/main/resources/docker/amd64/rti/packages/*.rtipkg  /tmp/
-COPY src/main/resources/docker/amd64/rti/packages/*.tar.gz  /tmp/
-
-ARG AMD_PREFIX=x64Linux3gcc5.4.0
-ENV NDDSHOME=/opt/rti_connext_dds-${RTI_DDS_VERSION}
-ENV PATH="${PATH}:${NDDSHOME}/bin"
-ENV LD_LIBRARY_PATH=/opt/rti_connext_dds-${RTI_DDS_VERSION}/lib/${AMD_PREFIX}
-
 RUN cd /tmp/ \
 # kept OpenSSL_1_0_2 for compatibility with the one provided by RTI (openssl-1.0.2n-5.3.1-host-x64Linux.rtipkg)
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
@@ -576,8 +567,27 @@ RUN cd /tmp/ \
     && cd /tmp/ \
     && rm -rvf openssl
 
+ARG RTI_DDS_VERSION=6.0.0
 
-RUN cd /tmp/ \
+# COPY src/main/resources/docker/amd64/rti/packages/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run /tmp/
+# COPY src/main/resources/docker/amd64/rti/packages/rti_license.dat /opt/rti_connext_dds-${RTI_DDS_VERSION}/
+# COPY src/main/resources/docker/amd64/rti/packages/*.rtipkg  /tmp/
+# COPY src/main/resources/docker/amd64/rti/packages/*.tar.gz  /tmp/
+
+RUN [ -z "$CI_DOMAIN" ] \
+    && cd /tmp/ \
+    && chmod +x /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  \
+    && ./rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  --mode unattended --prefix /opt --disable_copy_examples true \
+    && rm -rvf /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run \
+    || :
+
+ARG AMD_PREFIX=x64Linux3gcc5.4.0
+ENV NDDSHOME=/opt/rti_connext_dds-${RTI_DDS_VERSION}
+ENV PATH="${PATH}:${NDDSHOME}/bin"
+ENV LD_LIBRARY_PATH=/opt/rti_connext_dds-${RTI_DDS_VERSION}/lib/${AMD_PREFIX}
+
+RUN [ -z "$CI_DOMAIN" ] \
+    && cd /tmp/ \
     && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux3gcc5.4.0.rtipkg \
     && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux3gcc5.4.0.rtipkg \
     && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux3gcc5.4.0.rtipkg \
@@ -601,9 +611,11 @@ RUN cd /tmp/ \
     && rtipkginstall -unattended rti_security_plugins-6.0.0-target-armv8Linux4.4gcc5.4.0.rtipkg \
     && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
     && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
-    && rm -rvf /tmp/*.rtipkg
+    && rm -rvf /tmp/*.rtipkg \
+    || :
 
-RUN cd /tmp/ \
+RUN [ -z "$CI_DOMAIN" ] \
+    && cd /tmp/ \
     # && mkdir -pv /opt/rti_connext_openssl/{target-x64Linux3gcc5.4.0,target-x64Linux4gcc7.3.0,target-armv8Linux4.4gcc5.4.0} \
     && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
     && mkdir -pv /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 \
@@ -611,7 +623,8 @@ RUN cd /tmp/ \
     && tar -zvxf openssl-1.0.2o-target-armv8Linux4.4gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 --strip-components=1 \
     # && tar -zvxf openssl-1.0.2o-target-x64Linux4gcc7.3.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 --strip-components=1 \
     && tar -zvxf openssl-1.0.2o-target-x64Linux3gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 --strip-components=1 \
-    && rm -rvf /tmp/*.tar.gz
+    && rm -rvf /tmp/*.tar.gz \
+    || :
 
 # RUN cd /tmp \
   # && curl -o vscode-amd64.deb -L -O -k   https://go.microsoft.com/fwlink/?LinkID=760868 \
@@ -627,8 +640,6 @@ RUN cd /tmp/ \
 
 #  ENV PATH /opt/BullseyeCoverage/bin:$PATH
 #export COVFILE=$HOME/bullseye.cov && cov01 --on && cov01 --status && make -j12 && cov01 --off
-
-ARG ACCOUNT=developer
 
 RUN useradd -m $ACCOUNT \
    && echo "$ACCOUNT:$ACCOUNT" | chpasswd \

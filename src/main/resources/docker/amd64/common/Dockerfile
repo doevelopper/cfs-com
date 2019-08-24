@@ -31,46 +31,17 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
-   && apt-get -qq install --assume-yes --no-install-recommends \
-      ca-certificates apt-transport-https \
-      libtool autotools-dev autopoint autoconf automake make \
-      git xz-utils unzip wget curl openssh-server openssh-client \
-      bison flex build-essential libgcrypt20-dev libcrypto++-dev\
-      gawk vim texinfo emacs25 gtk-doc-tools autogen \
-      python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-      libxml2-dev libxml2-utils python3-setuptools python-setuptools \
-      ruby ruby-dev libnss3-dev libnss3-tools \
-      perl perl-base perl-modules libpthread-stubs0-dev \
-      zlib1g-dev libglib2.0-dev libglib2.0-bin \
-      libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-      mesa-common-dev libglu1-mesa-dev libpcap-dev libxrender1 libxrender-dev \
-      libxkbcommon-x11-0 libxtst6 \
-      libldap2-dev libldap-2.4-2 libmysql++-dev libxkbcommon-dev libxext-dev \
-      unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
-      libghc-uuid-dev libghc-uuid-types-dev libelf-dev  elfutils libelf1 \
-      libpulse-dev  nfs-common  xterm iputils-ping  \
-      htop libxss1 libasound2 x11-apps dbus gpg \
-      libc6-dev libgtk-3-0 libpango-1.0-0 \
-      libfreetype6-dev libxfixes-dev \
-      x264 libx264-dev pkg-config libjq-dev jq \
-      # libxcb-keysyms1-dev libxcb-image0-dev \
-      # libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev \
-      # libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-      # libxcb1-dev libxcb-glx0-dev  libxcb-xkb-dev \
-      libxslt1-dev x11vnc libxi-dev \
-      libcanberra-gtk-module libgl1-mesa-glx gettext \
-      xvfb  xauth  tmux vim-nox x11-xserver-utils libxkbfile1 libx11-xcb-dev \
-      libx11-dev libfontconfig libfontconfig1 libfontconfig1-dev \
-      rxvt-unicode-256color valgrind mscgen graphviz\
-      '^libxcb.*-dev' libxcb-xinerama0-dev \
-      gperf libicu-dev libxslt-dev libasound2-dev\
-      libssl-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libdbus-1-3 \
-      libdbus-1-3 libdbus-1-dev \
-      libcap-dev libxtst-dev libudev-dev libpci-dev \
-      libxss-dev libegl1-mesa-dev xserver-common xfonts-base twm xfonts-75dpi yasm\
-      libavcodec-dev libavformat-dev libavdevice-dev libavfilter-dev libavutil-dev \
-      libgl-dev  \
-      > /dev/null 2>&1 \
+    && apt-get -qq install --assume-yes --no-install-recommends \
+        ca-certificates apt-transport-https \
+        libtool autotools-dev autopoint autoconf automake make autoproject bison flex \
+        build-essential git xz-utils unzip wget curl openssh-server openssh-client \
+        gawk vim texinfo emacs25 gtk-doc-tools autogen autogen-doc \
+        python-pip python-dev python-wheel cython python-setuptools \
+        python3-pip python3-dev python3-wheel cython3 python3-setuptools \
+        ruby ruby-dev \
+        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev libglib2.0-0 \
+        libperl-dev perl perl-base perl-modules \
+        > /dev/null 2>&1 \
    # && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
@@ -150,15 +121,17 @@ RUN cd /tmp \
 RUN pip install -q --no-cache-dir conan \
    && pip install --upgrade conan_package_tools \
    && pip install cpplint \
-   && pip install cpplint-junit \
+   # && pip install cpplint-junit \
    && pip install cppcheck-junit \
    && pip install semver \
    && pip install semver-tool \
    && pip install lizard \
    && pip install cpp-demangle \
    && pip install polysquare-cmake-linter \
-   && pip install cmakedoc \
-   && pip install cpp-coveralls
+   # && pip install cmakedoc \
+   && pip install cpp-coveralls \
+   && pip install coverxygen \
+   && pip install doxygen-junit
 
 #RUN cd /tmp \
 #    && wget --no-check-certificate https://github.com/conan-io/conan/releases/download/1.18.1/conan-ubuntu-64_1_18_1.deb
@@ -287,7 +260,7 @@ ENV MANPATH=${MANPATH}:/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/m
 ARG BOOST_VERSION_MAJ=1
 ARG BOOST_VERSION_MIN=71
 ARG BOOST_VERSION_PATCH=0
-ARG BOOST_VERSION=1.69.0
+ARG BOOST_VERSION=${BOOST_VERSION_MAJ}.${BOOST_VERSION_MIN}.${BOOST_VERSION_PATCH}
 ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
 RUN cd /tmp \
    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
@@ -661,7 +634,9 @@ RUN cd /tmp \
    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
    && chmod +x ./qt-installer-noninteractive.qs \
    && chmod +x ./qt-installer-script.qs \
-   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
+   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run
+
+RUN cd /tmp \   
    && xvfb-run --script ./qt-installer-script.qs --platform minimal --verbose \
    && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
 

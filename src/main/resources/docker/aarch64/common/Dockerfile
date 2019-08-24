@@ -33,6 +33,7 @@ ENV AARCH64_DESTDIR /opt/aarch64
 
 RUN apt-get -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && apt-get install --assume-yes --no-install-recommends libtool apt-transport-https ca-certificates autotools-dev\
+        crossbuild-essential-arm64
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
         bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \

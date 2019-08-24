@@ -43,7 +43,16 @@ DOCKER_LABEL        += --label org.label-schema.release-date=$(shell date -u +"%
 
 BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
 BUILD_ARGS          += --build-arg DDS_BASE_IMAGE=$(BASE_IMAGE)
-BUILD_ARGS          += --build-arg ACCUNT=$(DTR_NAMESPACE)
+BUILD_ARGS          += --build-arg ACCOUNT=$(DTR_NAMESPACE)
+
+TTY_LOG             ?= "2>&1 | tee ${MODULE}.log"
+ifneq ($(CI_RUNNER_TAGS),)
+    TTY_LOG         := "> /dev/null 2>&1"
+    CI_DOMAIN       := "YES"
+endif
+
+BUILD_ARGS          += --build-arg LOG_OUTPUT=$(TTY_LOG)
+BUILD_ARGS          += --build-arg CI_DOMAIN=$(CI_DOMAIN)
 
 ifneq ($(DDS_DEV_IMAGE),)
     BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
@@ -61,11 +70,15 @@ endif
 
  .PHONY: dtr-login
 dtr-login: ## loging to DTR
+ifneq ($(CI_RUNNER_TAGS),)
 	echo "${DTR_PASSWORD}" | docker login -u "${DTR_NAMESPACE}" --password-stdin ${DOCKER_TRUSTED_REGISTRY}
+endif
 
 .PHONY: dtr-logout
 dtr-logout: ## Logout from DTR
+ifneq ($(CI_RUNNER_TAGS),)
 	$(Q)$(DOCKER) logout ${DOCKER_TRUSTED_REGISTRY} || true
+endif
 
 .PHONY: build
 build: build-image dtr-login push dtr-logout ## Build and deploy Docker images base.
@@ -73,7 +86,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	# $(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile .
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile .
 	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push
@@ -82,13 +95,15 @@ build-image:
 .PHONY: push-image
 push-image:
 	$(Q)echo "$(SH_BLUE) Apply tag [$(SEM_VERSION)|latest] on $(BUILDER_FQIN)  $(SH_DEFAULT)"
-	# $(Q)$(DOCKER) tag $(BUILDER_FQIN):$(SEM_VERSION) $(BUILDER_FQIN):latest
+	$(Q)$(DOCKER) tag $(BUILDER_FQIN):$(SEM_VERSION) $(BUILDER_FQIN):latest
 	$(Q)echo
+ifneq ($(CI_RUNNER_TAGS),)
 	$(Q)echo "$(SH_BLUE) Pushing $(BUILDER_FQIN):[$(SEM_VERSION)|latest] to $(DOCKER_TRUSTED_REGISTRY)$(SH_DEFAULT)"
-	# $(Q)$(DOCKER) push $(BUILDER_FQIN):$(SEM_VERSION)
-	# $(Q)$(DOCKER) push $(BUILDER_FQIN):latest
+	$(Q)$(DOCKER) push $(BUILDER_FQIN):$(SEM_VERSION)
+	$(Q)$(DOCKER) push $(BUILDER_FQIN):latest
 	# $(Q)echo "$(SEM_VERSION)" > $(VERSIONFILE)
 	$(Q)echo "$(SH_GREEN) Images $(BUILDER_FQIN):[$(SEM_VERSION)|latest] pushed to DTR$(SH_DEFAULT)"
+endif
 
 .PHONY: run
 run : run-image ## Run docker image.
