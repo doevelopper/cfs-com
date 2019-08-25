@@ -95,7 +95,8 @@ export GIT_LAST_TAG        := $(git log --first-parent --pretty="%d" | \
                                 grep -E "tag: v[0-9]+\.[0-9]+\.[0-9]+(\)|,)" -o | \
                                 grep "v[0-9]*\.[0-9]*\.[0-9]*" -o | head -n 1)
 
-export DK_MKFALGS          ="--no-print-directory -j$(shell nproc --all) --silent"
+#export DK_MKFALGS          ="--no-print-directory -j$(shell nproc --all) --silent"
+export DK_MKFALGS          ="--no-print-directory --silent"
 
 ifneq ($(CI_VERSION),)
     export SEM_VERSION     := ${CI_VERSION}

@@ -38,10 +38,15 @@ Controller.prototype.TargetDirectoryPageCallback = function() {
 // select the components to install
 Controller.prototype.ComponentSelectionPageCallback = function() {
     var widget = gui.currentPageWidget();
+
     widget.selectAll();
+
+	widget.deselectComponent("qt.qt5.5130.src");
+	widget.deselectComponent("qt.qt5.5130.android_armv7");
+	widget.deselectComponent("qt.qt5.5130.android_x86");
+    gui.clickButton(buttons.NextButton);
     //widget.deselectAll();
     //widget.selectComponent("qt.qt5.5130.gcc_64");
-    gui.clickButton(buttons.NextButton);
 }
 
 // accept the license agreement

@@ -45,9 +45,10 @@ BUILD_ARGS          = --build-arg MAKEFLAGS=$(DK_MKFALGS)
 BUILD_ARGS          += --build-arg DDS_BASE_IMAGE=$(BASE_IMAGE)
 BUILD_ARGS          += --build-arg ACCOUNT=$(DTR_NAMESPACE)
 
-TTY_LOG             ?= "2>&1 | tee ${MODULE}.log"
+#TTY_LOG             ?= "2>&1 | tee ${MODULE}_build_output.log"
+TTY_LOG             ?= "${MODULE}_build_output.log 2>&1"
 ifneq ($(CI_RUNNER_TAGS),)
-    TTY_LOG         := "> /dev/null 2>&1"
+    TTY_LOG         := "/dev/null 2>&1"
     CI_DOMAIN       := "YES"
 endif
 
@@ -86,7 +87,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile .
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee ${MODULE}_build_output.log
 	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push
@@ -111,7 +112,7 @@ run : run-image ## Run docker image.
 .PHONY: run-image
 run-image :
 	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
-	# $(Q)$(DOCKER) ${DK_RUN_STD_ARG}  --name="$(shell basename $(CURDIR))-$(RND_NS)" --hostname="$(shell basename $(CURDIR))-$(RND_NS)" --tty --interactive $(BUILDER_FQIN):$(VERSION)
+	# $(Q)$(DOCKER) ${DK_RUN_STD_ARG}  --name="$(shell basename $(CURDIR))-$(RND_NS)-$(date +'%Y%m%d-%H%M%S')" --hostname="$(shell basename $(CURDIR))-$(RND_NS)" --tty --interactive $(BUILDER_FQIN):$(VERSION)
 
 .PHONY: exec-in
 exec-in :  ## Run a command inside a docker image.
