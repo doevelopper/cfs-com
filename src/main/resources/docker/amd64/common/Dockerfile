@@ -41,7 +41,8 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         python-pip python-dev python-wheel cython python-setuptools \
         python3-pip python3-dev python3-wheel cython3 python3-setuptools \
         ruby ruby-dev \
-        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev libglib2.0-0 \
+        libglib2.0-dev libglib2.0-bin libglib2.0-0 \
+        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev\
         libperl-dev perl perl-base perl-modules \
    # && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
@@ -199,9 +200,9 @@ RUN cd /tmp \
    && cd gflags \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-		# -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -D GFLAGS_BUILD_TESTING=ON \
-		-DCMAKE_CONFIGURATION_TYPES=Release -D GFLAGS_BUILD_TESTING=ON \
-		-DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
+      # -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -D GFLAGS_BUILD_TESTING=ON \
+      -DCMAKE_CONFIGURATION_TYPES=Release -D GFLAGS_BUILD_TESTING=ON \
+      -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install \
    && cd /tmp \
@@ -271,7 +272,7 @@ RUN cd /tmp \
    && bundle install \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off \
-		-DCMAKE_INSTALL_PREFIX=/usr/local .. \
+      -DCMAKE_INSTALL_PREFIX=/usr/local .. \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
@@ -413,24 +414,24 @@ RUN cd /tmp \
    && rm -rf logging-log4cxx
 
 RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/catchorg/Catch2.git \
-	&& cd Catch2 \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
-	&& cmake --build build --target install || true \
-	&& cd /tmp \
-	&& rm -Rf Catch2
+   && git clone --depth=1 https://github.com/catchorg/Catch2.git \
+   && cd Catch2 \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp \
+   && rm -Rf Catch2
 
 RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/google/breakpad.git \
-	&& cd breakpad \
-	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
-	&& ./configure --prefix=/usr/local  \
-	&& make > /dev/null 2>&1 \
-	&& make install \
-	&& cd /tmp \
-	&& rm -Rf breakpad
+   && git clone --depth=1 https://github.com/google/breakpad.git \
+   && cd breakpad \
+   && git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
+   && ./configure --prefix=/usr/local  \
+   && make > /dev/null 2>&1 \
+   && make install \
+   && cd /tmp \
+   && rm -Rf breakpad
 
 RUN cd /opt \
    && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
@@ -539,19 +540,19 @@ ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 # ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 RUN cd /tmp \
-	&& git clone git://git.linuxtv.org/v4l-utils.git \
-	&& cd v4l-utils \
-	&& autoreconf -vfi \
-	&& ./configure --prefix=/usr \
+   && git clone git://git.linuxtv.org/v4l-utils.git \
+   && cd v4l-utils \
+   && autoreconf -vfi \
+   && ./configure --prefix=/usr \
     && make  \
     && make install  \
     && cd /tmp/ \
     && rm -Rf v4l-utils
 
 RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/opencv/opencv.git \
+   && git clone --depth=1 https://github.com/opencv/opencv.git \
     && cd opencv \
-	&& git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
+   && git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
       -D INSTALL_C_EXAMPLES=ON \
@@ -598,10 +599,10 @@ RUN echo -e '\033[36;1m ******* ADD USER ******** \033[0m'
 # Add a new user  '$ACCOUNT' with ID 1000
 # Add $ACCOUNT to sudoers list with no password required
 # Make 'bash' the default shell for everyone
-RUN set -ex 	cut -d: -f1 /etc/group
-RUN set -ex 	cut -d: -f1 /etc/passwd
+RUN set -ex    cut -d: -f1 /etc/group
+RUN set -ex    cut -d: -f1 /etc/passwd
 RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
-	--gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
+   --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
 # Anyone in the $ACCOUNT group have read/write/execute permissions in the '/usr/local' path
 # Others have read/execute permissions
 # RUN chown -R ${ACCOUNT}s:${ACCOUNT} /home/${ACCOUNT}
@@ -708,7 +709,7 @@ CMD ["/bin/bash"]
     # rm -Rf wireshark
 
 # RUN cd /tmp \
-	# && git clone --depth=1 https://github.com/Snaipe/Criterion.git \
+   # && git clone --depth=1 https://github.com/Snaipe/Criterion.git \
     # && cd Criterion \
     # && cmake -E make_directory build \
     # && cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
@@ -724,18 +725,18 @@ CMD ["/bin/bash"]
 # "Building translating between absolute and civil times"
 
 # RUN cd /tmp \
-	# && git clone --depth=1 https://github.com/google/cctz.git \
-	# && cd cctz \
-	# && cmake -E make_directory mybuild \
-	# && cmake -E chdir mybuild cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
+   # && git clone --depth=1 https://github.com/google/cctz.git \
+   # && cd cctz \
+   # && cmake -E make_directory mybuild \
+   # && cmake -E chdir mybuild cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
       # -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr \
       # -DCMAKE_CXX_STANDARD_LIBRARIES="" \
-	# && cmake --build mybuild --target all  --clean-first \
-	# && ctest \
-	##&& cmake --build mybuild --config Release --target install \
-	# && cmake --build mybuild --target install \
-	# && cd /tmp \
-	# && rm -rf cctz
+   # && cmake --build mybuild --target all  --clean-first \
+   # && ctest \
+   ##&& cmake --build mybuild --config Release --target install \
+   # && cmake --build mybuild --target install \
+   # && cd /tmp \
+   # && rm -rf cctz
 # Lost of dependencies ... protobuf build previously with my flags
 # RUN cd /tmp \
    # && git clone --depth=1 https://github.com/google/bloaty.git \

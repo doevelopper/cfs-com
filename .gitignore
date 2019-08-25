@@ -109,7 +109,6 @@ target_wrapper.*
 
 
 # QtCreator
-
 *.autosave
 
 # QtCtreator Qml
@@ -122,6 +121,9 @@ CMakeLists.txt.user*
 # *.config
 # *.creator
 # *.files
+
+# Build logs qnd others
+*.log
 
 # temprary work to exlude
 osgi/src/test/cpp/levitics/arkhe/gcs/osgi/core/workflow/

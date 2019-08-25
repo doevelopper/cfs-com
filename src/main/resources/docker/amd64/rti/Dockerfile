@@ -56,9 +56,9 @@ RUN cd /tmp \
    && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
-   && ./configure > /dev/null 2>&1 \
+   && ./configure\
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install  \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
