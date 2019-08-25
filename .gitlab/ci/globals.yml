@@ -205,9 +205,9 @@
     script:
         - |
             if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-common:latest >/dev/null; then
-                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE}
+                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
             else
-                make GOAL=${GOAL} ${MODULE}
+                make GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
             fi
     after_script:
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true

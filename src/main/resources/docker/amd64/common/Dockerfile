@@ -438,6 +438,7 @@ RUN cd /opt \
 ENV  PATH /opt/depot_tools:$PATH
 
 # Fetch and build GStreamer
+# 1.14.5 1.15.90 1.16.0
 ARG GST_VERSION=1.14.0
 # http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
 RUN cd /tmp \
