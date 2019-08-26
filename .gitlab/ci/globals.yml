@@ -21,6 +21,14 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+.define_config: &triggered_by_api_call
+    only:
+        - triggers
+
+.define_config: &triggered_by_schedules
+    only:
+        - schedules
+
 .Log files: &log_files  [./*.log, ./build/logs/]
 
 # .Build logs: &save_build_logs

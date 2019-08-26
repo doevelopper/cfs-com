@@ -32,18 +32,21 @@ RUN apt-get update -qq \
     && apt-get  -qq install --assume-yes --no-install-recommends libtool apt-transport-https \
          ca-certificates autotools-dev\
         git xz-utils unzip wget curl openssh-server  openssh-client  automake \
-        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim \
+        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
         python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
         perl-base perl-modules zlib1g-dev gtk-doc-tools\
         libxml2-dev libxml2-utils python3-setuptools python-setuptools \
         libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
         mesa-common-dev libglu1-mesa-dev libpcap-dev \
         emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1 libxrender1 libxkbcommon-x11-0 libx11-dev libfontconfig1\
+        x11-xserver-utils libxkbfile1 libxrender1 libxkbcommon-x11-0 libx11-dev \
+        libglib2.0-dev libglib2.0-bin libglib2.0-0 \
+        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
         libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
         unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
         libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
-        libpulse-dev  make nfs-common  xvfb  xauth xterm iputils-ping  libswt-gtk-3-java tmux vim-nox \
+        libpulse-dev  make nfs-common xterm iputils-ping tmux vim-nox \
+         > /dev/null 2>&1  \
     && apt-get clean --assume-yes  \
     && apt-get --assume-yes --quiet clean \
     && apt-get --assume-yes --quiet autoremove \
@@ -56,9 +59,9 @@ RUN cd /tmp \
    && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
-   && ./configure\
+   && ./configure \
    && make > /dev/null 2>&1 \
-   && make install  \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -130,7 +133,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf uncrustify
 
@@ -140,7 +143,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
    && rm -rf cppcheck
@@ -151,7 +154,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf doxygen
 
@@ -161,7 +164,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf googletest
 
@@ -171,7 +174,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf benchmark
 
@@ -202,7 +205,7 @@ RUN cd /tmp \
    && ./bootstrap.sh --prefix=/usr/ --with-python=python3  > /dev/null 2>&1\
    && ./b2 --help \
    && ./b2 link=shared threading=multi variant=release address-model=64  > /dev/null 2>&1 \
-   && ./b2 install --prefix=/usr/ \
+   && ./b2 install --prefix=/usr/ > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
@@ -236,7 +239,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf double-conversion
 
@@ -245,7 +248,7 @@ RUN cd /tmp \
    && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
    && tar -xvzf afl-2.52b.tgz \
    && cd afl-2.52b \
-   && make clean  > /dev/null 2>&1\
+   && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
    && make DESTDIR=/opt/afl \
          BINDIR=/opt/afl/bin \
@@ -299,7 +302,7 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
            --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
@@ -313,7 +316,7 @@ RUN cd /tmp \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
@@ -323,7 +326,7 @@ RUN cd /tmp \
    && ./buildconf.sh > /dev/null 2>&1 \
    && ./configure CPPFLAGS=-DXML_LARGE_SIZE --without-docbook --prefix=/usr/ \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf libexpat
 
@@ -335,7 +338,7 @@ RUN cd /tmp \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/  \
    && make clean > /dev/null 2>&1  \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
@@ -367,7 +370,7 @@ RUN cd /tmp \
 	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
 	&& ./configure --prefix=/usr/local  \
 	&& make > /dev/null 2>&1 \
-	&& make install \
+	&& make install > /dev/null 2>&1 \
 	&& cd /tmp \
 	&& rm -Rf breakpad
 
@@ -384,7 +387,7 @@ RUN cd /tmp \
     && cd gstreamer-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-base
@@ -394,7 +397,7 @@ RUN cd /tmp \
     && cd gst-plugins-base-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # libnice
@@ -414,7 +417,7 @@ RUN cd /tmp \
     && cd gst-plugins-good-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-bad
@@ -424,7 +427,7 @@ RUN cd /tmp \
     && cd gst-plugins-bad-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-ugly
@@ -434,7 +437,7 @@ RUN cd /tmp \
     && cd gst-plugins-ugly-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-rtsp-server
@@ -444,12 +447,12 @@ RUN cd /tmp \
     && cd gst-rtsp-server-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     rm -rf gst*
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-    && apt-get install --assume-yes --no-install-recommends nodejs
+    && apt-get -qq install --assume-yes --no-install-recommends nodejs
 
 ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
 ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
@@ -467,7 +470,7 @@ RUN cd /tmp \
    && chmod +x ./qt-installer-noninteractive.qs \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \   
-   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose \
+   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
    && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QT_INSTALL_DIR=/opt/qt
@@ -480,8 +483,8 @@ RUN cd /tmp \
 	&& cd v4l-utils \
 	&& autoreconf -vfi \
 	&& ./configure --prefix=/usr \
-    && make  \
-    && make install  \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     && rm -Rf v4l-utils
 
@@ -501,7 +504,7 @@ RUN cd /tmp \
       -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
       -D BUILD_EXAMPLES=ON \
       -DCMAKE_INSTALL_PREFIX=/usr/opencv \
-    && cmake --build build --target all --clean-first \
+    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
     && cmake --build build --target install || true \
     && cd /tmp \
     && rm -Rf opencv
@@ -512,8 +515,8 @@ RUN cd /tmp/ \
     && cd openssl \
 #    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
     && ./config --prefix=/usr  \
-    && make \
-    && make install \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     && rm -rvf openssl
 

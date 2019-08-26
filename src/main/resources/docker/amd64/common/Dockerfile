@@ -44,6 +44,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         libglib2.0-dev libglib2.0-bin libglib2.0-0 \
         xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev\
         libperl-dev perl perl-base perl-modules \
+        > /dev/null 2>&1 \
    # && mkdir -pv /var/run/dbus \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
@@ -59,7 +60,7 @@ RUN cd /tmp \
    && cd gdb-8.3 \
    && ./configure\
    && make > /dev/null 2>&1 \
-   && make install  \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -90,7 +91,7 @@ ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
    &&  wget --no-check-certificate \
    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
-   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz > /dev/null 2>&1 \
    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
@@ -150,7 +151,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install> /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf uncrustify
 
@@ -160,7 +161,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
    && rm -rf cppcheck
@@ -171,7 +172,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf doxygen
 
@@ -181,7 +182,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf googletest
 
@@ -191,32 +192,32 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf benchmark
 
-RUN cd /tmp \
-   && git clone --depth=1 https://github.com/gflags/gflags.git \
-   && cd gflags \
-   && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-      # -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -D GFLAGS_BUILD_TESTING=ON \
-      -DCMAKE_CONFIGURATION_TYPES=Release -D GFLAGS_BUILD_TESTING=ON \
-      -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
-   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
-   && cd /tmp \
-   && rm -rf gflags
+# RUN cd /tmp \
+#    && git clone --depth=1 https://github.com/gflags/gflags.git \
+#    && cd gflags \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#       # -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -D GFLAGS_BUILD_TESTING=ON \
+#       -DCMAKE_CONFIGURATION_TYPES=Release -D GFLAGS_BUILD_TESTING=ON \
+#       -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
+#    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+#    && cmake --build build --target install > /dev/null 2>&1 \
+#    && cd /tmp \
+#    && rm -rf gflags
 
-RUN cd /tmp \
-   && git clone --depth=1 https://github.com/google/glog.git \
-   && cd glog \
-   && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
-   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
-   && cd /tmp \
-   && rm -rf glog
+# RUN cd /tmp \
+#    && git clone --depth=1 https://github.com/google/glog.git \
+#    && cd glog \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+#    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+#    && cmake --build build --target install > /dev/null 2>&1 \
+#    && cd /tmp \
+#    && rm -rf glog
 
 RUN cd /tmp \
    && git clone --depth=1 --recurse-submodules https://github.com/google/crc32c.git \
@@ -224,7 +225,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf crc32c
 
@@ -250,7 +251,7 @@ RUN cd /tmp \
    && ./bootstrap.sh --prefix=/usr/ --with-python=python3  > /dev/null 2>&1\
    && ./b2 --help \
    && ./b2 link=shared threading=multi variant=release address-model=64  > /dev/null 2>&1 \
-   && ./b2 install --prefix=/usr/ \
+   && ./b2 install --prefix=/usr/ > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
@@ -284,7 +285,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install \
+   && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf double-conversion
 
@@ -334,7 +335,7 @@ RUN cd /tmp \
 #    && ./config --prefix=/usr  \
    && ./config --prefix=/usr shared  \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf openssl
 
@@ -346,7 +347,7 @@ RUN cd /tmp \
    && ./configure --prefix=/usr/  \
    && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf protobuf
 
@@ -361,7 +362,7 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
            --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
@@ -375,7 +376,7 @@ RUN cd /tmp \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
@@ -385,7 +386,7 @@ RUN cd /tmp \
    && ./buildconf.sh > /dev/null 2>&1 \
    && ./configure CPPFLAGS=-DXML_LARGE_SIZE --without-docbook --prefix=/usr/ \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf libexpat
 
@@ -397,7 +398,7 @@ RUN cd /tmp \
    && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/  \
    && make clean > /dev/null 2>&1  \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
@@ -429,7 +430,7 @@ RUN cd /tmp \
    && git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
    && ./configure --prefix=/usr/local  \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -Rf breakpad
 
@@ -447,7 +448,7 @@ RUN cd /tmp \
     && cd gstreamer-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-base
@@ -457,7 +458,7 @@ RUN cd /tmp \
     && cd gst-plugins-base-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # libnice
@@ -468,7 +469,8 @@ RUN cd /tmp \
       --with-gstreamer --enable-static --enable-static-plugins \
       --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf libnice \
 
 # gst-plugins-good
 RUN cd /tmp \
@@ -477,7 +479,7 @@ RUN cd /tmp \
     && cd gst-plugins-good-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-bad
@@ -487,7 +489,7 @@ RUN cd /tmp \
     && cd gst-plugins-bad-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-plugins-ugly
@@ -497,7 +499,7 @@ RUN cd /tmp \
     && cd gst-plugins-ugly-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/
 
 # gst-rtsp-server
@@ -507,12 +509,12 @@ RUN cd /tmp \
     && cd gst-rtsp-server-${GST_VERSION} \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
-    && make install \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     rm -rf gst*
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-    && apt-get install --assume-yes --no-install-recommends nodejs
+    && apt-get -qq install --assume-yes --no-install-recommends nodejs
 
 ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
 ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
@@ -530,7 +532,7 @@ RUN cd /tmp \
    && chmod +x ./qt-installer-noninteractive.qs \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \   
-   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose \
+   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
    && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
 
 ENV QT_INSTALL_DIR=/opt/qt
@@ -540,36 +542,36 @@ ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 # ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 # ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
-RUN cd /tmp \
-   && git clone git://git.linuxtv.org/v4l-utils.git \
-   && cd v4l-utils \
-   && autoreconf -vfi \
-   && ./configure --prefix=/usr \
-    && make  \
-    && make install  \
-    && cd /tmp/ \
-    && rm -Rf v4l-utils
+# RUN cd /tmp \
+#    && git clone  --depth=1 git://git.linuxtv.org/v4l-utils.git \
+#    && cd v4l-utils \
+#    && autoreconf -vfi \
+#    && ./configure --prefix=/usr > /dev/null 2>&1 \
+#    && make > /dev/null 2>&1 \
+#    && make install > /dev/null 2>&1 \
+#    && cd /tmp/ \
+#    && rm -Rf v4l-utils
 
-RUN cd /tmp \
-   && git clone --depth=1 https://github.com/opencv/opencv.git \
-    && cd opencv \
-   && git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D INSTALL_C_EXAMPLES=ON \
-      -D INSTALL_PYTHON_EXAMPLES=ON \
-      -D WITH_TBB=ON \
-      -D WITH_V4L=ON \
-      -D OPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
-      -D WITH_QT=ON \
-      -D WITH_OPENGL=ON \
-      -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
-      -D BUILD_EXAMPLES=ON \
-      -DCMAKE_INSTALL_PREFIX=/usr/opencv \
-    && cmake --build build --target all --clean-first \
-    && cmake --build build --target install || true \
-    && cd /tmp \
-    && rm -Rf opencv
+# RUN cd /tmp \
+#    && git clone --depth=1 https://github.com/opencv/opencv.git \
+#     && cd opencv \
+#    && git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
+#     && cmake -E make_directory build \
+#     && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+#       -DINSTALL_C_EXAMPLES=ON \
+#       -DINSTALL_PYTHON_EXAMPLES=ON \
+#       -DWITH_TBB=ON \
+#       -DWITH_V4L=ON \
+#       -DOPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
+#       -DWITH_QT=ON \
+#       -DWITH_OPENGL=ON \
+#       -DOPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
+#       -DBUILD_EXAMPLES=ON \
+#       -DCMAKE_INSTALL_PREFIX=/usr/opencv .. \
+#     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+#     && cmake --build build --target install || true \
+#     && cd /tmp \
+#     && rm -Rf opencv
 
 
 # RUN cd /tmp \
