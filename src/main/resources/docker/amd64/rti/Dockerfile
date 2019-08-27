@@ -478,36 +478,36 @@ ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 
-RUN cd /tmp \
-	&& git clone git://git.linuxtv.org/v4l-utils.git \
-	&& cd v4l-utils \
-	&& autoreconf -vfi \
-	&& ./configure --prefix=/usr \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/ \
-    && rm -Rf v4l-utils
+# RUN cd /tmp \
+# 	&& git clone git://git.linuxtv.org/v4l-utils.git \
+# 	&& cd v4l-utils \
+# 	&& autoreconf -vfi \
+# 	&& ./configure --prefix=/usr \
+#     && make > /dev/null 2>&1 \
+#     && make install > /dev/null 2>&1 \
+#     && cd /tmp/ \
+#     && rm -Rf v4l-utils
 
-RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/opencv/opencv.git \
-    && cd opencv \
-	&& git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
-    && cmake -E make_directory build \
-    && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D INSTALL_C_EXAMPLES=ON \
-      -D INSTALL_PYTHON_EXAMPLES=ON \
-      -D WITH_TBB=ON \
-      -D WITH_V4L=ON \
-      -D OPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
-      -D WITH_QT=ON \
-      -D WITH_OPENGL=ON \
-      -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
-      -D BUILD_EXAMPLES=ON \
-      -DCMAKE_INSTALL_PREFIX=/usr/opencv \
-    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-    && cmake --build build --target install || true \
-    && cd /tmp \
-    && rm -Rf opencv
+# RUN cd /tmp \
+# 	&& git clone --depth=1 https://github.com/opencv/opencv.git \
+#     && cd opencv \
+# 	&& git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
+#     && cmake -E make_directory build \
+#     && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
+#       -D INSTALL_C_EXAMPLES=ON \
+#       -D INSTALL_PYTHON_EXAMPLES=ON \
+#       -D WITH_TBB=ON \
+#       -D WITH_V4L=ON \
+#       -D OPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
+#       -D WITH_QT=ON \
+#       -D WITH_OPENGL=ON \
+#       -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
+#       -D BUILD_EXAMPLES=ON \
+#       -DCMAKE_INSTALL_PREFIX=/usr/opencv \
+#     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+#     && cmake --build build --target install || true \
+#     && cd /tmp \
+#     && rm -Rf opencv
 
 RUN cd /tmp/ \
 # kept OpenSSL_1_0_2 for compatibility with the one provided by RTI (openssl-1.0.2n-5.3.1-host-x64Linux.rtipkg)

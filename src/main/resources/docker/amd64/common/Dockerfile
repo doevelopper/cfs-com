@@ -684,8 +684,9 @@ CMD ["/bin/bash"]
 #    && cd /tmp/ \
 #    && rm -rf /gstreamer
 
+# need libjpeg-dev
 # RUN cd /tmp \
-#     git clone https://github.com/Motion-Project/motion.git
+#  &&   git clone --depth=1 https://github.com/Motion-Project/motion.git
    # cd motion  && \
    # autoreconf -fiv && \
    # ./configure && \
