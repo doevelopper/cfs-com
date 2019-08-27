@@ -1,3 +1,28 @@
+<!--
+       cfs-com/README.md
+
+              Copyright (c) 2014-2018 A.H.L
+
+       Permission is hereby granted, free of charge, to any person obtaining
+       a copy of this software and associated documentation files (the
+       "Software"), to deal in the Software without restriction, including
+       without limitation the rights to use, copy, modify, merge, publish,
+       distribute, sublicense, and/or sell copies of the Software, and to
+       permit persons to whom the Software is furnished to do so, subject to
+       the following conditions:
+
+       The above copyright notice and this permission notice shall be
+       included in all copies or substantial portions of the Software.
+
+       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+       EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+       MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+       NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+       LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+       OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+-->
+
+
 ```txt
  __          __            __
 /   _  _ _  |_|. _ |_ |_  (_    _|_ _ _
@@ -37,6 +62,34 @@ Branch   | Gitlab-CI | Travis | Build |  Tests  | Integration Test | Coverage | 
 Each DDS implementation can do everything we ask for (and even more), but it will not show you how to achieve that.
 DDS AL Library sits on top of common DDS implementation and do initializes the runtime environment,
 loads the classes, creates the domain participants...
+
+Todo
+----
+
+* [ ] :volcano: RTI Shapes Demo of OMG's Data Distribution Service (DDS): OpenDDS, OpenSplice and Fast RTPS
+* [ ] :feet: CI script covering many cloud ci and local storage ci solutions
+* [ ] :skull: Provide custom script for runing static coverage analysis tools
+* [ ] :fu: Provide ability to generate specifications from code sources
+* [ ] :ok_hand: Provide seamless integration with common IDE CLion/Eclipse-cdt/Netbeans...
+* [ ] :point_up_2: Define a version number inside CMake and print it to the output of the executable.
+* [ ] :point_right: Print the Git hash to the output of the executable.
+* [ ] :star: Create an installer so the program can be installed properly (GNU standards).
+* [ ] :pill: Create a DEB or RPM package (if relevant for your distribution).
+* [ ] :zzz: More specific FAQ and Troubleshooting help
+* [ ] :cyclone: C++11/14/17 Features
+* [ ] :alien: Design patterns lectures
+* [ ] :trollface: Offuscated c++ snippets...
+
+Artifactory binaries distribution management
+--------------------------------------------
+
+| Distribution  Chanel         | Description                                                                                                                                                                                   |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :bangbang: [__Nightly__](#www.tbd.acme) | Builds created out of the central repository every night, packaged up every night for bleeding-edge testers to install and test.These are not qualified by QA.                                                                                                      |
+| :heavy_exclamation_mark: [__Aurora__](#www.tbd.acme) | Builds created out of the aurora repository, which is synced from central repository every weeks.There is a small amount of QA at the start of the 1 week period before the updates are offered.as such its status is roughly "experimental".  |
+| :interrobang: [__Beta__](#www.tbd.acme)  | Builds created out of the master repository, qualified by QA as being of sufficient quality to release to beta users.                                                                         |
+| :heavy_check_mark: [__Release__](#www.tbd.acme) | Builds created out of the release repository, qualified by QA as being of sufficient quality to release to hundreds of millions of people.
+
 ## Introduction
 
 There are a number of different DDS implementations available.
@@ -191,6 +244,15 @@ for details.
 - Code are released under [![License][apache-license-shield]][apache-license]
 - Docs are released under [![License: CC BY-NC-SA 4.0][BY-NC-SA-4.0-shield]][BY-NC-SA-4.0]
 - CI/CD Scripts are under [![License: LGPL v3][LGPL-v3-shield]][LGPL-v3]
+
+## Contact
+
+---
+
+> Portal [acme](https://www.tbd.acme) &nbsp;&middot;&nbsp;
+> GitHub [@doevelopper](https://github.com/doevelopper) &nbsp;&middot;&nbsp;
+> Twitter [@doevelopper](https://twitter.com/doevelopper)
+
 
 [LGPL-v3-shield]: https://img.shields.io/badge/License-LGPL%20v3-blue.svg
 [LGPL-v3]: http://www.gnu.org/licenses/lgpl-3.0

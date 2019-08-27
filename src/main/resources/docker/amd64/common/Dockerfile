@@ -470,7 +470,7 @@ RUN cd /tmp \
       --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
     && make install > /dev/null 2>&1 \
     && cd /tmp/ \
-    && rm -rf libnice \
+    && rm -rf libnice
 
 # gst-plugins-good
 RUN cd /tmp \

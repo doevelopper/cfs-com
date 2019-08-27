@@ -527,57 +527,57 @@ ARG RTI_DDS_VERSION=6.0.0
 # COPY src/main/resources/docker/amd64/rti/packages/*.rtipkg  /tmp/
 # COPY src/main/resources/docker/amd64/rti/packages/*.tar.gz  /tmp/
 
-RUN [ -z "$CI_DOMAIN" ] \
-    && cd /tmp/ \
-    && chmod +x /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  \
-    && ./rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  --mode unattended --prefix /opt --disable_copy_examples true \
-    && rm -rvf /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run \
-    || :
+# RUN [ -z "$CI_DOMAIN" ] \
+#     && cd /tmp/ \
+#     && chmod +x /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  \
+#     && ./rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run  --mode unattended --prefix /opt --disable_copy_examples true \
+#     && rm -rvf /tmp/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run \
+#     || :
 
-ARG AMD_PREFIX=x64Linux3gcc5.4.0
-ENV NDDSHOME=/opt/rti_connext_dds-${RTI_DDS_VERSION}
-ENV PATH="${PATH}:${NDDSHOME}/bin"
-ENV LD_LIBRARY_PATH=/opt/rti_connext_dds-${RTI_DDS_VERSION}/lib/${AMD_PREFIX}
+# ARG AMD_PREFIX=x64Linux3gcc5.4.0
+# ENV NDDSHOME=/opt/rti_connext_dds-${RTI_DDS_VERSION}
+# ENV PATH="${PATH}:${NDDSHOME}/bin"
+# ENV LD_LIBRARY_PATH=/opt/rti_connext_dds-${RTI_DDS_VERSION}/lib/${AMD_PREFIX}
 
-RUN [ -z "$CI_DOMAIN" ] \
-    && cd /tmp/ \
-    && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux3gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux3gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_limited_bandwidth_plugins_host-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_web_integration_service-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_security_plugins-6.0.0-host-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_database_integration-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_tls_host_support-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Windows.rtipkg \
-    && rtipkginstall -unattended openssl-1.0.2o-6.0.0-host-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_secure_wan_host-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_queuing_service-6.0.0-x64Linux.rtipkg \
-    && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Unix.rtipkg \
+# RUN [ -z "$CI_DOMAIN" ] \
+#     && cd /tmp/ \
+#     && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+#     && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux3gcc5.4.0.rtipkg \
+#     && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux3gcc5.4.0.rtipkg \
+#     && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+#     && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+#     && rtipkginstall -unattended rti_limited_bandwidth_plugins_host-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_web_integration_service-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_security_plugins-6.0.0-host-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_database_integration-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_tls_host_support-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Windows.rtipkg \
+#     && rtipkginstall -unattended openssl-1.0.2o-6.0.0-host-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_secure_wan_host-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_queuing_service-6.0.0-x64Linux.rtipkg \
+#     && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Unix.rtipkg \
     # && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux4gcc7.3.0.rtipkg \
-    && rtipkginstall -unattended rti_security_plugins-6.0.0-target-armv8Linux4.4gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
-    && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
-    && rm -rvf /tmp/*.rtipkg \
-    || :
+   #  && rtipkginstall -unattended rti_security_plugins-6.0.0-target-armv8Linux4.4gcc5.4.0.rtipkg \
+   #  && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
+   #  && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
+   #  && rm -rvf /tmp/*.rtipkg \
+   #  || :
 
-RUN [ -z "$CI_DOMAIN" ] \
-    && cd /tmp/ \
+# RUN [ -z "$CI_DOMAIN" ] \
+#     && cd /tmp/ \
     # && mkdir -pv /opt/rti_connext_openssl/{target-x64Linux3gcc5.4.0,target-x64Linux4gcc7.3.0,target-armv8Linux4.4gcc5.4.0} \
-    && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
-    && mkdir -pv /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 \
-    && mkdir -pv /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 \
-    && tar -zvxf openssl-1.0.2o-target-armv8Linux4.4gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 --strip-components=1 \
+   #  && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
+   #  && mkdir -pv /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 \
+   #  && mkdir -pv /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 \
+   #  && tar -zvxf openssl-1.0.2o-target-armv8Linux4.4gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 --strip-components=1 \
     # && tar -zvxf openssl-1.0.2o-target-x64Linux4gcc7.3.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 --strip-components=1 \
-    && tar -zvxf openssl-1.0.2o-target-x64Linux3gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 --strip-components=1 \
-    && rm -rvf /tmp/*.tar.gz \
-    || :
+   #  && tar -zvxf openssl-1.0.2o-target-x64Linux3gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 --strip-components=1 \
+   #  && rm -rvf /tmp/*.tar.gz \
+   #  || :
 
 
 RUN useradd -m $ACCOUNT \
@@ -586,9 +586,9 @@ RUN useradd -m $ACCOUNT \
    && usermod -aG sudo $ACCOUNT \
    && echo "$ACCOUNT ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$ACCOUNT \
    && chmod 0440 /etc/sudoers.d/$ACCOUNT \
-#        # Replace 1000 with your user/group id
    && usermod  --uid 1000 $ACCOUNT \
    && groupmod --gid 1000 $ACCOUNT
+
 # ENTRYPOINT rtilauncher
 # ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
 # CMD ["-cfgFile","/config.xml","-cfgName","gets_persistence"]
