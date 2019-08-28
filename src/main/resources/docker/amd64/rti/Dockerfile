@@ -478,6 +478,31 @@ ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 
+RUN cd /tmp \
+   && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
+   && cd eigen-git-mirror \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS="-std=c++11" \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp/ \
+   && rm -Rf eigen-git-mirror
+
+RUN cd /tmp \
+   && git clone  --depth=1 https://github.com/CGAL/cgal.git \
+   && cd cgal \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=ON \
+      -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=ON \
+      -DWITH_demos=ON -DWITH_tests=ON \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp/ \
+   && rm -Rf cgal
+
 # RUN cd /tmp \
 # 	&& git clone git://git.linuxtv.org/v4l-utils.git \
 # 	&& cd v4l-utils \
