@@ -302,7 +302,7 @@ RUN cd /tmp \
          DATAROOTDIR=/opt/afl/share \
          LIBDIR=/opt/afl/lib install  \
    && cd /tmp \
-   && rm -rf afl-2.52b*
+   && rm -rf afl-2.52b* american-fuzzy-lop
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/libcheck/check.git \
@@ -449,7 +449,8 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+   && rm -Rf gstreamer-${GST_VERSION}
 
 # gst-plugins-base
 RUN cd /tmp \
@@ -459,7 +460,8 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+   && rm -Rf gst-plugins-base-${GST_VERSION}*
 
 # libnice
 RUN cd /tmp \
@@ -480,7 +482,8 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+   && rm -Rf gst-plugins-good-${GST_VERSION}*
 
 # gst-plugins-bad
 RUN cd /tmp \
@@ -490,7 +493,8 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+   && rm -Rf gst-plugins-bad-${GST_VERSION}*
 
 # gst-plugins-ugly
 RUN cd /tmp \
@@ -500,7 +504,8 @@ RUN cd /tmp \
     && ./configure --prefix=/usr --disable-gtk-doc \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && cd /tmp/ \
+   && rm -Rf gst-plugins-ugly-${GST_VERSION}*
 
 # gst-rtsp-server
 RUN cd /tmp \
@@ -511,7 +516,7 @@ RUN cd /tmp \
     && make > /dev/null 2>&1 \
     && make install > /dev/null 2>&1 \
     && cd /tmp/ \
-    rm -rf gst*
+    rm -rf gst-rtsp-server-${GST_VERSION}*
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get -qq install --assume-yes --no-install-recommends nodejs
@@ -533,7 +538,7 @@ RUN cd /tmp \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \   
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
-   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
+   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
 
 ENV QT_INSTALL_DIR=/opt/qt
 ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
@@ -541,6 +546,31 @@ ENV CMAKE_PREFIX_PATH=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 # ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
 # ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+
+RUN cd /tmp \
+   && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
+   && cd eigen-git-mirror \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS="-std=c++11" \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp/ \
+   && rm -Rf eigen-git-mirror
+
+RUN cd /tmp \
+   && git clone  --depth=1 https://github.com/CGAL/cgal.git \
+   && cd cgal \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=ON \
+      -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=ON \
+      -DWITH_demos=ON -DWITH_tests=ON \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp/ \
+   && rm -Rf cgal
 
 # RUN cd /tmp \
 #    && git clone  --depth=1 git://git.linuxtv.org/v4l-utils.git \
@@ -675,7 +705,7 @@ CMD ["/bin/bash"]
    # && rm -Rf /tmp/grpc
 
 # RUN cd /tmp \
-#    && git clone -b $GST_VERSION --depth 1 git://anongit.freedesktop.org/git/gstreamer/gstreamer \
+#    && git clone -b $GST_VERSION --depth=1 git://anongit.freedesktop.org/git/gstreamer/gstreamer \
 #    && cd gstreamer \
 #    && git checkout ${GST_VERSION} \
 #    && ./autogen.sh --prefix=/usr --disable-gtk-doc \

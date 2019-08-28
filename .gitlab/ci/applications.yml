@@ -21,6 +21,17 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+.variables-builds:
+    GIT_STRATEGY: clone
+    GIT_SUBMODULE_STRATEGY: recursive
+    QT_HASH_SEED: 1
+    QT_NO_CPU_FEATURE: sse4.2
+    BUILD_TYPE: MinSizeRel
+    CMAKE: /opt/cmake/bin/cmake
+    QT_SDKS_PATH: /opt/Qt
+
+
+
 .application-build-container-prerequisities: &application-build-container-prerequisities
     variables:
         BUILD_IMAGE:${STAGING_REGISTRY}/${DTR_NAMESPACE}/${CI_PROJECT_NAME}/${DDS_TYPE}:${VERSION}
@@ -89,6 +100,9 @@
         - export TRIPLET=armv8l-linux-gnueabihf
 
 .aarch64-build-template: &aarch64
+    variables:
+        CMAKE_TOOLCHAIN: gcc-linux64
+        TARGET_HOST: gcc_64
     before_script:
         - export PATH=/opt/aarch64-linux-gnu/bin/:$PATH
         - export TRIPLET=aarch64-linux-gnu
