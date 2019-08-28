@@ -580,14 +580,14 @@ ARG RTI_DDS_VERSION=6.0.0
    #  || :
 
 
-RUN useradd -m $ACCOUNT \
-   && echo "$ACCOUNT:$ACCOUNT" | chpasswd \
-   && usermod --shell /bin/bash $ACCOUNT \
-   && usermod -aG sudo $ACCOUNT \
-   && echo "$ACCOUNT ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$ACCOUNT \
-   && chmod 0440 /etc/sudoers.d/$ACCOUNT \
-   && usermod  --uid 1000 $ACCOUNT \
-   && groupmod --gid 1000 $ACCOUNT
+RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
+   --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
+
+RUN chmod 1777 -R /tmp
+
+USER $ACCOUNT
+
+WORKDIR /home/$ACCOUNT
 
 # ENTRYPOINT rtilauncher
 # ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
