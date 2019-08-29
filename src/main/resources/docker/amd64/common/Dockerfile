@@ -536,7 +536,7 @@ RUN cd /tmp \
    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
    && chmod +x ./qt-installer-noninteractive.qs \
    && chmod +x ./qt-installer-script.qs \
-   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \   
+   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
    && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
 
@@ -557,6 +557,31 @@ RUN cd /tmp \
    && cmake --build build --target install || true \
    && cd /tmp/ \
    && rm -Rf eigen-git-mirror
+
+RUN cd /tmp \
+	&& git clone --depth=1  https://github.com/ginkgo-project/ginkgo.git \
+	&& cd ginkgo \
+	&& cmake -E make_directory build \
+	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DGINKGO_BUILD_TESTS=OFF -DGINKGO_BUILD_EXAMPLES=OFF \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DGINKGO_DEVEL_TOOLS=OFF -DGINKGO_BUILD_REFERENCE=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+	&& cmake --build build --target install > /dev/null 2>&1 \
+	&& cd /tmp \
+	&& rm -rf ginkgo
+
+RUN cd /tmp \
+	&& git clone --depth=1  https://github.com/dealii/dealii.git
+	&& cd dealii \
+	&& cmake -E make_directory build \
+	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_BUILD_TYPE=Release \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+	&& cmake --build build --target install > /dev/null 2>&1 \
+	&& cd /tmp \
+	&& rm -rf dealii
 
 RUN cd /tmp \
    && git clone  --depth=1 https://github.com/CGAL/cgal.git \
@@ -616,7 +641,7 @@ RUN cd /tmp \
 #    && ./vscode-ext.sh \
 #    && rm -vf vscode-ext.sh
 
-RUN echo -e '\033[36;1m ******* ADD USER ******** \033[0m' 
+RUN echo -e '\033[36;1m ******* ADD USER ******** \033[0m'
 
 # RUN useradd -m $ACCOUNT \
 #    && echo "$ACCOUNT:$ACCOUNT" | chpasswd \
@@ -753,7 +778,7 @@ CMD ["/bin/bash"]
     # && rm -Rf Criterion
 
 ###################################################### WARNING ################################################################
- # Faild because linking agains wrong gtest... pthread .. the one in /usr/local/lib/libgmock.a 
+ # Faild because linking agains wrong gtest... pthread .. the one in /usr/local/lib/libgmock.a
  # overriden by some previous libraies
  # Same issue with capture-thread
 # "Building translating between absolute and civil times"
