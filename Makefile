@@ -24,14 +24,14 @@
 #
 
 export PROJECT_NAME        ?= $(shell basename $(CURDIR))
-export DTR_NAMESPACE      	?= doevelopper
+export DTR_NAMESPACE       ?= doevelopper
 #  jfrog.io - docker.io - registry.gitlab.com - artifactory.io
 export DOCKER_TRUSTED_REGISTRY ?= docker.io
 export ARCH                ?= amd64
 export PLATFORM            =
 export BASE_IMAGE          =
 export GOAL                ?= build
-export APP_BASE_IMAGE_NAME = ${DOCKER_TRUSTED_REGISTRY}/${DTR_NAMESPACE}/${PROJECT_NAME}
+export APP_BASE_IMAGE_NAME := ${DOCKER_TRUSTED_REGISTRY}/${DTR_NAMESPACE}/${PROJECT_NAME}
 
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
@@ -52,3 +52,4 @@ include $(shell pwd -P)/src/main/resources/docker/makefiles/target-coordinator.m
 # from cli
 # make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 GOAL=build PLATFORM=RTI  rti-connext-dds
 # make DOCKER_TRUSTED_REGISTRY=docker.io DTR_NAMESPACE=doevelopper ARCH=amd64 GOAL=build omg-opendds
+
