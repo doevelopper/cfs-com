@@ -124,7 +124,7 @@ RUN cd /tmp \
 RUN pip install -q --no-cache-dir conan \
    && pip install --upgrade conan_package_tools \
    && pip install cpplint \
-   && pip install meson \
+   && pip3 install meson \
    # && pip install cpplint-junit \
    && pip install cppcheck-junit \
    && pip install semver \
@@ -132,7 +132,7 @@ RUN pip install -q --no-cache-dir conan \
    && pip install lizard \
    && pip install cpp-demangle \
    && pip install polysquare-cmake-linter \
-   # && pip install cmakedoc \
+   && pip3 install cmakedoc \
    && pip install cpp-coveralls \
    && pip install coverxygen \
    && pip install doxygen-junit
