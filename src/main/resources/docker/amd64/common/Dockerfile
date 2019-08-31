@@ -59,8 +59,8 @@ RUN cd /tmp \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
    && ./configure --prefix=/usr/local \
-   && make  2>&1 >/dev/null | grep -E "warning|error|Making" \
-   && make install 2>&1 >/dev/null | grep -E "warning|error|Making" \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -460,7 +460,7 @@ RUN cd /tmp \
 			--enable-encoder=eac3 \
 			--enable-encoder=mp2 \
 			--enable-encoder=mpeg2video \
-    && make 2>&1 >/dev/null | grep -E "warning|error|Making|Configuring|written|Scanning|Linking" \
+    && make > /dev/null 2>&1 \
     && make install \
     && cd /tmp  \
     && rm -rf FFmpeg
@@ -510,7 +510,7 @@ RUN cd /tmp \
 	&& tar xjvf qwt-6.1.4.tar.bz2 \
 	&& cd qwt-6.1.4 \
 	&& qmake qwt.pro \
-	&& make 2>&1 >/dev/null | grep -E "warning|error|Making|Configuring|written|Scanning|Linking" \
+	&& make > /dev/null 2>&1 \
 	&& make install DESTDIR=/usr/local \
 	&& cd /tmp \
 	&& rm -rf qwt-6.1.4.tar.bz2 qwt-6.1.4
@@ -521,7 +521,7 @@ RUN cd /tmp \
 	&& cd gsl-2.6 \
 	&& ./autogen.sh \
 	&& ./configure --enable-maintainer-mode --prefix=/usr/local \
-	&& make -j `nproc` 2>&1 >/dev/null | grep -E "warning|error|Making" \
+	&& make -j `nproc` > /dev/null 2>&1 \
 	&& make install > /dev/null 2>&1 \
 	&& cd /tmp \
 	&& rm -rf gsl-2.6.tar.gz gsl-2.6
