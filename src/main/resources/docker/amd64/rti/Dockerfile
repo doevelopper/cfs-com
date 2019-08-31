@@ -446,24 +446,39 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -rf x264
 
-RUN cd /tmp \
-	&& git clone https://github.com/FFmpeg/FFmpeg.git \
-    && cd FFmpeg \
-		./configure \
-			--prefix=/usr/local \
-			--disable-debug \
-			--disable-doc \
-			--disable-ffplay \
-			--enable-shared \
-			--enable-decoder=h264 \
-			--enable-encoder=ac3 \
-			--enable-encoder=eac3 \
-			--enable-encoder=mp2 \
-			--enable-encoder=mpeg2video \
-    && make > /dev/null 2>&1 \
-    && make install \
-    && cd /tmp  \
-    && rm -rf FFmpeg
+#RUN cd /tmp \
+#	&& git clone --depth=1 https://github.com/cisco/openh264.git \
+#	&& cd openh264 \
+#	&& make PREFIX=/usr/local\
+#	&& make install PREFIX=/usr/local \
+#	&& cd /tmp \
+#	&& rm -rf openh264
+
+##	&& git clone https://github.com/FFmpeg/FFmpeg.git \
+#RUN cd /tmp \
+#	&& curl -L -O -k https://ffmpeg.org/releases/ffmpeg-4.2.tar.xz \
+#    && tar -xJf ffmpeg-4.2.tar.xz \
+#    && cd ffmpeg-4.2 \
+#		./configure \
+#			--prefix=/usr/local \
+#			--target-os=linux --pkg-config-flags=--static \
+#			--enable-shared \
+#			--extra-libs=-lpthread \
+#			--enable-gpl -enable-nonfree \
+#			--enable-pthreads \
+#			--enable-openssl \
+#			--disable-debug \
+#			--disable-doc \
+#			--disable-ffplay \
+#			--enable-decoder=h264 \
+#			--enable-encoder=ac3 \
+#			--enable-encoder=eac3 \
+#			--enable-encoder=mp2 \
+#			--enable-encoder=mpeg2video \
+#    && make \
+#    && make install \
+#    && cd /tmp  \
+#    && rm -rf ffmpeg-4.2 ffmpeg-4.2.tar.xz
 
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
 RUN cd /tmp \
