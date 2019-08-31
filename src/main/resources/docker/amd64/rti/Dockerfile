@@ -20,7 +20,7 @@
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #
-ARG ACCOUNT=developer
+
 ARG BASE_IMAGE=amd64/ubuntu:18.04
 FROM $BASE_IMAGE
 
@@ -28,30 +28,28 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN apt-get update -qq \
-    && apt-get  -qq install --assume-yes --no-install-recommends libtool apt-transport-https \
-         ca-certificates autotools-dev\
-        git xz-utils unzip wget curl openssh-server  openssh-client  automake \
-        bison flex build-essential gawk libgcrypt20-dev libcrypto++-dev vim texinfo \
-        python-pip python3-pip python-dev python3-dev python-wheel cython cython3 python3-wheel \
-        perl-base perl-modules zlib1g-dev gtk-doc-tools\
-        libxml2-dev libxml2-utils python3-setuptools python-setuptools \
-        libgnutls28-dev libcurl4-gnutls-dev libgnutls-openssl27 \
-        mesa-common-dev libglu1-mesa-dev libpcap-dev \
-        emacs25  rxvt-unicode-256color valgrind mscgen graphviz \
-        x11-xserver-utils libxkbfile1 libxrender1 libxkbcommon-x11-0 libx11-dev \
+RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
+    && apt-get -qq install --assume-yes --no-install-recommends \
+        ca-certificates apt-transport-https \
+        libtool autotools-dev autopoint autoconf automake make autoproject bison flex \
+        build-essential git xz-utils unzip wget curl openssh-server openssh-client \
+        gawk vim vim-nox texinfo emacs25 gtk-doc-tools autogen autogen-doc \
+        python-pip python-dev python-wheel cython python-setuptools \
+        python3-pip python3-dev python3-wheel cython3 python3-setuptools \
+        ruby ruby-dev libjpeg-dev libudev-dev \
         libglib2.0-dev libglib2.0-bin libglib2.0-0 \
         xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
-        libfontconfig libldap2-dev libldap-2.4-2  libmysql++-dev \
-        unixodbc-dev libgdbm-dev libodb-pgsql-dev libcrossguid-dev  uuid-dev libossp-uuid-dev \
-        libghc-uuid-dev libghc-uuid-types-dev ruby ruby-dev libelf-dev  elfutils libelf1 \
-        libpulse-dev  make nfs-common xterm iputils-ping tmux vim-nox \
-         > /dev/null 2>&1  \
-    && apt-get clean --assume-yes  \
-    && apt-get --assume-yes --quiet clean \
-    && apt-get --assume-yes --quiet autoremove \
-    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
-    && rm -rf /usr/share/man/
+        libperl-dev perl perl-base perl-modules \
+        yasm nasm xotcl-dev tcl-expect-dev tcl-dev \
+		libpulse-dev libva-dev libxv-dev libelf-dev  elfutils libelf1 \
+        libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
+		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
+		display-dhammapada fortunes \
+   && apt-get clean --assume-yes  \
+   && apt-get --assume-yes --quiet clean \
+   && apt-get --assume-yes --quiet autoremove \
+   && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
+   && rm -rf /usr/share/man/
 
 ARG MAKEFLAGS
 
@@ -59,9 +57,9 @@ RUN cd /tmp \
    && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
    && tar -xzf gdb-8.3.tar.gz \
    && cd gdb-8.3 \
-   && ./configure \
-   && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && ./configure --prefix=/usr/local \
+   && make |& grep -E "warning|error|Making" \
+   && make install |& grep -E "warning|error|Making" \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3
 
@@ -79,6 +77,10 @@ RUN  cd /tmp \
    && mv ninja /usr/bin/ninja \
    && rm ninja-linux.zip
 
+#curl -L -C - -b "oraclelicense=accept-securebackup-cookie" -O 'https://download.oracle.com/otn/java/jdk/8u221-b11/230deb18db3e4014bb8e3e8324f81b43/jdk-8u221-linux-x64.tar.gz'
+#  http://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/jdk-8u212-linux-x64.tar.gz
+# COPY jdk-8u212-linux-x64.tar.gz /tmp
+
 RUN  cd /tmp \
    && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
    && tar -xzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
@@ -88,11 +90,11 @@ ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
    &&  wget --no-check-certificate \
    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
-   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz \
+   && tar -xzf apache-maven-${MVN_VERSION}-bin.tar.gz > /dev/null 2>&1 \
    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
-ENV GRADLE_VERSION ${GRADLE_VERSION:-5.6}
+ENV GRADLE_VERSION ${GRADLE_VERSION:-5.6.1}
 RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
@@ -111,12 +113,28 @@ ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jr
 ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
 ARG BAZEL_VERSION
-ENV BAZEL_VERSION ${BAZEL_VERSION:-0.28.1}
+ENV BAZEL_VERSION ${BAZEL_VERSION:-0.29}
 RUN cd /tmp \
    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
    && ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
    && rm -f ./bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
+
+RUN pip install -q --no-cache-dir conan \
+   && pip install --upgrade conan_package_tools \
+   && pip install cpplint \
+   && pip install meson \
+   # && pip install cpplint-junit \
+   && pip install cppcheck-junit \
+   && pip install semver \
+   && pip install semver-tool \
+   && pip install lizard \
+   && pip install cpp-demangle \
+   && pip install polysquare-cmake-linter \
+   # && pip install cmakedoc \
+   && pip install cpp-coveralls \
+   && pip install coverxygen \
+   && pip install doxygen-junit
 
 RUN cmake --version \
    && make --version \
@@ -131,9 +149,9 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
    && cd uncrustify \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install> /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf uncrustify
 
@@ -141,7 +159,7 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/danmar/cppcheck.git \
    && cd cppcheck \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install > /dev/null 2>&1 \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
@@ -178,20 +196,48 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf benchmark
 
-RUN pip install -q --no-cache-dir conan \
-   && pip install --upgrade conan_package_tools \
-   && pip install cpplint \
-   # && pip install cpplint-junit \
-   && pip install cppcheck-junit \
-   && pip install semver \
-   && pip install semver-tool \
-   && pip install lizard \
-   && pip install cpp-demangle \
-   && pip install polysquare-cmake-linter \
-   # && pip install cmakedoc \
-   && pip install cpp-coveralls \
-   && pip install coverxygen \
-   && pip install doxygen-junit
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/gflags/gflags.git \
+   && cd gflags \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#       # -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DGFLAGS_BUILD_TESTING=ON \
+       -DCMAKE_CONFIGURATION_TYPES=Release -DGFLAGS_BUILD_TESTING=OFF \
+       -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf gflags
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/google/glog.git \
+   && cd glog \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf glog
+
+RUN cd /tmp \
+   && git clone --depth=1 --recurse-submodules https://github.com/google/crc32c.git \
+   && cd crc32c \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf crc32c
+
+RUN cd /tmp \
+   && git clone --depth=1 https://github.com/jeaye/stdman.git \
+   && cd stdman \
+   && ./configure --prefix=/usr/local \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -Rf stdman
+
+ENV MANPATH=${MANPATH}:/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
 ARG BOOST_VERSION_MAJ=1
 ARG BOOST_VERSION_MIN=69
@@ -202,10 +248,10 @@ RUN cd /tmp \
    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
    && tar xzf boost_${BOOST_RELEASE}.tar.gz \
    && cd boost_${BOOST_RELEASE} \
-   && ./bootstrap.sh --prefix=/usr/ --with-python=python3  > /dev/null 2>&1\
+   && ./bootstrap.sh --prefix=/usr/local --with-python=python3  > /dev/null 2>&1\
    && ./b2 --help \
-   && ./b2 link=shared threading=multi variant=release address-model=64  > /dev/null 2>&1 \
-   && ./b2 install --prefix=/usr/ > /dev/null 2>&1 \
+   && ./b2 link=shared threading=multi variant=release address-model=64 > /dev/null 2>&1 \
+   && ./b2 install --prefix=/usr/local > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf boost_${BOOST_RELEASE} boost_${BOOST_RELEASE}.tar.gz
 
@@ -227,7 +273,7 @@ RUN cd /tmp \
    && bundle install \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off \
-		-DCMAKE_INSTALL_PREFIX=/usr/local .. \
+      -DCMAKE_INSTALL_PREFIX=/usr/local .. \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install > /dev/null 2>&1 \
    && cd /tmp \
@@ -243,55 +289,67 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf double-conversion
 
+
 RUN cd /tmp \
    && curl -L -O -k http://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz \
    && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
    && tar -xvzf afl-2.52b.tgz \
    && cd afl-2.52b \
-   && make clean  > /dev/null 2>&1 \
+   && make clean  > /dev/null 2>&1\
    && make > /dev/null 2>&1 \
-   && make DESTDIR=/opt/afl \
-         BINDIR=/opt/afl/bin \
-         DATAROOTDIR=/opt/afl/share \
-         LIBDIR=/opt/afl/lib install  \
+   # && make DESTDIR=/opt/afl  BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
+   && make DESTDIR=/usr/local
    && cd /tmp \
-   && rm -rf afl-2.52b*
+   && rm -rf afl-2.52b* american-fuzzy-lop
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/libcheck/check.git \
    && cd check \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test \
    && cmake --build build --target install || true \
    && cd /tmp \
    && rm -rf check
 
+# "Building IEEE doubles binary-decimal and decimal-binary ."
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/double-conversion.git  \
    && cd double-conversion \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/ \
+   && cmake -E chdir build cmake .. -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
 #   - test/cctest/cctest --list | tr -d '<' | xargs test/cctest/cctest \
    && cmake --build build --target install || true \
    && cd /tmp \
    && rm -rf double-conversion
 
+
+RUN cd /tmp/ \
+# kept OpenSSL_1_0_2 for compatibility with the one provided by RTI (openssl-1.0.2n-5.3.1-host-x64Linux.rtipkg)
+    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
+    && cd openssl \
+#    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
+    && ./config --prefix=/usr  \
+    && make > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
+    && cd /tmp/ \
+    && rm -rvf openssl
+
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
    && cd protobuf \
    && ./autogen.sh > /dev/null 2>&1  \
-#    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --prefix=/usr/ \
-   && ./configure --prefix=/usr/  \
+   && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --enable-silent-rules --prefix=/usr/ \
+   # && ./configure --prefix=/usr/local  \
    && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install \
+   && make install > /dev/null 2>&1 \
    && cd /tmp \
    && rm -rf protobuf
 
-ENV PROTOBUF_HOME /usr
+ENV PROTOBUF_HOME /usr/local
 
 RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/xerces-c-3.2.2.tar.gz \
    && tar -xzf xerces-c-3.2.2.tar.gz \
@@ -312,7 +370,7 @@ RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist/apr/apr-${APR_VERSION}.tar.gz  \
    && tar -xzf apr-${APR_VERSION}.tar.gz \
    && cd apr-${APR_VERSION} \
-   && ./configure --prefix=/usr/ --enable-threads --enable-posix-shm \
+   && ./configure --prefix=/usr/local --enable-threads --enable-posix-shm \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
@@ -324,7 +382,7 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/libexpat/libexpat.git  \
    && cd libexpat/expat  \
    && ./buildconf.sh > /dev/null 2>&1 \
-   && ./configure CPPFLAGS=-DXML_LARGE_SIZE --without-docbook --prefix=/usr/ \
+   && ./configure CPPFLAGS=-DXML_LARGE_SIZE --without-docbook --prefix=/usr/local \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
    && cd /tmp \
@@ -335,7 +393,7 @@ RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
    && tar -xzf apr-util-${APU_VERSION}.tar.gz  \
    && cd apr-util-${APU_VERSION} \
-   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-expat=/usr/  \
+   && ./configure --prefix=/usr/local --with-apr=/usr/local --with-expat=/usr/local  \
    && make clean > /dev/null 2>&1  \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
@@ -346,7 +404,7 @@ RUN cd /tmp \
    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 https://gitbox.apache.org/repos/asf/logging-log4cxx.git  \
    && cd logging-log4cxx  \
    && ./autogen.sh \
-   && ./configure --prefix=/usr/ --with-apr=/usr/ --with-apr-util=/usr/ \
+   && ./configure --prefix=/usr/local --with-apr=/usr/local --with-apr-util=/usr/local \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
@@ -355,101 +413,67 @@ RUN cd /tmp \
    && rm -rf logging-log4cxx
 
 RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/catchorg/Catch2.git \
-	&& cd Catch2 \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
-	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
-	&& cmake --build build --target install || true \
-	&& cd /tmp \
-	&& rm -Rf Catch2
+   && git clone --depth=1 https://github.com/catchorg/Catch2.git \
+   && cd Catch2 \
+   && cmake -E make_directory build \
+   && cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build build --target install || true \
+   && cd /tmp \
+   && rm -Rf Catch2
 
 RUN cd /tmp \
-	&& git clone --depth=1 https://github.com/google/breakpad.git \
-	&& cd breakpad \
-	&& git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
-	&& ./configure --prefix=/usr/local  \
-	&& make > /dev/null 2>&1 \
-	&& make install > /dev/null 2>&1 \
-	&& cd /tmp \
-	&& rm -Rf breakpad
+   && git clone --depth=1 https://github.com/google/breakpad.git \
+   && cd breakpad \
+   && git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
+   && ./configure --prefix=/usr/local  \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -Rf breakpad
 
 RUN cd /opt \
    && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
-
 ENV  PATH /opt/depot_tools:$PATH
 
-ARG GST_VERSION=1.14.0
-# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
 RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
-    && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gstreamer-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
+    && git clone https://git.videolan.org/git/x264.git \
+    && cd x264 \
+    && ./configure --prefix=/usr --bit-depth=all --chroma-format=all --enable-pic --enable-shared \
+    && make \
+    && make install \
+    && cd /tmp \
+    && rm -rf x264
 
-# gst-plugins-base
 RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-base-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
+	&& git clone https://github.com/FFmpeg/FFmpeg.git \
+    && cd FFmpeg \
+		./configure \
+			--prefix=/usr/local \
+			--disable-debug \
+			--disable-doc \
+			--disable-ffplay \
+			--enable-shared \
+			--enable-decoder=h264 \
+			--enable-encoder=ac3 \
+			--enable-encoder=eac3 \
+			--enable-encoder=mp2 \
+			--enable-encoder=mpeg2video \
+    && make |& grep -E "warning|error|Making|Configuring|written|Scanning|Linking" \
+    && make install \
+    && cd /tmp  \
+    && rm -rf FFmpeg
 
-# libnice
+# Clone the other GStreamer modules as meson subprojects and build everything in one go.
 RUN cd /tmp \
-    && git clone https://github.com/libnice/libnice.git \
-    && cd libnice \
-    && ./autogen.sh --prefix=/usr \
-      --with-gstreamer --enable-static --enable-static-plugins \
-      --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
+	&& git clone https://github.com/GStreamer/gst-build.git\
+    && cd gst-build \
+    && meson build --prefix=/usr/local \
+    && ninja -C build \
+    && ninja -C build install \
+    && cd /tmp \
+    && rm -rf gst-build
 
-# gst-plugins-good
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-good-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
-
-# gst-plugins-bad
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-bad-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
-
-# gst-plugins-ugly
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-ugly-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/
-
-# gst-rtsp-server
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-rtsp-server-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/ \
-    rm -rf gst*
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get -qq install --assume-yes --no-install-recommends nodejs
@@ -459,7 +483,6 @@ ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
 ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
 ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
-COPY qt-installer-noninteractive.qs /tmp
 COPY qt-installer-script.qs /tmp
 
 # COPY qt-opensource-linux-x64-${Q_VERSION}.run /tmp
@@ -467,27 +490,74 @@ COPY qt-installer-script.qs /tmp
 
 RUN cd /tmp \
    && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-   && chmod +x ./qt-installer-noninteractive.qs \
    && chmod +x ./qt-installer-script.qs \
-   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \   
+   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
-   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run
+   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
 
 ENV QT_INSTALL_DIR=/opt/qt
 ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
 ENV CMAKE_PREFIX_PATH=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
 ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
+# ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
+# ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
+
+RUN cd /tmp \
+	&& https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
+	&& tar xjvf qwt-6.1.4.tar.bz2 \
+	&& cd qwt-6.1.4 \
+	&& qmake qwt.pro \
+	&& make |& grep -E "warning|error|Making|Configuring|written|Scanning|Linking" \
+	&& make install DESTDIR=/usr/local \
+	&& cd /tmp \
+	&& rm -rf qwt-6.1.4.tar.bz2 qwt-6.1.4
+
+RUN cd /tmp \
+	&& curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
+	&& tar -xzf gsl-2.6.tar.gz \
+	&& cd gsl-2.6 \
+	&& ./autogen.sh \
+	&& ./configure --enable-maintainer-mode --prefix=/usr/local \
+	&& make -j `nproc` |& grep -E "warning|error|Making" \
+	&& make install > /dev/null 2>&1 \
+	&& cd /tmp \
+	&& rm -rf gsl-2.6.tar.gz gsl-2.6
 
 RUN cd /tmp \
    && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
    && cd eigen-git-mirror \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS="-std=c++11" \
+      -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS="-std=c++11" \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install || true \
    && cd /tmp/ \
    && rm -Rf eigen-git-mirror
+
+RUN cd /tmp \
+	&& git clone --depth=1  https://github.com/ginkgo-project/ginkgo.git \
+	&& cd ginkgo \
+	&& cmake -E make_directory build \
+	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DGINKGO_BUILD_TESTS=OFF -DGINKGO_BUILD_EXAMPLES=OFF \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DGINKGO_DEVEL_TOOLS=OFF -DGINKGO_BUILD_REFERENCE=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+	&& cmake --build build --target install > /dev/null 2>&1 \
+	&& cd /tmp \
+	&& rm -rf ginkgo
+
+RUN cd /tmp \
+	&& git clone --depth=1  https://github.com/dealii/dealii.git \
+	&& cd dealii \
+	&& cmake -E make_directory build \
+	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_BUILD_TYPE=Release \
+	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+	&& cmake --build build --target install > /dev/null 2>&1 \
+	&& cd /tmp \
+	&& rm -rf dealii
 
 RUN cd /tmp \
    && git clone  --depth=1 https://github.com/CGAL/cgal.git \
@@ -503,49 +573,23 @@ RUN cd /tmp \
    && cd /tmp/ \
    && rm -Rf cgal
 
-# RUN cd /tmp \
-# 	&& git clone git://git.linuxtv.org/v4l-utils.git \
-# 	&& cd v4l-utils \
-# 	&& autoreconf -vfi \
-# 	&& ./configure --prefix=/usr \
-#     && make > /dev/null 2>&1 \
-#     && make install > /dev/null 2>&1 \
-#     && cd /tmp/ \
-#     && rm -Rf v4l-utils
+RUN cd /tmp \
+   && git clone  --depth=1 git://git.linuxtv.org/v4l-utils.git \
+   && cd v4l-utils \
+   && autoreconf -vfi \
+   && ./configure --prefix=/usr > /dev/null 2>&1 \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp/ \
+   && rm -Rf v4l-utils
 
-# RUN cd /tmp \
-# 	&& git clone --depth=1 https://github.com/opencv/opencv.git \
-#     && cd opencv \
-# 	&& git clone --depth=1 https://github.com/opencv/opencv_contrib.git \
-#     && cmake -E make_directory build \
-#     && cmake -E chdir build cmake -D CMAKE_BUILD_TYPE=RELEASE \
-#       -D INSTALL_C_EXAMPLES=ON \
-#       -D INSTALL_PYTHON_EXAMPLES=ON \
-#       -D WITH_TBB=ON \
-#       -D WITH_V4L=ON \
-#       -D OPENCV_PYTHON3_INSTALL_PATH=/usr/opencv-py3/lib/python3.5/site-packages \
-#       -D WITH_QT=ON \
-#       -D WITH_OPENGL=ON \
-#       -D OPENCV_EXTRA_MODULES_PATH=../opencv/opencv_contrib/modules \
-#       -D BUILD_EXAMPLES=ON \
-#       -DCMAKE_INSTALL_PREFIX=/usr/opencv \
-#     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-#     && cmake --build build --target install || true \
-#     && cd /tmp \
-#     && rm -Rf opencv
 
-RUN cd /tmp/ \
-# kept OpenSSL_1_0_2 for compatibility with the one provided by RTI (openssl-1.0.2n-5.3.1-host-x64Linux.rtipkg)
-    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
-    && cd openssl \
-#    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
-    && ./config --prefix=/usr  \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
-    && cd /tmp/ \
-    && rm -rvf openssl
+RUN echo -e '\033[36;1m *******  To avoid RTI license violation.... ******** \033[0m'
+RUN echo -e '\033[36;1m *******  Refert to below commented section ******** \033[0m'
+RUN echo -e '\033[36;1m *******  to crreate an efficient development environment of.******** \033[0m'
+RUN echo -e '\033[36;1m *******  RTI Connext DDS Professional.******** \033[0m'
 
-ARG RTI_DDS_VERSION=6.0.0
+# ARG RTI_DDS_VERSION=6.0.0
 
 # COPY src/main/resources/docker/amd64/rti/packages/rti_connext_dds-${RTI_DDS_VERSION}-pro-host-x64Linux.run /tmp/
 # COPY src/main/resources/docker/amd64/rti/packages/rti_license.dat /opt/rti_connext_dds-${RTI_DDS_VERSION}/
@@ -565,58 +609,53 @@ ARG RTI_DDS_VERSION=6.0.0
 # ENV LD_LIBRARY_PATH=/opt/rti_connext_dds-${RTI_DDS_VERSION}/lib/${AMD_PREFIX}
 
 # RUN [ -z "$CI_DOMAIN" ] \
-#     && cd /tmp/ \
-#     && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-#     && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux3gcc5.4.0.rtipkg \
-#     && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux3gcc5.4.0.rtipkg \
-#     && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-#     && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux3gcc5.4.0.rtipkg \
-#     && rtipkginstall -unattended rti_limited_bandwidth_plugins_host-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_web_integration_service-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_security_plugins-6.0.0-host-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_database_integration-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_tls_host_support-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Windows.rtipkg \
-#     && rtipkginstall -unattended openssl-1.0.2o-6.0.0-host-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_secure_wan_host-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_queuing_service-6.0.0-x64Linux.rtipkg \
-#     && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Unix.rtipkg \
+    # && cd /tmp/ \
+    # && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux3gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux3gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux3gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_limited_bandwidth_plugins_host-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_web_integration_service-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_security_plugins-6.0.0-host-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_database_integration-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_tls_host_support-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Windows.rtipkg \
+    # && rtipkginstall -unattended openssl-1.0.2o-6.0.0-host-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_secure_wan_host-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_queuing_service-6.0.0-x64Linux.rtipkg \
+    # && rtipkginstall -unattended rti_connext_dds_micro-3.0.0-Unix.rtipkg \
     # && rtipkginstall -unattended rti_limited_bandwidth_plugins-6.0.0-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_security_plugins-6.0.0-target-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_tls_support-6.0.0-x64Linux4gcc7.3.0.rtipkg \
     # && rtipkginstall -unattended rti_secure_wan-6.0.0-x64Linux4gcc7.3.0.rtipkg \
-   #  && rtipkginstall -unattended rti_security_plugins-6.0.0-target-armv8Linux4.4gcc5.4.0.rtipkg \
-   #  && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
-   #  && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
-   #  && rm -rvf /tmp/*.rtipkg \
-   #  || :
+    # && rtipkginstall -unattended rti_security_plugins-6.0.0-target-armv8Linux4.4gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_connext_dds-6.0.0-pro-target-armv8Linux4.4gcc5.4.0.rtipkg \
+    # && rtipkginstall -unattended rti_tls_support-6.0.0-armv8Linux4.4gcc5.4.0.rtipkg \
+    # && rm -rvf /tmp/*.rtipkg \
+    # || :
 
 # RUN [ -z "$CI_DOMAIN" ] \
-#     && cd /tmp/ \
+    # && cd /tmp/ \
     # && mkdir -pv /opt/rti_connext_openssl/{target-x64Linux3gcc5.4.0,target-x64Linux4gcc7.3.0,target-armv8Linux4.4gcc5.4.0} \
-   #  && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
-   #  && mkdir -pv /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 \
-   #  && mkdir -pv /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 \
-   #  && tar -zvxf openssl-1.0.2o-target-armv8Linux4.4gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 --strip-components=1 \
+    # && mkdir -pv /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 \
+    # && mkdir -pv /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 \
+    # && mkdir -pv /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 \
+    # && tar -zvxf openssl-1.0.2o-target-armv8Linux4.4gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-armv8Linux4.4gcc5.4.0 --strip-components=1 \
     # && tar -zvxf openssl-1.0.2o-target-x64Linux4gcc7.3.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux4gcc7.3.0 --strip-components=1 \
-   #  && tar -zvxf openssl-1.0.2o-target-x64Linux3gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 --strip-components=1 \
-   #  && rm -rvf /tmp/*.tar.gz \
-   #  || :
+    # && tar -zvxf openssl-1.0.2o-target-x64Linux3gcc5.4.0.tar.gz -C /opt/rti_connext_openssl/target-x64Linux3gcc5.4.0 --strip-components=1 \
+    # && rm -rvf /tmp/*.tar.gz \
+    # || :
 
-
-RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
-   --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
-
-RUN chmod 1777 -R /tmp
-
-USER $ACCOUNT
-
-WORKDIR /home/$ACCOUNT
+RUN adduser --system --home /home/developer --shell /bin/bash --gecos GECOS \
+	--group --disabled-password developer
+USER developer
+WORKDIR /home/developer
 
 # ENTRYPOINT rtilauncher
 # ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
 # CMD ["-cfgFile","/config.xml","-cfgName","gets_persistence"]
 
-CMD ["/bin/bash"]
+CMD ["fortune"]
 

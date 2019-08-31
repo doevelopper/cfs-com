@@ -25,9 +25,6 @@
 ARG BASE_IMAGE=amd64/ubuntu:19.04
 FROM $BASE_IMAGE
 
-ARG ACCOUNT=developer
-ARG LOG_OUTPUT
-
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -40,16 +37,15 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         gawk vim vim-nox texinfo emacs25 gtk-doc-tools autogen autogen-doc \
         python-pip python-dev python-wheel cython python-setuptools \
         python3-pip python3-dev python3-wheel cython3 python3-setuptools \
-        ruby ruby-dev libjpeg-dev libudev libudev-dev \
+        ruby ruby-dev libjpeg-dev libudev-dev \
         libglib2.0-dev libglib2.0-bin libglib2.0-0 \
-        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev\
+        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
         libperl-dev perl perl-base perl-modules \
         yasm nasm xotcl-dev tcl-expect-dev tcl-dev \
-		libpulse-dev libva-dev libxv-dev \
+		libpulse-dev libva-dev libxv-dev libelf-dev  elfutils libelf1 \
         libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
 		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
-        > /dev/null 2>&1 \
-   # && mkdir -pv /var/run/dbus \
+		display-dhammapada fortunes \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
@@ -302,10 +298,8 @@ RUN cd /tmp \
    && cd afl-2.52b \
    && make clean  > /dev/null 2>&1\
    && make > /dev/null 2>&1 \
-   && make DESTDIR=/opt/afl \
-         BINDIR=/opt/afl/bin \
-         DATAROOTDIR=/opt/afl/share \
-         LIBDIR=/opt/afl/lib install  \
+#   && make DESTDIR=/opt/afl  BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
+   && make DESTDIR=/usr/local
    && cd /tmp \
    && rm -rf afl-2.52b* american-fuzzy-lop
 
@@ -558,7 +552,7 @@ RUN cd /tmp \
 	&& rm -rf ginkgo
 
 RUN cd /tmp \
-	&& git clone --depth=1  https://github.com/dealii/dealii.git
+	&& git clone --depth=1  https://github.com/dealii/dealii.git \
 	&& cd dealii \
 	&& cmake -E make_directory build \
 	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
@@ -642,22 +636,18 @@ RUN echo -e '\033[36;1m ******* ADD USER ******** \033[0m'
 # Add a new user  '$ACCOUNT' with ID 1000
 # Add $ACCOUNT to sudoers list with no password required
 # Make 'bash' the default shell for everyone
+
 RUN set -ex    cut -d: -f1 /etc/group
 RUN set -ex    cut -d: -f1 /etc/passwd
-RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
-   --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
-# Anyone in the $ACCOUNT group have read/write/execute permissions in the '/usr/local' path
-# Others have read/execute permissions
-# RUN chown -R ${ACCOUNT}s:${ACCOUNT} /home/${ACCOUNT}
-#RUN chown -R $ACCOUNT:${ACCOUNT} /usr/local && chmod -R 775 /usr/local
-# So $ACCOUNT can write to temp folder
-RUN chmod 1777 -R /tmp
-USER $ACCOUNT
-WORKDIR /home/$ACCOUNT
+RUN adduser --system --home /home/developer --shell /bin/bash --gecos GECOS \
+	--group --disabled-password developer
+USER developer
+WORKDIR /home/developer
+
 
 RUN echo -e '\033[36;1m ******* CONTAINER START COMMAND ******** \033[0m'
 
-CMD ["/bin/bash"]
+CMD ["fortune"]
 
 
 # RUN cd /tmp \
