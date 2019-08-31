@@ -299,7 +299,7 @@ RUN cd /tmp \
    && make clean  > /dev/null 2>&1\
    && make > /dev/null 2>&1 \
 #   && make DESTDIR=/opt/afl  BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
-   && make DESTDIR=/usr/local
+   && make DESTDIR=/usr/local \
    && cd /tmp \
    && rm -rf afl-2.52b* american-fuzzy-lop
 
