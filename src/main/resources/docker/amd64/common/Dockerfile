@@ -480,11 +480,17 @@ RUN cd /tmp \
     # && cd /tmp  \
     # && rm -rf ffmpeg-4.2 ffmpeg-4.2.tar.xz
 
+
+
+
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
 RUN cd /tmp \
 	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git \
     && cd gst-build \
-    && meson --prefix=/usr/local -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
+    && meson --prefix=/usr/local
+        -Dpython=enabled -Dlibav=enabled -Dugly=enabled -Dbad=enabled -Ddevtools=enabled \
+        -Dges=enabled -Drtsp_server=enabled -Dvaapi=enabled -Dsharp=disabled \
+        -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
     && PYTHONIOENCODING=utf-8 ninja -C build \
     && PYTHONIOENCODING=utf-8 ninja -C build install \
     && cd /tmp \
