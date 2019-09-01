@@ -453,7 +453,7 @@ RUN cd /tmp \
 	# && make install PREFIX=/usr/local \
 	# && cd /tmp \
 	# && rm -rf openh264
-	
+
 ##&& git clone https://github.com/FFmpeg/FFmpeg.git \
 # RUN cd /tmp \
 	# && curl -L -O -k https://ffmpeg.org/releases/ffmpeg-4.2.tar.xz \
@@ -484,9 +484,9 @@ RUN cd /tmp \
 RUN cd /tmp \
 	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git \
     && cd gst-build \
-    && meson --prefix=/usr/local -Dtests=disabled -Dgtk_doc=disabled build/ \
-    && ninja -C build \
-    && ninja -C build install \
+    && meson --prefix=/usr/local -Dtests=disabled -Ddoc=false -Dgtk_doc=disabled build/ \
+    && PYTHONIOENCODING=utf-8 ninja -C build \
+    && PYTHONIOENCODING=utf-8 ninja -C build install \
     && cd /tmp \
     && rm -rf gst-build
 

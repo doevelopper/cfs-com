@@ -482,14 +482,14 @@ RUN cd /tmp \
 #    && rm -rf ffmpeg-4.2 ffmpeg-4.2.tar.xz
 
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
-RUN cd /tmp \
-	&& git clone https://github.com/GStreamer/gst-build.git\
-    && cd gst-build \
-    && meson --prefix=/usr/local -Dtests=disabled -Dgtk_doc=disabled build/ \
-    && ninja -C build \
-    && ninja -C build install \
-    && cd /tmp \
-    && rm -rf gst-build
+#RUN cd /tmp \
+#	&& git clone https://github.com/GStreamer/gst-build.git\
+#    && cd gst-build \
+#    && meson --prefix=/usr/local -Dtests=disabled -Ddoc=false -Dgtk_doc=disabled build/ \
+#    && PYTHONIOENCODING=utf-8 ninja -C build \
+#    && PYTHONIOENCODING=utf-8 ninja -C build install
+#    && cd /tmp \
+#    && rm -rf gst-build
 
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
