@@ -331,8 +331,7 @@ RUN cd /tmp \
 #    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
    && cd openssl \
-#    && ./config --prefix=/usr shared enable-ec enable-ecdh enable-ecdsa \
-#    && ./config --prefix=/usr  \
+#    && ./config --prefix=/usr/local shared enable-ec enable-ecdh enable-ecdsa \
    && ./config --prefix=/usr/local shared  \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
@@ -343,7 +342,7 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/protocolbuffers/protobuf.git \
    && cd protobuf \
    && ./autogen.sh > /dev/null 2>&1  \
-   && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --enable-silent-rules --prefix=/usr/ \
+   && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --enable-silent-rules --prefix=/usr/local \
    # && ./configure --prefix=/usr/local  \
    && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
@@ -441,7 +440,7 @@ ENV  PATH /opt/depot_tools:$PATH
 RUN cd /tmp \
     && git clone https://git.videolan.org/git/x264.git \
     && cd x264 \
-    && ./configure --prefix=/usr --bit-depth=all --chroma-format=all --enable-pic --enable-shared \
+    && ./configure --prefix=/usr/local --bit-depth=all --chroma-format=all --enable-pic --enable-shared \
     && make \
     && make install \
     && cd /tmp \
@@ -483,9 +482,9 @@ RUN cd /tmp \
 
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
 RUN cd /tmp \
-	&& git clone https://github.com/GStreamer/gst-build.git\
+	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git \
     && cd gst-build \
-    && meson build --prefix=/usr/local \
+    && meson --prefix=/usr/local -Dtests=disabled -Dgtk_doc=disabled build/ \
     && ninja -C build \
     && ninja -C build install \
     && cd /tmp \
@@ -543,7 +542,7 @@ RUN cd /tmp \
 	&& rm -rf gsl-2.6.tar.gz gsl-2.6
 
 RUN cd /tmp \
-   && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
+   && git clone --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
    && cd eigen-git-mirror \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
@@ -596,7 +595,7 @@ RUN cd /tmp \
    && git clone  --depth=1 git://git.linuxtv.org/v4l-utils.git \
    && cd v4l-utils \
    && autoreconf -vfi \
-   && ./configure --prefix=/usr > /dev/null 2>&1 \
+   && ./configure --prefix=/usr/local > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
    && cd /tmp/ \

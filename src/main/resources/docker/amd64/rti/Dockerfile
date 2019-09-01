@@ -484,7 +484,7 @@ RUN cd /tmp \
 RUN cd /tmp \
 	&& git clone https://github.com/GStreamer/gst-build.git\
     && cd gst-build \
-    && meson build --prefix=/usr/local \
+    && meson --prefix=/usr/local -Dtests=disabled -Dgtk_doc=disabled build/ \
     && ninja -C build \
     && ninja -C build install \
     && cd /tmp \
