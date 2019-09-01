@@ -45,6 +45,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
 		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
 		display-dhammapada fortunes \
+        libc6-dev \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
