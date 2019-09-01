@@ -520,7 +520,7 @@ ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 # ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 RUN cd /tmp \
-	&& https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
+	&& curl -L -O -k https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
 	&& tar xjvf qwt-6.1.4.tar.bz2 \
 	&& cd qwt-6.1.4 \
 	&& qmake qwt.pro \
