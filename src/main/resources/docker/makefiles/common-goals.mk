@@ -49,11 +49,10 @@ BUILD_ARGS          += --build-arg ACCOUNT=$(DTR_NAMESPACE)
 TTY_LOG             ?= "${MODULE}_build_output.log 2>&1"
 ifneq ($(CI_RUNNER_TAGS),)
     TTY_LOG         := "/dev/null 2>&1"
-    CI_DOMAIN       := "YES"
 endif
 
 BUILD_ARGS          += --build-arg LOG_OUTPUT=$(TTY_LOG)
-BUILD_ARGS          += --build-arg CI_DOMAIN=$(CI_DOMAIN)
+BUILD_ARGS          += --build-arg CI_DOMAIN=$(CI_RUNNER_TAGS)
 
 ifneq ($(DDS_DEV_IMAGE),)
     BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
@@ -87,7 +86,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee ${MODULE}_build_output.log
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee $(shell basename $(CURDIR))_build_output.log
 	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push

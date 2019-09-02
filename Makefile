@@ -35,9 +35,9 @@ export APP_BASE_IMAGE_NAME := ${DOCKER_TRUSTED_REGISTRY}/${DTR_NAMESPACE}/${PROJ
 
 ifneq ($(DOCKER_TRUSTED_REGISTRY),)
     ifneq ($(ARCH),)
-        BASE_IMAGE := $(ARCH)/ubuntu:19.04
+        BASE_IMAGE         := $(ARCH)/ubuntu:19.04
         ifeq ($(PLATFORM),RTI)
-        	BASE_IMAGE := $(ARCH)/ubuntu:18.04
+        	BASE_IMAGE     := $(ARCH)/ubuntu:18.04
         endif
     else
         $(error ERROR - unsupported value $(ARCH) for target arch!)

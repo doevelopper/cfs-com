@@ -54,15 +54,15 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
 
 ARG MAKEFLAGS
 
-RUN cd /tmp \
-   && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
-   && tar -xzf gdb-8.3.tar.gz \
-   && cd gdb-8.3 \
-   && ./configure --prefix=/usr/local \
-   && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
-   && cd /tmp \
-   && rm -rf gdb-8.3.tar.gz gdb-8.3
+# RUN cd /tmp \
+   # && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   # && tar -xzf gdb-8.3.tar.gz \
+   # && cd gdb-8.3 \
+   # && ./configure --prefix=/usr/local \
+   # && make > /dev/null 2>&1 \
+   # && make install > /dev/null 2>&1 \
+   # && cd /tmp \
+   # && rm -rf gdb-8.3.tar.gz gdb-8.3
 
 ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
 ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
@@ -202,7 +202,6 @@ RUN cd /tmp \
    && cd gflags \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-#       # -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DGFLAGS_BUILD_TESTING=ON \
        -DCMAKE_CONFIGURATION_TYPES=Release -DGFLAGS_BUILD_TESTING=OFF \
        -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
@@ -343,7 +342,6 @@ RUN cd /tmp \
    && cd protobuf \
    && ./autogen.sh > /dev/null 2>&1  \
    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --enable-silent-rules --prefix=/usr/local \
-   # && ./configure --prefix=/usr/local  \
    && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
@@ -356,9 +354,9 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
    && tar -xzf xerces-c-3.2.2.tar.gz \
    && cd xerces-c-3.2.2/ \
    && ./configure --prefix=/usr/local \
-           --enable-static --enable-shared --enable-netaccessor-socket \
-           --enable-transcoder-gnuiconv --enable-transcoder-iconv \
-           --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t  \
+        --enable-static --enable-shared --enable-netaccessor-socket \
+        --enable-transcoder-gnuiconv --enable-transcoder-iconv \
+        --enable-msgloader-inmemory --enable-xmlch-uint16_t --enable-xmlch-char16_t  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
@@ -480,23 +478,6 @@ RUN cd /tmp \
     # && cd /tmp  \
     # && rm -rf ffmpeg-4.2 ffmpeg-4.2.tar.xz
 
-
-
-
-# Clone the other GStreamer modules as meson subprojects and build everything in one go.
-RUN cd /tmp \
-	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git \
-    && cd gst-build \
-    && meson --prefix=/usr/local
-        -Dpython=enabled -Dlibav=enabled -Dugly=enabled -Dbad=enabled -Ddevtools=enabled \
-        -Dges=enabled -Drtsp_server=enabled -Dvaapi=enabled -Dsharp=disabled \
-        -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
-    && PYTHONIOENCODING=utf-8 ninja -C build \
-    && PYTHONIOENCODING=utf-8 ninja -C build install \
-    && cd /tmp \
-    && rm -rf gst-build
-
-
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get -qq install --assume-yes --no-install-recommends nodejs
 
@@ -505,15 +486,19 @@ ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
 ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
 ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
 
-COPY qt-installer-noninteractive.qs /tmp
 COPY qt-installer-script.qs /tmp
 
-# COPY qt-opensource-linux-x64-${Q_VERSION}.run /tmp
+COPY qt-opensource-linux-x64-${Q_VERSION}.run* /tmp
 # RUN objdump -p ./qt-opensource-linux-x64-${Q_VERSION}.run | grep NEEDED
 
 RUN cd /tmp \
-   && curl -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
-   && chmod +x ./qt-installer-noninteractive.qs \
+    && if [[ -n $CI_DOMAIN ]]; then \
+			curl -k -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run"; \
+		else \
+			: ; \
+		fi
+
+RUN cd /tmp \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
@@ -535,6 +520,27 @@ RUN cd /tmp \
 	&& make install DESTDIR=/usr/local \
 	&& cd /tmp \
 	&& rm -rf qwt-6.1.4.tar.bz2 qwt-6.1.4
+
+# Clone the other GStreamer modules as meson subprojects and build everything in one go.
+RUN cd /tmp \
+	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git
+
+RUN apt-get -qq install --assume-yes --no-install-recommends \
+        apt-utils gettext
+
+RUN cd /tmp \
+    && cd gst-build \
+    && meson --prefix=/usr/local \
+        -Dpython=enabled -Dlibav=enabled -Dugly=enabled -Dbad=enabled -Ddevtools=enabled \
+        -Dges=enabled -Drtsp_server=enabled -Dvaapi=enabled -Dsharp=disabled \
+        -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
+		-Dintrospection=disabled -Dexamples=disabled -Dbenchmarks=disabled \
+		-Dcpp_std=c++11 \
+		-Dorc=disabled \
+    && PYTHONIOENCODING=utf-8 ninja -C build \
+    && PYTHONIOENCODING=utf-8 ninja -C build install \
+    && cd /tmp \
+    && rm -rf gst-build
 
 RUN cd /tmp \
 	&& curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
