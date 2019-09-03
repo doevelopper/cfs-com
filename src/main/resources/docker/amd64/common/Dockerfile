@@ -528,19 +528,97 @@ RUN cd /tmp \
 RUN apt-get -qq install --assume-yes --no-install-recommends \
         apt-utils gettext
 
+# RUN cd /tmp \
+    # && cd gst-build \
+    # && meson --prefix=/usr/local \
+        # -Dpython=enabled -Dlibav=enabled -Dugly=enabled -Dbad=enabled -Ddevtools=enabled \
+        # -Dges=enabled -Drtsp_server=enabled -Dvaapi=enabled -Dsharp=disabled \
+        # -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
+		# -Dintrospection=disabled -Dexamples=disabled -Dbenchmarks=disabled \
+		# -Dcpp_std=c++11 \
+		# -Dorc=disabled \
+        # -Dgst-python:python=/usr/bin/python3.7 \
+        # -Dpygobject=enabled \
+        # -Dpygobject:python=/usr/bin/python3.7 \
+        # -Dpygobject:pycairo=false \
+        # -Dgobject-introspection:python=/usr/bin/python3.7 \
+    # && PYTHONIOENCODING=utf-8 ninja -C build \
+    # && PYTHONIOENCODING=utf-8 ninja -C build install \
+    # && cd /tmp \
+    # && rm -rf gst-build
+
+ARG GST_VERSION=1.16.0
+
+# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
 RUN cd /tmp \
-    && cd gst-build \
-    && meson --prefix=/usr/local \
-        -Dpython=enabled -Dlibav=enabled -Dugly=enabled -Dbad=enabled -Ddevtools=enabled \
-        -Dges=enabled -Drtsp_server=enabled -Dvaapi=enabled -Dsharp=disabled \
-        -Dtests=disabled -Ddoc=disabled -Dgtk_doc=disabled build/ \
-		-Dintrospection=disabled -Dexamples=disabled -Dbenchmarks=disabled \
-		-Dcpp_std=c++11 \
-		-Dorc=disabled \
-    && PYTHONIOENCODING=utf-8 ninja -C build \
-    && PYTHONIOENCODING=utf-8 ninja -C build install \
-    && cd /tmp \
-    && rm -rf gst-build
+    && curl -L -O -k  https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
+    && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gstreamer-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make -j`nproc` \
+    && make install  \
+    && cd /tmp/
+
+# gst-plugins-base
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-base-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/
+
+# libnice
+RUN cd /tmp \
+    && git clone https://github.com/libnice/libnice.git \
+    && cd libnice \
+    && ./autogen.sh --prefix=/usr \
+      --with-gstreamer --enable-static --enable-static-plugins \
+      --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
+    && make install  \
+    && cd /tmp/
+
+# gst-plugins-good
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-good-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/
+
+# gst-plugins-bad
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-bad-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/
+
+# gst-plugins-ugly
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-plugins-ugly-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/
+
+# gst-rtsp-server
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-rtsp-server-${GST_VERSION} \
+    && ./configure --prefix=/usr --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/ \
+    rm -rf gst*
 
 RUN cd /tmp \
 	&& curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
@@ -674,7 +752,7 @@ WORKDIR /home/developer
 
 RUN echo -e '\033[36;1m ******* CONTAINER START COMMAND ******** \033[0m'
 
-CMD ["fortune"]
+CMD ["/bin/bash"]
 
 
 # RUN cd /tmp \
