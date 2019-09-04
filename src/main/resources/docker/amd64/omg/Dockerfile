@@ -24,27 +24,30 @@
 ARG DDS_DEV_IMAGE=docker.io/doevelopper/cfs-com-common:latest
 FROM $DDS_DEV_IMAGE
 
-ARG OPENDDS_BUILD_OPTIONS="-std=c++11 --ipv6 --openssl --xerces3=/usr/local --java --rapidjson --glib --boost=/usr"
-ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --macros=c++11=1 --no-debug --optimize"
-ARG DDS_BUILD_CONFIG_OPTIONS="--security --safety-profile=base --cmake=/opt/cmake/bin/"
-ARG DDS_SAFETY_BASE_NO_BUILTIN_TOPICS="--safety-profile=base --no-built-in-topics"
-ARG DDS_SECURITY="--security --features=versioned_namespace=1"
-# ARG DDS_WITHOUTFEATURES "--no-inline --no-debug --no-built-in-topics --no-content-subscription --no-ownership-profile --no-object-model-profile --no-persistence-profile --security"
-ARG DDS_BUILD_MACRO="--macros=c++11=1"
-ARG DDS_BUILD_MACRO_1="--macros=CPPFLAGS+=-Wno-deprecated -Wno-unused-result"
-ARG DDS_BUILD_MACRO_2="--macros=CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result"
-ARG DDS_BUILD_SECURITY_OPTIONS="--security --safety-profile=base"
-ARG DDS_BUILD_QT_OPTIONS="--qt --wireshark=/usr/local/include/wireshark/"
-
-ARG GET_DDS_VERSION="DDS-3.13-2"
-ARG DDS_SRCS_LINUX="https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.13.2/OpenDDS-3.13.2.tar.gz"
-ARG DDS_REPO="https://github.com/objectcomputing/OpenDDS.git"
+USER root
 
 RUN git config --global url."https://github.com/".insteadOf "git@github.com:"
 RUN git config --global url."https://".insteadOf git://
 #RUN git config --global url."https".insteadOf "git+https"
 
-# USER root
+ARG OPENDDS_BUILD_OPTIONS="--std=c++11 --ipv6 --openssl=/usr/local --xerces3=/usr/local --java --rapidjson --glib --boost=/usr/local"
+ARG OPENDDS_BUILD_CONFIG_OPTIONS="--no-tests --no-inline --macros=c++11=1 --no-debug --optimize"
+ARG DDS_BUILD_CONFIG_OPTIONS="--security --safety-profile=base --cmake=/opt/cmake/bin/"
+ARG DDS_SAFETY_BASE_NO_BUILTIN_TOPICS="--safety-profile=base --no-built-in-topics"
+ARG DDS_SECURITY="--security --features=versioned_namespace=1"
+ARG DDS_WITHOUTFEATURE="--no-inline --no-debug --no-built-in-topics --no-content-subscription --no-ownership-profile --no-object-model-profile --no-persistence-profile --security"
+ARG DDS_BUILD_MACRO="--macros=c++11=1"
+ARG DDS_BUILD_MACRO_1="--macros=CPPFLAGS+=-Wno-deprecated -Wno-unused-result"
+ARG DDS_BUILD_MACRO_2="--macros=CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result"
+ARG DDS_BUILD_SECURITY_OPTIONS="--security --safety-profile=base"
+ARG DDS_BUILD_QT_OPTIONS="--qt --wireshark=/usr/local/"
+
+ARG GET_DDS_VERSION="DDS-3.13-2"
+ARG DDS_SRCS_LINUX="https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.13.2/OpenDDS-3.13.2.tar.gz"
+ARG DDS_REPO="https://github.com/objectcomputing/OpenDDS.git"
+
+ARG DDS_BASE_DIR=/opt/dds
+ENV DDS_INSTALL_DIR=/opt/dds_install
 
 RUN cd /tmp \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/wireshark/wireshark.git \
@@ -56,21 +59,79 @@ RUN cd /tmp \
     cd /tmp \
     rm -Rf wireshark
 
-ENV DDS_BASE_DIR=/opt/dds
-
-
-RUN cd /tmp \
-    && git clone --depth=1 https://github.com/DOCGroup/CIAO.git \
-    && git clone --depth=1 https://github.com/DOCGroup/DAnCE.git \
-    && git clone --depth=1 https://github.com/DOCGroup/MPC.git \
-    && git clone --depth=1 git://github.com/DOCGroup/ACE_TAO.git \
+RUN mkdir -pv ${DDS_BASE_DIR} \
+    && cd ${DDS_BASE_DIR} \
+    && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/MPC.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/ACE_TAO.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/CIAO.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/DAnCE.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/XSC.git \
     && git clone --depth=1 --recurse-submodules https://github.com/objectcomputing/OpenDDS.git \
-    && export ACE_TAO_ROOT=/tmp/ACE_TAO \
+    && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-rtps.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-xtypes.git \
+    && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-security.git \
+    && git clone --depth=1 https://github.com/RemedyIT/dancex11.git \
+    && git clone --depth=1 https://github.com/RemedyIT/ciaox11.git
+
+RUN cd ${DDS_BASE_DIR} \
+    && cd XSC \
+    && export ACE_TAO_ROOT=${DDS_BASE_DIR}/ACE_TAO \
     && export ACE_ROOT=$ACE_TAO_ROOT/ACE \
     && export TAO_ROOT=$ACE_TAO_ROOT/TAO \
-    && export CIAO_ROOT=/tmp/CIAO \
-    && export DANCE_ROOT=/tmp/DAnCE \
-    && export MPC_ROOT=/tmp/MPC \
+    && export CIAO_ROOT=${DDS_BASE_DIR}/CIAO \
+    && export DANCE_ROOT=${DDS_BASE_DIR}/DAnCE \
+    && export MPC_ROOT=${DDS_BASE_DIR}/MPC \
+    && export XSC_ROOT=${DDS_BASE_DIR}/XSC \
+    && export LD_LIBRARY_PATH=$ACE_ROOT/lib:${XSC_ROOT}/XSC/utils:${XSC_ROOT}/lib:/usr/local/lib/:$LD_LIBRARY_PATH \
+    && echo "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
+    && echo "boost=1\nxsc=1\nxerces3=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    && echo "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    && echo "boost=1\nxerces3=1\nxsc=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    && echo "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    && cat $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    && cat $ACE_ROOT/ace/config.h \
+    && cat $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 2 XSC.mwc \
+    && mkdir -pv ${DDS_INSTALL_DIR}/XSC \
+    && make -j$(nproc) \
+    && INSTALL_PREFIX=${DDS_INSTALL_DIR}/XSC make install
+
+RUN cd ${DDS_BASE_DIR}/OpenDDS \
+    && ./configure --help \
+    && export ACE_TAO_ROOT=${DDS_BASE_DIR}/ACE_TAO \
+    && export ACE_ROOT=$ACE_TAO_ROOT/ACE \
+    && export TAO_ROOT=$ACE_TAO_ROOT/TAO \
+    && export CIAO_ROOT=${DDS_BASE_DIR}/CIAO \
+    && export DANCE_ROOT=${DDS_BASE_DIR}/DAnCE \
+    && export MPC_ROOT=${DDS_BASE_DIR}/MPC \
+    && export XSC_ROOT=${DDS_BASE_DIR}/XSC \
+    && export LD_LIBRARY_PATH=${DDS_BASE_DIR}/OpenDDS/lib:${DDS_BASE_DIR}/OpenDDS/build/target/lib:$ACE_ROOT/lib:$LD_LIBRARY_PATH \
+    && export LD_LIBRARY_PATH=$ACE_ROOT/lib:${XSC_ROOT}/XSC/utils:${XSC_ROOT}/lib:/usr/local/lib/:$LD_LIBRARY_PATH \
+    && ./configure --prefix=${DDS_INSTALL_DIR} \
+            ${OPENDDS_BUILD_OPTIONS} \
+            ${OPENDDS_BUILD_CONFIG_OPTIONS} \
+            ${OPENDDS_SECURITY_OPTIONS} \
+            ${OPENDDS_QT_OPTIONS} \
+            --cmake=/opt/cmake/bin/ \
+			--ace=$ACE_ROOT \
+			--tao=$TAO_ROOT \
+			--mpc=$MPC_ROOT \
+			--mpcopts="-workers 4" \
+            --features="uses_wchar=1" \
+            --features="versioned_namespace=1" \
+            --features="xerces3=1" \
+            --features="ssl=1" \
+            --macros="xerces3=1" \
+            --macros="ssl=1" \
+            --macros="c++11=1" \
+            --macros="CPPFLAGS+=-Wno-deprecated -Wno-unused-result" \
+            --macros="CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result" \
+            # --configh="#define ACE_FACE_SAFETY_BASE" \
+            # --configh="#include \"ace/config-linux.h\"" \
+    && ./tools/scripts/show_build_config.pl || true \
+    && make -j$(nproc) > /dev/null 2>&1 \
+    && make INSTALL_PREFIX=${DDS_INSTALL_DIR} install 
+
     # && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
 	# && echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
 	# && echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
@@ -81,88 +142,34 @@ RUN cd /tmp \
 	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
 	# && echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
 	# && echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-    && cd OpenDDS \
-    && ./configure --help \
-    && ./configure --prefix=${DDS_BASE_DIR} \
-            # ${OPENDDS_BUILD_OPTIONS} \
-            # ${OPENDDS_BUILD_CONFIG_OPTIONS} \
-            # ${DDS_SECURITY} \
-            --std=c++11 --verbose --ipv6 --java --qt --no-tests \
-            --xerces3 --wireshark --glib --rapidjson --boost\
-            --security --openssl --safety-profile=base\
-            --cmake=/opt/cmake/bin/ \
-            --wireshark=/usr/local/wireshark/include/ \
-            --ace=$ACE_ROOT \
-            --tao=$TAO_ROOT \
-            --mpc=$MPC_ROOT \
-            --configh="#define ACE_FACE_SAFETY_BASE" \
-            --configh="#include \"ace/config-linux.h\"" \
-            --mpcopts="-workers 4" \
-            --features="uses_wchar=1" \
-            --features="versioned_namespace=1" \
-            --features="xerces3=1" \
-            --features="ssl=1" \
-            --macros="xerces3=1" \
-            --macros="ssl=1" \
-            --macros="c++11=1" \
-            --macros="CPPFLAGS+=-Wno-deprecated -Wno-unused-result" \
-            --macros="CPPFLAGS+=-Wno-deprecated-declarations -Wno-implicit-fallthroug -Wno-unused-result" \
-    && ./tools/scripts/show_build_config.pl || true \
-    && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
-    && make > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1
 
-ENV ACE_TAO_ROOT=$DDS_BASE_DIR/ACE_TAO
-ENV ACE_ROOT=$ACE_TAO_ROOT/ACE
-ENV TAO_ROOT=$ACE_TAO_ROOT/TAO
-ENV CIAO_ROOT=$DDS_BASE_DIR/CIAO
-ENV DANCE_ROOT=$DDS_BASE_DIR/DAnCE
-ENV MPC_ROOT=$DDS_BASE_DIR/MPC
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ACE_ROOT/lib:$LD_LIBRARY_PATH
-ENV PATH="${PATH}:${ACE_ROOT}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-
-RUN cd /tmp \
-    && git clone --depth=1 https://github.com/DOCGroup/XSC.git \
-    && export ACE_ROOT=/tmp/build_dir/ACE_TAO/ACE/ \
-    && export MPC_ROOT=/tmp/build_dir/MPC \
-    && cd XSC \
-    && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 2 XSC.mwc \
-    && mkdir -pv ${DDS_BASE_DIR}/XSC \
-    && make > /dev/null 2>&1 \
-    && DESTDIR=${DDS_BASE_DIR}/XSC make install > /dev/null 2>&1
-
-RUN cd /tmp \
-    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-rtps.git \
-    && git clone --depth=1 --recurse-submodules  https://github.com/omg-dds/dds-xtypes.git \
-    && git clone --depth=1 --recurse-submodules https://github.com/omg-dds/dds-security.git \
-    && cd dds-security
-
-#https://github.com/RemedyIT/dancex11.git
-#https://github.com/RemedyIT/ciaox11.git
-#    && export CMAKE_INSTALL_PREFIX=/usr/
-#    && export QTDIR: /opt/Qt5.11.2/5.11.2/gcc_64
-
-RUN cd /tmp \
+RUN cd ${DDS_BASE_DIR} \
     && git clone --depth=1 --recursive https://github.com/objectcomputing/mFAST.git \
     && cd mFAST \
     && cmake -E make_directory build \
-    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local > /dev/null 2>&1 \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=${DDS_INSTALL_DIR}  \
     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
     && cmake --build build --target install > /dev/null 2>&1 \
-    && cd /tmp
+    && cd ${DDS_BASE_DIR}
 
-# ENV ACE_ROOT=/usr/local/share/ace \
-    # TAO_ROOT=/usr/local/share/tao \
-    # DDS_ROOT=/usr/local/share/dds \
-    # LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
+#ENV export CMAKE_INSTALL_PREFIX=/usr/
+ENV ACE_TAO_ROOT=${DDS_BASE_DIR}/ACE_TAO \
+    ACE_ROOT=$ACE_TAO_ROOT/ACE \
+    TAO_ROOT=$ACE_TAO_ROOT/TAO \
+    CIAO_ROOT=${DDS_BASE_DIR}/CIAO \
+    DANCE_ROOT=${DDS_BASE_DIR}/DAnCE \
+    MPC_ROOT=${DDS_BASE_DIR}/MPC \
+    XSC_ROOT=${DDS_BASE_DIR}/XSC \
+    LD_LIBRARY_PATH=${DDS_BASE_DIR}/OpenDDS/lib:${DDS_BASE_DIR}/OpenDDS/build/target/lib:$ACE_ROOT/lib:$LD_LIBRARY_PATH \
+    LD_LIBRARY_PATH=$ACE_ROOT/lib:${XSC_ROOT}/XSC/utils:${XSC_ROOT}/lib:/usr/local/lib/:$LD_LIBRARY_PATH  \
+    PATH="${PATH}:${ACE_ROOT}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-#ENV ACE_ROOT=/usr/local/share/ace \
-#    TAO_ROOT=/usr/local/share/tao \
-#    DDS_ROOT=/usr/local/share/dds \
-#    LD_LIBRARY_PATH=$ACE_ROOT/lib:$LD_LIBRARY_PATH \
-#    PATH=".:${PATH}:/usr/local/share/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#ENV ACE_ROOT=${DDS_INSTALL_DIR}/ace \
+#    TAO_ROOT=${DDS_INSTALL_DIR}/tao \
+#    DDS_ROOT=${DDS_INSTALL_DIR}/dds \
+#    PATH=".:${PATH}:${DDS_INSTALL_DIR}/ace/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-#RUN cd /root \
+#RUN cd ${DDS_BASE_DIR} \
 #    && git clone https://github.com/objectcomputing/liquibook.git \
 #    && cd liquibook/ \
 #    && git submodule init \
@@ -187,8 +194,7 @@ RUN cd /tmp \
 #    && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 6 travis.mwc \
 #    && make -j `nproc`
 
-# RUN cd /opt \
-	# && git clone --depth=1 https://github.com/DOCGroup/ACE_TAO.git \
+# RUN cd ${DDS_BASE_DIR} \
 	# && cd ACE_TAO \
 	# && export ACE_ROOT=/opt/ACE_wrappers \
 	# && export TAO_ROOT=$ACE_ROOT/TAO \
@@ -219,16 +225,4 @@ RUN cd /tmp \
 	# && make \
 	# && cd ..
 
-# setup virtual X server
-# RUN mkdir /tmp/.X11-unix \
-# 	&& chmod 1777 /tmp/.X11-unix \
-# 	&& chown -R root:root /tmp/.X11-unix
-# ENV DISPLAY :99
-
-ARG ACCOUNT
-ENV ACCOUNT ${ACCOUNT:-developer}
-RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
-USER $ACCOUNT
-
-WORKDIR /home/$ACCOUNT
 CMD ["/bin/bash"]

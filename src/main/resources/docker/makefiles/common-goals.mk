@@ -86,7 +86,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee $(shell basename $(CURDIR))_build_output.log
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee $(GIT_ROOTDIR)/$(shell basename $(CURDIR))_build_output.log
 	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push

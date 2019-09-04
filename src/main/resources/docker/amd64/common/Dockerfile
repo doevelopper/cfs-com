@@ -25,69 +25,92 @@
 ARG BASE_IMAGE=amd64/ubuntu:19.04
 FROM $BASE_IMAGE
 
+#docker build --build-arg PROXY=$HTTP_PROXY
+ARG PROXY
+ARG MAKEFLAGS
+ARG NOPROXY
+ARG http_proxy=$PROXY
+ARG https_proxy=$PROXY
+ARG no_proxy=$NOPROXY
+ARG HTTP_PROXY=$PROXY
+ARG HTTPS_PROXY=$PROXY
+ARG NO_PROXY=$NOPROXY
+ARG CMAKE_MAJOR_VERSION=${CMAKE_MAJOR_VERSION:-3.15}
+ARG CMAKE_VERSION=${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
+ARG MVN_VERSION=${MVN_VERSION:-3.6.1}
+ARG GRADLE_VERSION=${GRADLE_VERSION:-5.6.1}
+ARG BAZEL_VERSION=${BAZEL_VERSION:-0.29.0}
+ARG BOOST_VERSION_MAJ=1
+ARG BOOST_VERSION_MIN=69
+ARG BOOST_VERSION_PATCH=0
+ARG BOOST_VERSION=${BOOST_VERSION_MAJ}.${BOOST_VERSION_MIN}.${BOOST_VERSION_PATCH}
+ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
+ARG APR_VERSION=1.7.0
+ARG APU_VERSION=1.6.1
+ARG Q_MAJOR_VERSION=${Q_MAJOR_VERSION:-5.13}
+ARG Q_VERSION=${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+ARG QT_SHA_256=0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
+ARG T_MD5=c839aed9d551bdc8411a0a33e5ae46f3
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
     && apt-get -qq install --assume-yes --no-install-recommends \
-        ca-certificates apt-transport-https \
-        libtool autotools-dev autopoint autoconf automake make autoproject bison flex \
-        build-essential git xz-utils unzip wget curl openssh-server openssh-client \
-        gawk vim vim-nox texinfo emacs25 gtk-doc-tools autogen autogen-doc \
-        python-pip python-dev python-wheel cython python-setuptools \
-        python3-pip python3-dev python3-wheel cython3 python3-setuptools \
-        ruby ruby-dev libjpeg-dev libudev-dev \
-        libglib2.0-dev libglib2.0-bin libglib2.0-0 \
-        xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
-        libperl-dev perl perl-base perl-modules \
-        yasm nasm xotcl-dev tcl-expect-dev tcl-dev \
-		libpulse-dev libva-dev libxv-dev libelf-dev  elfutils libelf1 \
-        libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
-		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
-		display-dhammapada fortunes \
+      ca-certificates apt-transport-https \
+      libtool autotools-dev autopoint autoconf automake make autoproject bison flex \
+      build-essential git xz-utils unzip wget curl openssh-server openssh-client \
+      gawk vim vim-nox texinfo emacs25 gtk-doc-tools autogen autogen-doc \
+      python-pip python-dev python-wheel cython python-setuptools \
+      python3-pip python3-dev python3-wheel cython3 python3-setuptools \
+      ruby ruby-dev libjpeg-dev libudev-dev \
+      libglib2.0-dev libglib2.0-bin libglib2.0-0 \
+      xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
+      libperl-dev perl perl-base perl-modules apt-utils gettext \
+      yasm nasm xotcl-dev tcl-expect-dev tcl-dev docbook2x dos2unix \
+      libpulse-dev libva-dev libxv-dev libelf-dev elfutils libelf1 \
+      libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
+      libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
+      display-dhammapada fortunes \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
    && rm -rvf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/* \
    && rm -rf /usr/share/man/
 
-ARG MAKEFLAGS
+##setting up the apt so it will run through the proxy
+# RUN [ -n "$http_proxy" ] && echo "Acquire::http::proxy \"$http_proxy\";" > /etc/apt/apt.conf; \
+    # [ -n "$https_proxy" ] && echo "Acquire::https::proxy \"$https_proxy\";" >> /etc/apt/apt.conf; \
+    # [ -f /etc/apt/apt.conf ] && cat /etc/apt/apt.conf; exit 0
 
-# RUN cd /tmp \
-   # && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
-   # && tar -xzf gdb-8.3.tar.gz \
-   # && cd gdb-8.3 \
-   # && ./configure --prefix=/usr/local \
-   # && make > /dev/null 2>&1 \
-   # && make install > /dev/null 2>&1 \
-   # && cd /tmp \
-   # && rm -rf gdb-8.3.tar.gz gdb-8.3
+# RUN apt-get update
 
-ENV CMAKE_MAJOR_VERSION ${CMAKE_MAJOR_VERSION:-3.15}
-ENV CMAKE_VERSION ${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
+# Set wget proxies
+RUN [ -n "$http_proxy" ] && printf "use_proxy=yes\nhttp_proxy=$http_proxy\nhttps_proxy=$https_proxy\nno_proxy=$no_proxy" > /root/.wgetrc; exit 0
+
+
 RUN cd /tmp \
-   && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-   && tar -xzf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz  \
-   && rm cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
-   && mv cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
+    && curl -L -O -k https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+    && tar -xvf cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz > /dev/null \
+    && rm -v cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz \
+    && mv -v cmake-${CMAKE_VERSION}-Linux-x86_64 /opt/cmake
 
 RUN  cd /tmp \
+    # && curl -x '${HTTPS_PROXY}' -L -O -k https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
    && curl -L -O -k  https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip\
    && unzip ninja-linux.zip  \
    && mv ninja /usr/bin/ninja \
    && rm ninja-linux.zip
 
-#curl -L -C - -b "oraclelicense=accept-securebackup-cookie" -O 'https://download.oracle.com/otn/java/jdk/8u221-b11/230deb18db3e4014bb8e3e8324f81b43/jdk-8u221-linux-x64.tar.gz'
-#  http://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/jdk-8u212-linux-x64.tar.gz
-# COPY jdk-8u212-linux-x64.tar.gz /tmp
+# COPY [ -f ./jdk-8u212-linux-x64.tar.gz ] && [] jdk-8u212-linux-x64.tar.gz /tmp
 
 RUN  cd /tmp \
+#  http://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/jdk-8u212-linux-x64.tar.gz
    && curl -L -O -k https://github.com/frekele/oracle-java/releases/download/8u212-b10/jdk-8u212-linux-x64.tar.gz \
    && tar -xzf jdk-8u212-linux-x64.tar.gz -C /opt/ \
    && rm jdk-8u212-linux-x64.tar.gz
 
-ENV MVN_VERSION ${MVN_VERSION:-3.6.1}
 RUN cd /tmp \
    &&  wget --no-check-certificate \
    https://www-eu.apache.org/dist/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz \
@@ -95,14 +118,12 @@ RUN cd /tmp \
    && mv apache-maven-${MVN_VERSION}/ /opt/apache-maven \
    && rm -v apache-maven-${MVN_VERSION}-bin.tar.gz
 
-ENV GRADLE_VERSION ${GRADLE_VERSION:-5.6.1}
 RUN cd /tmp \
    && curl -L -O -k https://downloads.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
    && mkdir -pv /opt/gradle \
    && unzip gradle-${GRADLE_VERSION}-bin.zip  \
    && mv gradle-${GRADLE_VERSION}  /opt/gradle/ \
    && rm -f gradle-${GRADLE_VERSION}-bin.zip
-
 
 ENV JAVA_HOME /opt/jdk1.8.0_212
 ENV JRE_HOME /opt/jdk1.8.0_212/jre
@@ -113,8 +134,6 @@ ENV MAVEN_OPTS "-Dstyle.info=bold,green -Dstyle.project=bold,magenta -Dstyle.war
 ENV PATH $PATH:/opt/apache-maven/bin/:/opt/jdk1.8.0_212/bin:/opt/jdk1.8.0_212/jre/bin:/opt/cmake/bin
 ENV PATH $PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
-ARG BAZEL_VERSION
-ENV BAZEL_VERSION ${BAZEL_VERSION:-0.29.0}
 RUN cd /tmp \
    && curl -L -O -k https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh \
    && chmod +x bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh  \
@@ -135,7 +154,8 @@ RUN pip install -q --no-cache-dir conan \
    && pip3 install cmakedoc \
    && pip install cpp-coveralls \
    && pip install coverxygen \
-   && pip install doxygen-junit
+   && pip install doxygen-junit \
+   && pip install gdb-tools
 
 RUN cmake --version \
    && make --version \
@@ -145,6 +165,19 @@ RUN cmake --version \
    && gradle -v \
    && bazel version \
    && conan --version || true
+
+RUN cd /tmp \
+   && Time="$(date +%s)" \
+   && curl -L -O -k http://ftp.gnu.org/gnu/gdb/gdb-8.3.tar.gz \
+   && tar -xzf gdb-8.3.tar.gz \
+   && cd gdb-8.3 \
+   && ./configure --prefix=/usr/local \
+   && make > /dev/null 2>&1 \
+   && make install > /dev/null 2>&1 \
+   && cd /tmp \
+   && rm -rf gdb-8.3.tar.gz gdb-8.3 \ 
+   && Time="$(($(date +%s)-Time))" \ 
+   && printf "Build time: %dd %02d:%02d:%02d\n" "$((Time/86400))" "$((Time/3600%24))" "$((Time/60%60))" "$((Time%60))"
 
 RUN cd /tmp \
    && git clone --depth=1 https://github.com/uncrustify/uncrustify.git \
@@ -240,11 +273,6 @@ RUN cd /tmp \
 
 ENV MANPATH=${MANPATH}:/usr/local/man:/usr/local/share/man:/usr/share/man:/usr/man
 
-ARG BOOST_VERSION_MAJ=1
-ARG BOOST_VERSION_MIN=69
-ARG BOOST_VERSION_PATCH=0
-ARG BOOST_VERSION=${BOOST_VERSION_MAJ}.${BOOST_VERSION_MIN}.${BOOST_VERSION_PATCH}
-ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATCH}
 RUN cd /tmp \
    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
    && tar xzf boost_${BOOST_RELEASE}.tar.gz \
@@ -281,17 +309,6 @@ RUN cd /tmp \
    && rm -rf cucumber-cpp
 
 RUN cd /tmp \
-   && git clone --depth=1 https://github.com/google/double-conversion.git \
-   && cd double-conversion \
-   && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local  \
-   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
-   && cd /tmp \
-   && rm -rf double-conversion
-
-
-RUN cd /tmp \
    && curl -L -O -k http://lcamtuf.coredump.cx/afl/releases/afl-2.52b.tgz \
    && tar zxvf afl-2.52b.tgz --one-top-level=american-fuzzy-lop \
    && tar -xvzf afl-2.52b.tgz \
@@ -319,7 +336,7 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/google/double-conversion.git  \
    && cd double-conversion \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
 #   - test/cctest/cctest --list | tr -d '<' | xargs test/cctest/cctest \
    && cmake --build build --target install || true \
@@ -364,7 +381,6 @@ RUN cd /tmp && curl -L -O -k http://www-us.apache.org/dist//xerces/c/3/sources/x
    && rm xerces-c-3.2.2.tar.gz \
    && rm -rf xerces-c-3.2.2/
 
-ARG APR_VERSION=1.7.0
 RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist/apr/apr-${APR_VERSION}.tar.gz  \
    && tar -xzf apr-${APR_VERSION}.tar.gz \
@@ -387,7 +403,6 @@ RUN cd /tmp \
    && cd /tmp \
    && rm -rf libexpat
 
-ARG APU_VERSION=1.6.1
 RUN cd /tmp \
    && curl -L -O -k https://www-us.apache.org/dist//apr/apr-util-${APU_VERSION}.tar.gz  \
    && tar -xzf apr-util-${APU_VERSION}.tar.gz  \
@@ -415,7 +430,8 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/catchorg/Catch2.git \
    && cd Catch2 \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake .. -DUSE_CPP14=1 -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake -E chdir build cmake .. -DEXAMPLES=ON -DCOVERAGE=OFF -DEXTRAS=ON -DCMAKE_CXX_STANDARD=17 \
+       -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD_REQUIRED=ON -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install || true \
    && cd /tmp \
@@ -434,6 +450,28 @@ RUN cd /tmp \
 RUN cd /opt \
    && git clone https://chromium.googlesource.com/chromium/tools/depot_tools
 ENV  PATH /opt/depot_tools:$PATH
+
+COPY qt-installer-script.qs /tmp
+COPY qt-opensource-linux-x64-${Q_VERSION}.run* /tmp
+# RUN objdump -p ./qt-opensource-linux-x64-${Q_VERSION}.run | grep NEEDED
+
+RUN cd /tmp \
+    && if [[ -n $CI_DOMAIN ]]; then \
+			curl -k -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run"; \
+		else \
+			: ; \
+		fi
+
+RUN cd /tmp \
+   && chmod +x ./qt-installer-script.qs \
+   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
+   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
+   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
+
+ENV QT_INSTALL_DIR=/opt/qt
+ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
+ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
+ENV PKG_CONFIG_PATH=${QTDIR}/lib/pkgconfig:$PKG_CONFIG_PATH
 
 RUN cd /tmp \
     && git clone https://git.videolan.org/git/x264.git \
@@ -481,36 +519,6 @@ RUN cd /tmp \
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get -qq install --assume-yes --no-install-recommends nodejs
 
-ENV Q_MAJOR_VERSION ${Q_MAJOR_VERSION:-5.13}
-ENV Q_VERSION ${Q_VERSION:-${Q_MAJOR_VERSION}.0}
-ENV QT_SHA_256 0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
-ENV QT_MD5 c839aed9d551bdc8411a0a33e5ae46f3
-
-COPY qt-installer-script.qs /tmp
-
-COPY qt-opensource-linux-x64-${Q_VERSION}.run* /tmp
-# RUN objdump -p ./qt-opensource-linux-x64-${Q_VERSION}.run | grep NEEDED
-
-RUN cd /tmp \
-    && if [[ -n $CI_DOMAIN ]]; then \
-			curl -k -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run"; \
-		else \
-			: ; \
-		fi
-
-RUN cd /tmp \
-   && chmod +x ./qt-installer-script.qs \
-   && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
-   && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
-   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
-
-ENV QT_INSTALL_DIR=/opt/qt
-ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
-ENV CMAKE_PREFIX_PATH=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64:$CMAKE_PREFIX_PATH
-ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
-# ENV LD_LIBRARY_PATH=$QT_BASE_DIR/lib/x86_64-linux-gnu:$QT_BASE_DIR/lib:$LD_LIBRARY_PATH
-# ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
-
 RUN cd /tmp \
 	&& curl -L -O -k https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
 	&& tar xjvf qwt-6.1.4.tar.bz2 \
@@ -523,10 +531,8 @@ RUN cd /tmp \
 
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
 RUN cd /tmp \
-	&& git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git
+   && git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/gst-build.git
 
-RUN apt-get -qq install --assume-yes --no-install-recommends \
-        apt-utils gettext
 
 # RUN cd /tmp \
     # && cd gst-build \
