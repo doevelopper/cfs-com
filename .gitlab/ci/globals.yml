@@ -274,7 +274,7 @@
         - export SECOND_LEVEL="omg eprosima adlinktech"
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
-        - [[ $SECOND_LEVEL =~ (^|[[:space:]])"$MODULE_DIR"($|[[:space:]]) ]] && CHECK_IMG=${ROOT_IMG_IMAGE}-common:latest || CHECK_IMG=${ROOT_IMG_IMAGE}-${MODULE_DIR}:${SEM_VERSION}
+        - "[[ $SECOND_LEVEL =~ (^|[[:space:]])"$MODULE_DIR"($|[[:space:]]) ]] && CHECK_IMG=${ROOT_IMG_IMAGE}-common:latest || CHECK_IMG=${ROOT_IMG_IMAGE}-${MODULE_DIR}:${SEM_VERSION}"
         - echo "Availability of ${CHECK_IMG} in ${DOCKER_TRUSTED_REGISTRY}"
         - |
             if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${CHECK_IMG} >/dev/null; then
