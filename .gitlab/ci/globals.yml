@@ -50,10 +50,7 @@
             - api_failure
             - runner_system_failure
     tags:
-        # - agent-smith
-        # - gitlab-org
         - docker
-
 
 # ---------------------------------------------------------------------
 #
@@ -218,12 +215,12 @@
         ROOT_IMG_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
         IMG_NAME: ${ROOT_IMG_IMAGE}
 
-.Build logs: &save_build_logs
-    artifacts:
-        name: log
-        when: always
-        paths:
-            <<: *log_file
+# .Build logs: &save_build_logs
+    # artifacts:
+        # name: log
+        # when: always
+        # paths:
+            # <<: *log_file
 
 # ---------------------------------------------------------------------
 #
