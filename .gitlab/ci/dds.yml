@@ -31,7 +31,7 @@ docker:build:omg-opendds:
         MODULE_DIR: omg
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
 
-.docker:build:adlinkist-vortex:
+docker:build:adlinktech-vortex:
     extends: .create-docker-container
     stage: Build docker image
     variables:
@@ -47,6 +47,6 @@ docker:build:eprosima-rtps:
     variables:
         GOAL: build
         BUMP_VERSION: 1.9.0
-        MODULE_DIR: eprosima
         MODULE: "fast-rtps"
+        MODULE_DIR: eprosima
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
