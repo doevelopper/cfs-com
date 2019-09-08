@@ -27,14 +27,11 @@ docker:build:dds-base:
         - .create-docker-container
     variables:
         GOAL: build
-        VERSION: 0.0.1
+        PLATFORM: ""
+        BUMP_VERSION: 0.0.1
         MODULE: "dds-base"
-        IMAGE_NAME: ${CONTAINER_IMAGE}
-        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         MODULE_DIR: common
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
-        # DOCKER_TLS_CERTDIR: ""
-        # DOCKER_HOST: tcp://docker:2375
     # only:
         # changes: [ subdir/**/*, Dockerfile, requirement.txt
 
@@ -44,10 +41,9 @@ docker:build:rti-dds-base:
         - .create-docker-container
     variables:
         GOAL: build
-        VERSION: 5.3.3
+        PLATFORM: "RTI"
+        BUMP_VERSION: 5.3.3
         MODULE: "rti-connext-dds"
-        IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
-        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
         MODULE_DIR: rti
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
     # only:

@@ -46,6 +46,8 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
 		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
 		display-dhammapada fortunes \
         libc6-dev libmpfr-dev \
+		libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
+		gnutls-bin ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30 \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \

@@ -26,12 +26,6 @@ FROM $DDS_DEV_IMAGE
 
 USER root
 
-RUN apt-get -qq install --assume-yes --no-install-recommends \
-	libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
-	gnutls-bin \
-	ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30
-
-
 RUN git config --global url."https://github.com/".insteadOf "git@github.com:"
 RUN git config --global url."https://".insteadOf git://
 #RUN git config --global url."https".insteadOf "git+https"
