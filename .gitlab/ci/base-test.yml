@@ -27,10 +27,15 @@ docker:test:dds-base:
     variables:
         GOAL: run
         MODULE: "dds-base"
+        MODULE_DIR: common
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
 
 docker:test:rti-dds-base:
     stage: Test docker image
     extends: .create-docker-container
     variables:
+        GOAL: run
         VERSION: 5.3.3
         MODULE: "rti-connext-dds"
+        MODULE_DIR: rti
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest

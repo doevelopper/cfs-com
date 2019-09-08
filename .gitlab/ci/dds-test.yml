@@ -22,36 +22,34 @@
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 docker:test:omg-opendds:
-    # image: docker.io/doevelopper/cfs-com-omg-opendds-dev:0.0.1
-    extends: .create-docker-container
-    stage: Test docker image
-    variables:
-        GOAL: run
-        MODULE: "omg-opendds"
-
-docker:test:adlinkist-vortex:
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1    
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
     extends: .create-docker-container
     stage: Test docker image
     variables:
         VERSION: 0.0.1
-        GOAL: run
-        MODULE: "vortex-opensplice"
+        MODULE_DIR: omg
+
+docker:test:adlinktech-vortex:
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
+    extends: .create-docker-container
+    stage: Test docker image
+    variables:
+        VERSION: 0.0.1
+        MODULE_DIR: adlinktech		
 
 docker:test:eprosima-rtps:
     extends: .create-docker-container
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
     stage: Test docker image
     variables:
-        GOAL: run
         VERSION: 0.0.1
-        MODULE: "fast-rtps"
+        MODULE_DIR: eprosima		
 
 docker:test:rti-connextDDS:
     extends: .create-docker-container
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
+    image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
     stage: Test docker image
     variables:
         GOAL: run
         VERSION: 0.0.1
-        MODULE: "fast-rtps"
+        MODULE_DIR: rti

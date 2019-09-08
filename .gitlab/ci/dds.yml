@@ -30,9 +30,6 @@ docker:build:omg-opendds:
         MODULE: "omg-opendds"
         MODULE_DIR: omg
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
-    # only:
-    #    variables:
-        #    - $BASE_DONE == "yes"
 
 .docker:build:adlinkist-vortex:
     extends: .create-docker-container
@@ -43,9 +40,6 @@ docker:build:omg-opendds:
         MODULE: "vortex-opensplice"
         MODULE_DIR: adlinktech
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
-    # only:
-    #    variables:
-    #        - $BASE_DONE == "yes"
 
 docker:build:eprosima-rtps:
     extends: .create-docker-container
@@ -56,6 +50,3 @@ docker:build:eprosima-rtps:
         MODULE_DIR: eprosima
         MODULE: "fast-rtps"
         DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
-    # only:
-    #    variables:
-    #        - $BASE_DONE == "yes"
