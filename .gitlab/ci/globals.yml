@@ -285,11 +285,11 @@
             fi
     after_script:
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
-    artifacts:
-        when: on_failure
-        paths:
-            - $CI_PROJECT_DIR/*.log
-            - tmp/*.log
+    # artifacts:
+        # when: on_failure
+        # paths:
+            # - $CI_PROJECT_DIR/*.log
+            # - tmp/*.log
 
 # ---------------------------------------------------------------------
 #
