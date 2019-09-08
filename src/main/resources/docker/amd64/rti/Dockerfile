@@ -41,13 +41,13 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
         libperl-dev perl perl-base perl-modules \
         yasm nasm xotcl-dev tcl-expect-dev tcl-dev \
-		libpulse-dev libva-dev libxv-dev libelf-dev  elfutils libelf1 \
+        libpulse-dev libva-dev libxv-dev libelf-dev  elfutils libelf1 \
         libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
-		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
-		display-dhammapada fortunes \
+        libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
+        display-dhammapada fortunes \
         libc6-dev libmpfr-dev \
-		libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
-		gnutls-bin ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30 \
+        libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
+        gnutls-bin ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30 \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
@@ -450,34 +450,34 @@ RUN cd /tmp \
     && rm -rf x264
 
 #RUN cd /tmp \
-#	&& git clone --depth=1 https://github.com/cisco/openh264.git \
-#	&& cd openh264 \
-#	&& make PREFIX=/usr/local\
-#	&& make install PREFIX=/usr/local \
-#	&& cd /tmp \
-#	&& rm -rf openh264
+#    && git clone --depth=1 https://github.com/cisco/openh264.git \
+#    && cd openh264 \
+#    && make PREFIX=/usr/local\
+#    && make install PREFIX=/usr/local \
+#    && cd /tmp \
+#    && rm -rf openh264
 
-##	&& git clone https://github.com/FFmpeg/FFmpeg.git \
+##    && git clone https://github.com/FFmpeg/FFmpeg.git \
 #RUN cd /tmp \
-#	&& curl -L -O -k https://ffmpeg.org/releases/ffmpeg-4.2.tar.xz \
+#    && curl -L -O -k https://ffmpeg.org/releases/ffmpeg-4.2.tar.xz \
 #    && tar -xJf ffmpeg-4.2.tar.xz \
 #    && cd ffmpeg-4.2 \
-#		./configure \
-#			--prefix=/usr/local \
-#			--target-os=linux --pkg-config-flags=--static \
-#			--enable-shared \
-#			--extra-libs=-lpthread \
-#			--enable-gpl -enable-nonfree \
-#			--enable-pthreads \
-#			--enable-openssl \
-#			--disable-debug \
-#			--disable-doc \
-#			--disable-ffplay \
-#			--enable-decoder=h264 \
-#			--enable-encoder=ac3 \
-#			--enable-encoder=eac3 \
-#			--enable-encoder=mp2 \
-#			--enable-encoder=mpeg2video \
+#        ./configure \
+#            --prefix=/usr/local \
+#            --target-os=linux --pkg-config-flags=--static \
+#            --enable-shared \
+#            --extra-libs=-lpthread \
+#            --enable-gpl -enable-nonfree \
+#            --enable-pthreads \
+#            --enable-openssl \
+#            --disable-debug \
+#            --disable-doc \
+#            --disable-ffplay \
+#            --enable-decoder=h264 \
+#            --enable-encoder=ac3 \
+#            --enable-encoder=eac3 \
+#            --enable-encoder=mp2 \
+#            --enable-encoder=mpeg2video \
 #    && make \
 #    && make install \
 #    && cd /tmp  \
@@ -485,7 +485,7 @@ RUN cd /tmp \
 
 # Clone the other GStreamer modules as meson subprojects and build everything in one go.
 #RUN cd /tmp \
-#	&& git clone https://github.com/GStreamer/gst-build.git\
+#    && git clone https://github.com/GStreamer/gst-build.git\
 #    && cd gst-build \
 #    && meson --prefix=/usr/local -Dtests=disabled -Ddoc=false -Dgtk_doc=disabled build/ \
 #    && PYTHONIOENCODING=utf-8 ninja -C build \
@@ -522,25 +522,25 @@ ENV PATH="${QTDIR}/bin/:${QT_INSTALL_DIR}/Tools/QtCreator/bin:${PATH}"
 # ENV PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:$PKG_CONFIG_PATH
 
 RUN cd /tmp \
-	&& curl -L -O -k https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
-	&& tar xjvf qwt-6.1.4.tar.bz2 \
-	&& cd qwt-6.1.4 \
-	&& qmake qwt.pro \
-	&& make > /dev/null 2>&1 \
-	&& make install DESTDIR=/usr/local \
-	&& cd /tmp \
-	&& rm -rf qwt-6.1.4.tar.bz2 qwt-6.1.4
+    && curl -L -O -k https://freefr.dl.sourceforge.net/project/qwt/qwt/6.1.4/qwt-6.1.4.tar.bz2 \
+    && tar xjvf qwt-6.1.4.tar.bz2 \
+    && cd qwt-6.1.4 \
+    && qmake qwt.pro \
+    && make > /dev/null 2>&1 \
+    && make install DESTDIR=/usr/local \
+    && cd /tmp \
+    && rm -rf qwt-6.1.4.tar.bz2 qwt-6.1.4
 
 RUN cd /tmp \
-	&& curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
-	&& tar -xzf gsl-2.6.tar.gz \
-	&& cd gsl-2.6 \
-	&& ./autogen.sh \
-	&& ./configure --enable-maintainer-mode --prefix=/usr/local \
-	&& make -j `nproc` > /dev/null 2>&1 \
-	&& make install > /dev/null 2>&1 \
-	&& cd /tmp \
-	&& rm -rf gsl-2.6.tar.gz gsl-2.6
+    && curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
+    && tar -xzf gsl-2.6.tar.gz \
+    && cd gsl-2.6 \
+    && ./autogen.sh \
+    && ./configure --enable-maintainer-mode --prefix=/usr/local \
+    && make -j `nproc` > /dev/null 2>&1 \
+    && make install > /dev/null 2>&1 \
+    && cd /tmp \
+    && rm -rf gsl-2.6.tar.gz gsl-2.6
 
 RUN cd /tmp \
    && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
@@ -554,29 +554,29 @@ RUN cd /tmp \
    && rm -Rf eigen-git-mirror
 
 RUN cd /tmp \
-	&& git clone --depth=1  https://github.com/ginkgo-project/ginkgo.git \
-	&& cd ginkgo \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-		-DGINKGO_BUILD_TESTS=OFF -DGINKGO_BUILD_EXAMPLES=OFF \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-		-DGINKGO_DEVEL_TOOLS=OFF -DGINKGO_BUILD_REFERENCE=ON \
+    && git clone --depth=1  https://github.com/ginkgo-project/ginkgo.git \
+    && cd ginkgo \
+    && cmake -E make_directory build \
+    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DGINKGO_BUILD_TESTS=OFF -DGINKGO_BUILD_EXAMPLES=OFF \
+        -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+        -DGINKGO_DEVEL_TOOLS=OFF -DGINKGO_BUILD_REFERENCE=ON \
         -DCMAKE_BUILD_TYPE=Release \
-	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
-	&& cmake --build build --target install > /dev/null 2>&1 \
-	&& cd /tmp \
-	&& rm -rf ginkgo
+    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
+    && cmake --build build --target install > /dev/null 2>&1 \
+    && cd /tmp \
+    && rm -rf ginkgo
 
 #RUN cd /tmp \
-#	&& git clone --depth=1  https://github.com/dealii/dealii.git \
-#	&& cd dealii \
-#	&& cmake -E make_directory build \
-#	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#    && git clone --depth=1  https://github.com/dealii/dealii.git \
+#    && cd dealii \
+#    && cmake -E make_directory build \
+#    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
 #        -DCMAKE_BUILD_TYPE=Release \
-#	&& cmake --build build --target all --clean-first -- -j`nproc` \
-#	&& cmake --build build --target install \
-#	&& cd /tmp \
-#	&& rm -rf dealii
+#    && cmake --build build --target all --clean-first -- -j`nproc` \
+#    && cmake --build build --target install \
+#    && cd /tmp \
+#    && rm -rf dealii
 #c++: internal compiler error: Killed (program cc1plus)
 #Please submit a full bug report,
 #with preprocessed source if appropriate.
@@ -676,7 +676,7 @@ RUN echo -e '\033[36;1m *******  RTI Connext DDS Professional.******** \033[0m'
     # || :
 
 RUN adduser --system --home /home/developer --shell /bin/bash --gecos GECOS \
-	--group --disabled-password developer
+    --group --disabled-password developer
 USER developer
 WORKDIR /home/developer
 

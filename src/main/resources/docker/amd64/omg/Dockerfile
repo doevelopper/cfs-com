@@ -58,54 +58,54 @@ ARG PREFIX_PATH="${CMAKE_PREFIX_PATH:+${CMAKE_PREFIX_PATH};}${QT_DIR}"
 # RUN cd /tmp/ \
     # && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/MPC.git \
     # && git clone --depth=1 --recurse-submodules https://github.com/DOCGroup/ACE_TAO.git
-	# && cd ACE_TAO \
+    # && cd ACE_TAO \
     # && export ACE_TAO_ROOT=/tmp/ACE_TAO \
     # && export ACE_ROOT=$ACE_TAO_ROOT/ACE \
     # && export TAO_ROOT=$ACE_TAO_ROOT/TAO \
     # && export MPC_ROOT=/tmp/MPC \
-	# && export PATH=$PATH:$ACE_ROOT/bin \
-	# && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ACE_ROOT/lib \
-	# && echo "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
-	# && echo "workspace {\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
-	# && echo "\$(TAO_ROOT)/TAO_ACE.mwc\n\$(TAO_ROOT)/tests/Hello\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
-	# && echo "\$(ACE_ROOT)/ace/ace.mwc\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
-	# && echo "}\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
-	# && rm -vf $ACE_ROOT/include/makeinclude/platform*.GNU \
+    # && export PATH=$PATH:$ACE_ROOT/bin \
+    # && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ACE_ROOT/lib \
+    # && echo "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
+    # && echo "workspace {\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
+    # && echo "\$(TAO_ROOT)/TAO_ACE.mwc\n\$(TAO_ROOT)/tests/Hello\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
+    # && echo "\$(ACE_ROOT)/ace/ace.mwc\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
+    # && echo "}\n" >> $ACE_TAO_ROOT/ACE_TAO.mwc \
+    # && rm -vf $ACE_ROOT/include/makeinclude/platform*.GNU \
     # && echo "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
-	# && echo "corba_e_micro=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "corba_e_micro=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "corba_e_compact=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "corba_e_compact=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "ace_for_tao=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "ace_for_tao=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "ccm_lw=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "ccm_noevent=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && cat $ACE_TAO_ROOT/ACE_TAO.mwc \
-	# && cat $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && cat $ACE_ROOT/ace/config.h \
-	# && cat $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 2 ACE_TAO.mwc \
-	# && perl $ACE_ROOT/bin/mwc.pl  -type gnuace $TAO_ROOT/TAO_ACE.mwc \
-	# && cd $ACE_ROOT \
-	# && perl $ACE_ROOT/bin/mwc.pl -type gnuace -features ssl=1,qt5=1,qos=1,ace_for_tao=1 ACE.mwc \
+    # && echo "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
+    # && echo "corba_e_micro=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo "corba_e_micro=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "corba_e_compact=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo "corba_e_compact=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "ace_for_tao=1" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo "ace_for_tao=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "ccm_lw=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "ccm_noevent=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && cat $ACE_TAO_ROOT/ACE_TAO.mwc \
+    # && cat $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && cat $ACE_ROOT/ace/config.h \
+    # && cat $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && perl $ACE_ROOT/bin/mwc.pl -type gnuace -workers 2 ACE_TAO.mwc \
+    # && perl $ACE_ROOT/bin/mwc.pl  -type gnuace $TAO_ROOT/TAO_ACE.mwc \
+    # && cd $ACE_ROOT \
+    # && perl $ACE_ROOT/bin/mwc.pl -type gnuace -features ssl=1,qt5=1,qos=1,ace_for_tao=1 ACE.mwc \
     # && make realclean \
     # && make -j$(nproc) \
     # && mkdir -pv ${DDS_INSTALL_DIR}/ACE_TAO \
     # && INSTALL_PREFIX=${DDS_INSTALL_DIR}/ACE_TAO make install
-	# && cd $ACE_ROOT/ace \
-	# && make \
-	# && cd $ACE_ROOT/apps/gperf/src \
-	# && make \
-	# && cd $TAO_ROOT \
-	# && make \
-	# && cd ..
+    # && cd $ACE_ROOT/ace \
+    # && make \
+    # && cd $ACE_ROOT/apps/gperf/src \
+    # && make \
+    # && cd $TAO_ROOT \
+    # && make \
+    # && cd ..
 
 ARG GET_DDS_VERSION="DDS-3.13-2"
 ARG DDS_SRCS_LINUX="https://github.com/objectcomputing/OpenDDS/releases/download/DDS-3.13.2/OpenDDS-3.13.2.tar.gz"
@@ -153,11 +153,11 @@ ENV CMAKE_PREFIX_PATH=${QTDIR}:${CMAKE_PREFIX_PATH}
     # && cd wireshark \
     # && cmake -E make_directory wireshark-build \
     ## && cmake -E chdir wireshark-build cmake .. -DCMAKE_PREFIX_PATH=${PREFIX_PATH} \
-	## && export CMAKE_PREFIX_PATH=${QTDIR}:${CMAKE_PREFIX_PATH} \
+    ## && export CMAKE_PREFIX_PATH=${QTDIR}:${CMAKE_PREFIX_PATH} \
     # && cmake -E chdir wireshark-build cmake .. \
-		# -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
-		# -DCMAKE_INSTALL_DOCDIR=/usr/share/doc/wireshark \
-		# -DDUMPCAP_INSTALL_OPTION=suid \
+        # -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
+        # -DCMAKE_INSTALL_DOCDIR=/usr/share/doc/wireshark \
+        # -DDUMPCAP_INSTALL_OPTION=suid \
     # && make -C wireshark-build -j$(nproc) \
     # && make -C wireshark-build -j$(nproc) install\
     # cd /tmp \
@@ -217,10 +217,10 @@ RUN cd ${DDS_BASE_DIR}/OpenDDS \
             ${OPENDDS_SECURITY_OPTIONS} \
             ${OPENDDS_QT_OPTIONS} \
             --cmake=/opt/cmake/bin/ \
-			--ace=$ACE_ROOT \
-			--tao=$TAO_ROOT \
-			--mpc=$MPC_ROOT \
-			--mpcopts="-workers 4" \
+            --ace=$ACE_ROOT \
+            --tao=$TAO_ROOT \
+            --mpc=$MPC_ROOT \
+            --mpcopts="-workers 4" \
             --features="uses_wchar=1" \
             --features="versioned_namespace=1" \
             --features="xerces3=1" \
@@ -237,15 +237,15 @@ RUN cd ${DDS_BASE_DIR}/OpenDDS \
     && make INSTALL_PREFIX=${DDS_INSTALL_DIR} install
 
     # && export LD_LIBRARY_PATH=:${LD_LIBRARY_PATH}:${pwd}/build/target/ACE_TAO/ACE/lib:${ACE_ROOT}/lib:${pwd}/build/target/lib:${pwd}/lib \
-	# && echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
-	# && echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
-	# && echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
-	# && echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
-	# && echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo -e "#include \"ace/config-linux.h\"" >> $ACE_ROOT/ace/config.h \
+    # && echo -e "#define ACE_FACE_SAFETY_BASE" >> $ACE_ROOT/ace/config.h \
+    # && echo -e "uses_wchar=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo -e "versioned_namespace=1" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo -e "inline=0\nipv6=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo -e "xerces3=1\nssl=1\n" >> $ACE_ROOT/bin/MakeProjectCreator/config/default.features \
+    # && echo -e "c++11=1\n" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
+    # && echo -e "include \$(ACE_ROOT)/include/makeinclude/platform_linux.GNU" >> $ACE_ROOT/include/makeinclude/platform_macros.GNU \
 
 # RUN cd ${DDS_BASE_DIR} \
     # && git clone --depth=1 --recursive https://github.com/objectcomputing/mFAST.git \
@@ -287,7 +287,7 @@ RUN cd ${DDS_BASE_DIR}/OpenDDS \
 
 ARG ACCOUNT=${ACCOUNT:-developer}
 RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
-	--gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
+    --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
 USER $ACCOUNT
 WORKDIR /home/$ACCOUNT
 
