@@ -127,18 +127,16 @@ DK_RUN_STD_ARG      = run --rm
 # DK_RUN_STD_ARG      += --cpus=$((`nproc` - 1)) ${}
 DK_RUN_STD_ARG      += --log-opt max-size=50m
 DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vim:/home/${DTR_NAMESPACE}/.vim
-DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vimrc:/home/devel${DTR_NAMESPACE}oper/.vimrc
+DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.vimrc:/home/${DTR_NAMESPACE}/.vimrc
 DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR)/src/main/resources/dotfiles/.bashrc:/home/${DTR_NAMESPACE}/.bashrc
 DK_RUN_STD_ARG      += --volume $(GIT_ROOTDIR):/home/${DTR_NAMESPACE}/workspace
-DK_RUN_STD_ARG      += --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
+#DK_RUN_STD_ARG      += --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
 DK_RUN_STD_ARG      += --volume ${HOME}/.conan:/home/${DTR_NAMESPACE}/.conan
 DK_RUN_STD_ARG      += --volume ${HOME}/.ssh:/home/${DTR_NAMESPACE}/.ssh
-DK_RUN_STD_ARG      += --volume ${HOME}/.Xauthority:/root/.Xauthority
+#DK_RUN_STD_ARG      += --volume ${HOME}/.Xauthority:/root/.Xauthority
 DK_RUN_STD_ARG      += --volume ${HOME}/.m2:/home/${DTR_NAMESPACE}/.m2
-DK_RUN_STD_ARG      += --volume /etc/passwd:/etc/passwd:ro
-DK_RUN_STD_ARG      += --env DISPLAY=unix${DISPLAY}
+#DK_RUN_STD_ARG      += --volume /etc/passwd:/etc/passwd:ro
+#DK_RUN_STD_ARG      += --env DISPLAY=unix${DISPLAY}
 DK_RUN_STD_ARG      += --env LANG=C.UTF-8
 DK_RUN_STD_ARG      += --env LC_ALL=C.UTF-8
 DK_RUN_STD_ARG      += --env DOCKER_USER=`id -un`

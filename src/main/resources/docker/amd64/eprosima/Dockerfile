@@ -22,20 +22,9 @@
 #
 
 ARG DDS_DEV_IMAGE=docker.io/doevelopper/cfs-com-common:latest
-FROM $DDS_DEV_IMAGE 
+FROM $DDS_DEV_IMAGE
 
 USER root
-
-# Java
-#RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
-#RUN add-apt-repository ppa:webupd8team/java
-#RUN apt-get update
-#RUN apt-get install -y oracle-java8-installer
-#RUN rm -rf /var/cache/oracle-jdk8-installer
-
-RUN apt-get -qq install -y \
-    gtk-doc-tools 
-
 RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules https://github.com/foonathan/memory.git \
     && cd memory \
@@ -48,79 +37,7 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -rf memory
 
-ENV OPENSSL_ROOT_DIR  /usr/
-
-# Fetch and build GStreamer
-ARG GST_VERSION=1.14.0
-
-# http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
-    && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gstreamer-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/
-
-# gst-plugins-base
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-base-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/
-
-# libnice
-RUN cd /tmp \
-    && git clone https://github.com/libnice/libnice.git \
-    && cd libnice \
-    && ./autogen.sh --prefix=/usr --with-gstreamer --enable-static --enable-static-plugins --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
-    && make install > /dev/null \
-    && cd /tmp/
-
-# gst-plugins-good
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-good-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/
-
-# gst-plugins-bad
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-bad-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/
-
-# gst-plugins-ugly
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-plugins-ugly-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/ 
-
-# gst-rtsp-server
-RUN cd /tmp \
-    && wget https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
-    && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
-    && cd gst-rtsp-server-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
-    && make > /dev/null \
-    && make install > /dev/null \
-    && cd /tmp/ \
-    rm -rf gst*
+ENV OPENSSL_ROOT_DIR  /usr/local
 
 RUN cd /tmp \
     && git clone --depth=1 --recurse-submodules https://github.com/eProsima/Fast-RTPS.git
@@ -137,19 +54,43 @@ RUN cd /tmp \
     && cd /tmp \
     && rm -rf Fast-RTPS
 
-# Clone and install Micro XRCE-DDS Agent
+# Clone build and install Micro XRCE-DDS Agent and Client
+# https://micro-xrce-dds.readthedocs.io/en/latest/installation.html
 RUN cd /tmp \
-    && git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git agent \
-    && cd agent \
-    && cmake -E make_directory build \
-    && cmake -DTHIRDPARTY=ON -DVERBOSE=ON -DCMAKE_INSTALL_PREFIX=/usr/dds-qgent .. \
-    && make -j `nproc` install > /dev/null \
+    && git clone https://github.com/eProsima/Micro-XRCE-DDS.git \
+    && cd Micro-XRCE-DDS \
+    && cmake -E make_directory xrce-build \
+    && cmake -E chdir xrce-build cmake .. -DTHIRDPARTY=ON -DVERBOSE=ON -DCMAKE_INSTALL_PREFIX=/usr/local/xrce-dds \
+    && cmake --build xrce-build --target all --clean-first \
+    && cmake --build xrce-build --target install \
     && cd /tmp \
-    && rm -rf agent
+    && rm -rf Micro-XRCE-DDS
 
-ARG ACCOUNT
-ENV ACCOUNT ${ACCOUNT:-developer}
-RUN chown -R $ACCOUNT:$ACCOUNT /home/$ACCOUNT
+#RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/eProsima/Integration-Service.git \
+#    && cd Integration-Service \
+#    && cmake -E make_directory service-build \
+#    && cmake -E chdir service-build cmake .. -DTHIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=/usr/local/dds-int-svc \
+##        -DCMAKE_PREFIX_PATH="/usr/local;/usr/local/xrce-dds" \
+#    && cmake --build service-build --target all --clean-first \
+#    && cmake --build service-build --target install \
+#    && cd /tmp \
+#    && rm -rf Integration-Service
+
+#RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules https://github.com/eProsima/Discovery-Server.git \
+#    && cd Discovery-Server \
+#    && cmake -E make_directory discovery-build \
+#    && cmake -E chdir discovery-build cmake .. -DTHIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=/usr/local/disco-svr \
+#    && cmake --build discovery-build --target all --clean-first \
+#    && cmake --build discovery-build --target install \
+#    && cd /tmp \
+#    && rm -rf Discovery-Server
+
+ARG ACCOUNT=${ACCOUNT:-developer}
+RUN adduser --system --home /home/${ACCOUNT} --shell /bin/bash \
+        --gecos GECOS --group --disabled-password --quiet ${ACCOUNT}
 USER $ACCOUNT
 WORKDIR /home/$ACCOUNT
 CMD ["/bin/bash"]
+

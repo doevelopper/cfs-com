@@ -45,7 +45,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
         libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
 		libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
 		display-dhammapada fortunes \
-        libc6-dev \
+        libc6-dev libmpfr-dev \
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
@@ -544,7 +544,7 @@ RUN cd /tmp \
    && git clone  --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
    && cd eigen-git-mirror \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS="-std=c++11" \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build build --target install || true \
@@ -565,28 +565,36 @@ RUN cd /tmp \
 	&& cd /tmp \
 	&& rm -rf ginkgo
 
-RUN cd /tmp \
-	&& git clone --depth=1  https://github.com/dealii/dealii.git \
-	&& cd dealii \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DCMAKE_BUILD_TYPE=Release \
-	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
-	&& cmake --build build --target install > /dev/null 2>&1 \
-	&& cd /tmp \
-	&& rm -rf dealii
+#RUN cd /tmp \
+#	&& git clone --depth=1  https://github.com/dealii/dealii.git \
+#	&& cd dealii \
+#	&& cmake -E make_directory build \
+#	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#        -DCMAKE_BUILD_TYPE=Release \
+#	&& cmake --build build --target all --clean-first -- -j`nproc` \
+#	&& cmake --build build --target install \
+#	&& cd /tmp \
+#	&& rm -rf dealii
+#c++: internal compiler error: Killed (program cc1plus)
+#Please submit a full bug report,
+#with preprocessed source if appropriate.
+#See <file:///usr/share/doc/gcc-7/README.Bugs> for instructions.
+#make[2]: *** [source/numerics/CMakeFiles/obj_numerics_release.dir/data_out.cc.o] Error 4
+#source/numerics/CMakeFiles/obj_numerics_release.dir/build.make:62: recipe for target 'source/numerics/CMakeFiles/obj_numerics_release.dir/data_out.cc.o' failed
+#make[1]: *** [source/numerics/CMakeFiles/obj_numerics_release.dir/all] Error 2
+#make[1]: *** Waiting for unfinished jobs....
 
 RUN cd /tmp \
    && git clone  --depth=1 https://github.com/CGAL/cgal.git \
    && cd cgal \
-   && cmake -E make_directory build \
-   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+   && cmake -E make_directory cgal-build \
+   && cmake -E chdir cgal-build cmake .. -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=ON \
       -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=ON \
       -DWITH_demos=ON -DWITH_tests=ON \
-      -DCMAKE_INSTALL_PREFIX=/usr \
-   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install || true \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+   && cmake --build cgal-build --target all --clean-first -- -j`nproc` \
+   && cmake --build cgal-build --target install \
    && cd /tmp/ \
    && rm -Rf cgal
 

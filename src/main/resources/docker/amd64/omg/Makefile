@@ -21,17 +21,17 @@
 #        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 #        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# 
+#
 
 CONTAINER_IMAGE      = ${APP_BASE_IMAGE_NAME}-$(shell basename $(CURDIR))
 
-DOCKER_LABEL        := --label org.label-schema.title="Dind docker-compose make git"
-DOCKER_LABEL        += --label org.label-schema.description="Docker in docker for running container usin CI"
+DOCKER_LABEL        := --label org.label-schema.title="Object Management Group (OMG) Data Distribution Service (DDS)"
+DOCKER_LABEL        += --label org.label-schema.description="Docker image for developping C++ appplication relyig on OpenDDS Data Distribution Service"
 DOCKER_LABEL        += --label org.label-schema.name=$(CONTAINER_IMAGE)
 DOCKER_LABEL        += --label org.label-schema.schema-version="$(CONTAINER_IMAGE):$(VERSION)"
 DOCKER_LABEL        += --label org.label-schema.version=$(VERSION)
 DOCKER_LABEL        += --label org.label-schema.usage="Image used by gitlab-ci to build and run c++ app"
-DOCKER_LABEL        += --label org.label-schema.docker.cmd="make $(shell basename $(CURDIR)) run"
+DOCKER_LABEL        += --label org.label-schema.docker.cmd="make $(CONTAINER_IMAGE) run"
 DOCKER_LABEL        += --label org.label-schema.docker.dockerfile=$(DOCKER_FILE)
 
 # FQIN - fully qualified image name

@@ -111,7 +111,7 @@ run : run-image ## Run docker image.
 .PHONY: run-image
 run-image :
 	$(call purple, "  # $@ -> from $< ... Running tag  $(BUILDER_FQIN)")
-	# $(Q)$(DOCKER) ${DK_RUN_STD_ARG}  --name="$(shell basename $(CURDIR))-$(RND_NS)-$(date +'%Y%m%d-%H%M%S')" --hostname="$(shell basename $(CURDIR))-$(RND_NS)" --tty --interactive $(BUILDER_FQIN):$(VERSION)
+	$(Q)$(DOCKER) ${DK_RUN_STD_ARG}  --name="$(shell basename $(CURDIR))-$(RND_NS)-$(date +'%Y%m%d-%H%M%S')" --hostname="$(shell basename $(CURDIR))-$(RND_NS)" --tty --interactive $(BUILDER_FQIN):$(SEM_VERSION)
 
 .PHONY: exec-in
 exec-in :  ## Run a command inside a docker image.

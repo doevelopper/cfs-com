@@ -161,6 +161,7 @@ RUN cd /tmp \
     && cd googletest \
     && cmake -E make_directory build \
     && cmake -E chdir build cmake ..  \
+        -DCMAKE_TOOLCHAIN_FILE=${BUILD_ROOT}/src/main/resources/cmake/toolChains/arm64v8-toolchain.cmake
         CXX=aarch64-linux-gnu-g++ \
         CC=aarch64-linux-gnu-gcc \
         CXX_FLAGS="${CXX_FLAGS} -fPIE -fPIC" \
@@ -270,7 +271,7 @@ RUN cd /tmp \
 #    && GIT_SSL_NO_VERIFY=1 git clone --depth=1 -b OpenSSL_1_0_2-stable https://github.com/openssl/openssl.git  openssl \
     && GIT_SSL_NO_VERIFY=1 git clone --depth=1 --recurse-submodules https://github.com/openssl/openssl.git  openssl \
     && cd openssl \
-    && ./config --prefix=${AARCH64_DESTDIR shared  \
+    && ./config --prefix=${AARCH64_DESTDIR shared --cross-compile-prefix=arm-linux-gnueabihf- linux-armv4  \
     && make  -j `nproc` \
     && make install \
     && cd /tmp \

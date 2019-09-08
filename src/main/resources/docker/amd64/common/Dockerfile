@@ -36,7 +36,7 @@ ARG HTTP_PROXY=$PROXY
 ARG HTTPS_PROXY=$PROXY
 ARG NO_PROXY=$NOPROXY
 ARG CMAKE_MAJOR_VERSION=${CMAKE_MAJOR_VERSION:-3.15}
-ARG CMAKE_VERSION=${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.2}
+ARG CMAKE_VERSION=${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.3}
 ARG MVN_VERSION=${MVN_VERSION:-3.6.1}
 ARG GRADLE_VERSION=${GRADLE_VERSION:-5.6.1}
 ARG BAZEL_VERSION=${BAZEL_VERSION:-0.29.0}
@@ -64,7 +64,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       gawk vim vim-nox texinfo emacs25 gtk-doc-tools autogen autogen-doc \
       python-pip python-dev python-wheel cython python-setuptools \
       python3-pip python3-dev python3-wheel cython3 python3-setuptools \
-      ruby ruby-dev libjpeg-dev libudev-dev \
+      ruby ruby-dev libjpeg-dev libudev-dev libmpfr-dev \
       libglib2.0-dev libglib2.0-bin libglib2.0-0 \
       xvfb xauth libx11-xcb1 libfontconfig1 libfontconfig1-dev libdbus-1-3 libgl1-mesa-dev \
       libperl-dev perl perl-base perl-modules apt-utils gettext \
@@ -175,8 +175,8 @@ RUN cd /tmp \
    && make > /dev/null 2>&1 \
    && make install > /dev/null 2>&1 \
    && cd /tmp \
-   && rm -rf gdb-8.3.tar.gz gdb-8.3 \ 
-   && Time="$(($(date +%s)-Time))" \ 
+   && rm -rf gdb-8.3.tar.gz gdb-8.3 \
+   && Time="$(($(date +%s)-Time))" \
    && printf "Build time: %dd %02d:%02d:%02d\n" "$((Time/86400))" "$((Time/3600%24))" "$((Time/60%60))" "$((Time%60))"
 
 RUN cd /tmp \
@@ -466,7 +466,7 @@ RUN cd /tmp \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
-   && rm -vf ./qt-opensource-linux-x64-${Q_VERSION}.run ./qt-installer-*
+   && rm -vf qt-opensource-linux-x64-${Q_VERSION}.run qt-installer-script.qs
 
 ENV QT_INSTALL_DIR=/opt/qt
 ENV QTDIR=${QT_INSTALL_DIR}/${Q_VERSION}/gcc_64
@@ -560,71 +560,103 @@ RUN cd /tmp \
     && curl -L -O -k  https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
     && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
     && cd gstreamer-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make -j`nproc` \
     && make install  \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf gstreamer-*
 
+
+# orc
+RUN cd /tmp \
+    && git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/orc.git \
+    && cd orc \
+    && ./autogen.sh --prefix=/usr/local \
+      --disable-examples --enable-shared --disable-gtk-doc \
+    && make install  \
+    && cd /tmp/ \
+    && rm -rf orc
+
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 # gst-plugins-base
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-base-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make  \
     && make install  \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf gst-*
+
 
 # libnice
 RUN cd /tmp \
-    && git clone https://github.com/libnice/libnice.git \
+    && git clone --depth=1  https://github.com/libnice/libnice.git \
     && cd libnice \
-    && ./autogen.sh --prefix=/usr \
+    && ./autogen.sh --prefix=/usr/local \
       --with-gstreamer --enable-static --enable-static-plugins \
       --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
     && make install  \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf libnice
+
 
 # gst-plugins-good
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-good-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make  \
     && make install  \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf gst-*
+
 
 # gst-plugins-bad
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-bad-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make  \
-    && make install  \
-    && cd /tmp/
+    && make install \
+    && cd /tmp/ \
+    && rm -rf gst-*
 
 # gst-plugins-ugly
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-ugly-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make  \
     && make install  \
-    && cd /tmp/
+    && cd /tmp/ \
+    && rm -rf gst-*
+
+# gst-libav
+RUN cd /tmp \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${GST_VERSION}.tar.xz \
+    && tar xvfJ gst-libav-${GST_VERSION}.tar.xz > /dev/null \
+    && cd gst-libav-${GST_VERSION} \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
+    && make  \
+    && make install  \
+    && cd /tmp/ \
+    && rm -rf gst-*
 
 # gst-rtsp-server
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-rtsp-server-${GST_VERSION} \
-    && ./configure --prefix=/usr --disable-gtk-doc \
+    && ./configure --prefix=/usr/local --disable-gtk-doc \
     && make  \
     && make install  \
     && cd /tmp/ \
-    rm -rf gst*
+    && rm -rf gst-*
 
 RUN cd /tmp \
 	&& curl -L -O -k https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz \
@@ -641,10 +673,10 @@ RUN cd /tmp \
    && git clone --depth=1 https://github.com/eigenteam/eigen-git-mirror.git \
    && cd eigen-git-mirror \
    && cmake -E make_directory build \
-   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+   && cmake -E chdir build cmake .. -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_CXX_FLAGS="-std=c++11" \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install || true \
+   && cmake --build build --target install \
    && cd /tmp/ \
    && rm -Rf eigen-git-mirror
 
@@ -662,28 +694,36 @@ RUN cd /tmp \
 	&& cd /tmp \
 	&& rm -rf ginkgo
 
-RUN cd /tmp \
-	&& git clone --depth=1  https://github.com/dealii/dealii.git \
-	&& cd dealii \
-	&& cmake -E make_directory build \
-	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DCMAKE_BUILD_TYPE=Release \
-	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
-	&& cmake --build build --target install > /dev/null 2>&1 \
-	&& cd /tmp \
-	&& rm -rf dealii
+#c++: internal compiler error: Killed (program cc1plus)
+#Please submit a full bug report,
+#with preprocessed source if appropriate.
+#See <file:///usr/share/doc/gcc-7/README.Bugs> for instructions.
+#make[2]: *** [source/numerics/CMakeFiles/obj_numerics_release.dir/data_out.cc.o] Error 4
+#source/numerics/CMakeFiles/obj_numerics_release.dir/build.make:62: recipe for target 'source/numerics/CMakeFiles/obj_numerics_release.dir/data_out.cc.o' failed
+#make[1]: *** [source/numerics/CMakeFiles/obj_numerics_release.dir/all] Error 2
+#make[1]: *** Waiting for unfinished jobs....
+#RUN cd /tmp \
+#	&& git clone --depth=1  https://github.com/dealii/dealii.git \
+#	&& cd dealii \
+#	&& cmake -E make_directory build \
+#	&& cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#        -DCMAKE_BUILD_TYPE=Release \
+#	&& cmake --build build --target all --clean-first > /dev/null 2>&1 \
+#	&& cmake --build build --target install > /dev/null 2>&1 \
+#	&& cd /tmp \
+#	&& rm -rf dealii
 
 RUN cd /tmp \
-   && git clone  --depth=1 https://github.com/CGAL/cgal.git \
+   && git clone --depth=1 https://github.com/CGAL/cgal.git \
    && cd cgal \
-   && cmake -E make_directory build \
-   && cmake -E chdir build cmake -DCMAKE_BUILD_TYPE=Release \
+   && cmake -E make_directory cgal-build \
+   && cmake -E chdir cgal-build cmake -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=ON \
       -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=ON \
       -DWITH_demos=ON -DWITH_tests=ON \
-      -DCMAKE_INSTALL_PREFIX=/usr \
-   && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install || true \
+      -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+   && cmake --build cgal-build --target all --clean-first > /dev/null 2>&1 \
+   && cmake --build cgal-build --target install \
    && cd /tmp/ \
    && rm -Rf cgal
 
@@ -748,12 +788,12 @@ RUN echo -e '\033[36;1m ******* ADD USER ******** \033[0m'
 # Add $ACCOUNT to sudoers list with no password required
 # Make 'bash' the default shell for everyone
 
-RUN set -ex    cut -d: -f1 /etc/group
-RUN set -ex    cut -d: -f1 /etc/passwd
-RUN adduser --system --home /home/developer --shell /bin/bash --gecos GECOS \
-	--group --disabled-password developer
-USER developer
-WORKDIR /home/developer
+#RUN set -ex    cut -d: -f1 /etc/group
+#RUN set -ex    cut -d: -f1 /etc/passwd
+#RUN adduser --system --home /home/developer --shell /bin/bash --gecos GECOS \
+#	--group --disabled-password developer
+#USER developer
+#WORKDIR /home/developer
 
 
 RUN echo -e '\033[36;1m ******* CONTAINER START COMMAND ******** \033[0m'

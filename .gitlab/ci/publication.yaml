@@ -1,0 +1,8 @@
+publish release letter:
+    image: asciidoctor/docker-asciidoctor:latest
+    stage: pages
+    dependencies:
+        coverage
+    script:
+        - :
+
