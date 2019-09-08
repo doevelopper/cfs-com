@@ -29,6 +29,12 @@
 #
 # ---------------------------------------------------------------------
 
+.Git Untracked files: &save_untracked_files
+    artifacts:
+        name: untracked
+        paths: [$(pwd)]
+        expire_in: 3h45min
+
 .deploy_functions: &deploy_functions |
     [[ "$TRACE" ]] && set -x
     skipvar="SKIP_$(echo ${CI_JOB_STAGE} | tr 'a-z' 'A-Z')"
