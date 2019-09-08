@@ -23,45 +23,39 @@
 
 docker:build:omg-opendds:
     extends: .create-docker-container
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
-    # stage: Build docker image
+    stage: Build docker image
     variables:
         GOAL: build
-        VERSION: 3.13.2
+        BUMP_VERSION: 3.13.2
         MODULE: "omg-opendds"
-        IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
-        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/omg/Dockerfile
+        MODULE_DIR: omg
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
     # only:
     #    variables:
         #    - $BASE_DONE == "yes"
 
 .docker:build:adlinkist-vortex:
     extends: .create-docker-container
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1    
-    # stage: Build docker image
+    stage: Build docker image
     variables:
         GOAL: build
-        VERSION: 6.9.0
+        BUMP_VERSION: 6.9.0
         MODULE: "vortex-opensplice"
-        IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
-        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/adlinktech/Dockerfile
+        MODULE_DIR: adlinktech
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
     # only:
     #    variables:
-    #        - $BASE == "yes"
+    #        - $BASE_DONE == "yes"
 
 docker:build:eprosima-rtps:
     extends: .create-docker-container
-    # image: docker.io/doevelopper/cfs-com-dev:0.0.1
-    # stage: Build docker image
+    stage: Build docker image
     variables:
         GOAL: build
-        VERSION: 1.9.0
+        BUMP_VERSION: 1.9.0
+        MODULE_DIR: eprosima
         MODULE: "fast-rtps"
-        IMAGE_NAME: ${CONTAINER_IMAGE}-${MODULE}
-        IMAGE_TAG: ${IMAGE_NAME}:${VERSION}
-        DOCKER_FILE: src/main/resources/docker/${ARCH}/eprosima/Dockerfile
+        DOCKER_FILE: src/main/resources/docker/${ARCH}/${MODULE_DIR}/Dockerfile
     # only:
     #    variables:
-    #        - $BASE == "yes"
+    #        - $BASE_DONE == "yes"

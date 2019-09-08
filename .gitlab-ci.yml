@@ -52,7 +52,7 @@ include:
     - local: .gitlab/ci/dind.yml
     - local: .gitlab/ci/base.yml
     # - local: .gitlab/ci/base-test.yml
-    # - local: .gitlab/ci/dds.yml
+    - local: .gitlab/ci/dds.yml
     # - local: .gitlab/ci/dds-test.yml
 
 Intro CI:
