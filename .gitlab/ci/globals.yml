@@ -21,28 +21,26 @@
 #        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-.define_config: &triggered_by_api_call
-    only:
-        - triggers
-
-.define_config: &triggered_by_schedules
-    only:
-        - schedules
-
 .Log files: &log_files  [./*.log, ./build/logs/]
 
-# .Build logs: &save_build_logs
-#     artifacts:
-#         name: log
-#         when: always
-#         paths:
-#             <<: *log_file
+# ---------------------------------------------------------------------
+#
+# Various functions....
+#
+# ---------------------------------------------------------------------
 
-.Git Untracked files: &save_untracked_files
-    artifacts:
-        name: untracked
-        paths: [$(pwd)]
-        expire_in: 3h45min
+.deploy_functions: &deploy_functions |
+    [[ "$TRACE" ]] && set -x
+    skipvar="SKIP_$(echo ${CI_JOB_STAGE} | tr 'a-z' 'A-Z')"
+    [ "$(printenv $skipvar)" ] && echo "Skipping stage!" && exit 0
+# before_script:
+#   - *deploy_functions
+
+# ---------------------------------------------------------------------
+#
+# gitlab-runner selection
+#
+# ---------------------------------------------------------------------
 
 .agent-who:
     retry:
@@ -56,70 +54,12 @@
         # - gitlab-org
         - docker
 
-.default-cache: &default-cache
-    key: "dind-${CI_BUILD_REF_NAME}_${CI_BUILD_REF}"
-    paths:
-        - ${CI_PROJECT_PATH}/.cache
 
-.agent-who-default-cache:
-    extends: .agent-who
-    cache:
-        <<: *default-cache
-
-# Jobs that only need to pull cache
-.dedicated-pull-cache-job:
-    extends: .agent-who
-    cache:
-        <<: *default-cache
-        policy: pull
-    stage: Unit testing
-
-.only_stable:
-    only:
-        - master
-        - /^release-.*$/
-
-.tumbleweed:
-    only:
-        - develop
-        - /^feature-.*$/
-        - /^hotfix-.*$/
-        - /^bugfix-.*$/
-        - /^bugfix[/]v[0-9.]*$/
-        - /^support-.*$/
-#        - /(develop|feature|bugfix|hotfix)\/?(.*)/
-
-.notify:
-    image: alpine
-    stage: notification
-    cache: {}
-    before_script:
-        - apk update && apk add git curl bash
-    only:
-        - schedules
-    except:
-        variables:
-            - $CI_SLACK_NOTIFY != "true"
-            - $CI_SLACK_WEBHOOK_URL == null
-            - $CI_SLACK_CHANNEL == null
-
-.branch_exceptions:
-    only:
-        - branches
-    except:
-        - coverity_scan
-
-.amd64_variables:
-    variables:
-        IMAGE_ARCH=amd64
-
-.arm64v8_variables:
-    variables:
-        IMAGE_ARCH=arm64v8
-        HOSTCC=aarch64-linux-gnu-gcc
-        HOSTCXX=aarch64-linux-gnu-g++
-        TRIPLET=aarch64-linux-gnu
-        # - export PATH=/opt/aarch64-linux-gnu/bin/:/opt/armv8l-linux-gnueabihf/bin/:$PATH
+# ---------------------------------------------------------------------
+#
+# Fancy stuffs 
+#
+# ---------------------------------------------------------------------
 
 .pre_shared: &pre_shared
     before_script:
@@ -138,97 +78,67 @@
         - docker version  || true
         - docker logout docker.io || true
 
-.variables: &common_variables
-#    CI_DEBUG_TRACE: "true"
-#    GIT_SUBMODULE_STRATEGY: "none"
-#    GIT_SUBMODULE_STRATEGY: "recursive"
-#    GIT_STRATEGY: "fetch"
-#    GIT_CHECKOUT: "false"
-    GET_SOURCES_ATTEMPTS: "3"
-    ARTIFACT_DOWNLOAD_ATTEMPTS: "2"
-    GIT_DEPTH: "1"
-    LSB_RELEASE_ID: "$(lsb_release -i 2> /dev/null || echo Distributor ID: Unknown)"
-    LSB_RELEASE_RELEASE: "$(lsb_release -r 2> /dev/null || echo Release: Unknown)"
-    CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
-    STAGING_REGISTRY: "docker.io"
-    DTR_NAMESPACE: $CI_PROJECT_NAMESPACE
-    PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
-    PROJECT_NAME: $CI_PROJECT_NAME
-    TAG: $CI_BUILD_REF_NAME
-    ARCH: amd64
-    COMMIT_ID: ${CI_COMMIT_SHA:0:8}
-    CCACHE_BASEDIR: $CI_PROJECT_DIR
-    OS_NAME: $(lsb_release -is) || true
-    OS_VERS_LONG: $(lsb_release -rs | sed -r "s/^([0-9]+).*/\1/") || true
-    BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
-    COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
-    DOCKER_TRUSTED_REGISTRY: ${STAGING_REGISTRY}
+# ---------------------------------------------------------------------
+#
+# branches selections for differens stages
+#
+# ---------------------------------------------------------------------
+.tumbleweed:
+    only:
+        - develop
+        - /^feature-.*$/
+        - /^hotfix-.*$/
+        - /^bugfix-.*$/
+        - /^bugfix[/]v[0-9.]*$/
+        - /^support-.*$/
+#        - /(develop|feature|bugfix|hotfix)\/?(.*)/
 
-.dind_hub_variables:
-    variables:
-        <<: *common_variables
-        DOCKER_DIRVER: overlay2
-        DOCKER_HOST: tcp://docker:2376
-        DOCKER_TLS_VERIFY: 1
-        DOCKER_TLS_CERTDIR: "/certs"
-        DOCKER_CERT_PATH: "/certs/client"
-        ROOT_IMG_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
-        IMG_NAME: ${ROOT_IMG_IMAGE}
+.branch_exceptions:
+    only:
+        - branches
+    except:
+        - coverity_scan
 
-.docker-hub-dind:
-    image: docker:19.03.0
-    services:
-        - docker:19.03.0-dind
-    stage: Build in docker image
-    extends:
-        - .agent-who
-        - .dind_hub_variables
+.only_stable:
+    only:
+        - master
+        - /^release-.*$/
 
-.docker:
-    stage: Build docker image
-    services:
-        - docker:19.03.0-dind
-    extends: .dind_hub_variables
+.weekly build:
+    only:
+        variables:
+            - $SCHEDULE_TYPE == "weekly"
 
-.docker-app-prerequisities:
-    image: ${ROOT_IMG_IMAGE}-dind:0.0.1
-    extends: .docker
-    # only:
-        # refs:
-            # - branches
-        # changes:
-            # - src/main/resources/docker/${ARCH}/Dockerfile
+.define_config: &triggered_by_api_call
+    only:
+        - triggers
 
-.create-docker-container:
-    extends:
-        - .agent-who
-        - .docker-app-prerequisities
-    before_script:
-        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
-        - export VERSIONFILE=${CI_PROJECT_DIR}/src/main/resources/docker/${ARCH}/${MODULE_DIR}/VERSION_FILE
-        - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1"
-        - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log"
-        - export DTR_PASSWORD=$DOCKER_PASSWORD
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
-    script:
-        - |
-            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-common:latest >/dev/null; then
-                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
-            else
-                make GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
-            fi
-    after_script:
-        - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
-
-.deploy_functions: &deploy_functions |
-    [[ "$TRACE" ]] && set -x
-    skipvar="SKIP_$(echo ${CI_JOB_STAGE} | tr 'a-z' 'A-Z')"
-    [ "$(printenv $skipvar)" ] && echo "Skipping stage!" && exit 0
-# before_script:
-#   - *deploy_functions
-
-
+.define_config: &triggered_by_schedules
+    only:
+        - schedules
+# ---------------------------------------------------------------------
+#
 #  Caching configurations
+#
+# ---------------------------------------------------------------------
+
+.default-cache: &default-cache
+    key: "dind-${CI_BUILD_REF_NAME}_${CI_BUILD_REF}"
+    paths:
+        - ${CI_PROJECT_PATH}/.cache
+
+.agent-who-default-cache:
+    extends: .agent-who
+    cache:
+        <<: *default-cache
+
+# Jobs that only need to pull cache
+.dedicated-pull-cache-job:
+    extends: .agent-who
+    cache:
+        <<: *default-cache
+        policy: pull
+    stage: Unit testing
 
 .push-cache: &push-cache
     cache:
@@ -255,24 +165,135 @@
         key: "$CI_BUILD_STAGE/$CI_BUILD_REF_NAME"
         untracked: true
 
-.weekly build:
-    only:
-        variables:
-            - $SCHEDULE_TYPE == "weekly"
+# ---------------------------------------------------------------------
+#
+# common variables for the various stages
+#
+# ---------------------------------------------------------------------
 
-Intro CI:
-    stage: Intro
+.variables: &common_variables
+#    CI_DEBUG_TRACE: "true"
+#    GIT_SUBMODULE_STRATEGY: "recursive" "none"
+#    GIT_CHECKOUT: "false"
+    GIT_STRATEGY: "fetch"
+    GET_SOURCES_ATTEMPTS: "3"
+    ARTIFACT_DOWNLOAD_ATTEMPTS: "2"
+    GIT_DEPTH: "1"
+    CACHE_KEY: '$(if [[ ! -z ${CI_COMMIT_TAG+x} || "${CI_COMMIT_REF_SLUG}" == "prod" ]]; then echo "${CI_COMMIT_REF_SLUG}"; else echo "not-prod-or-tag"; fi)'
+    STAGING_REGISTRY: "docker.io"
+    BUILD_DATE: $(date +%Y-%m-%d-%H:%M:%S)
+    COMMIT_TIME: $(git show -s --format=%ct $CI_APPLICATION_TAG)
+    DOCKER_TRUSTED_REGISTRY: ${STAGING_REGISTRY}
+    DTR_NAMESPACE: $CI_PROJECT_NAMESPACE
+    PROJECT_SOURCE_DIR: "$CI_PROJECT_DIR"
+    PROJECT_NAME: $CI_PROJECT_NAME
+    TAG: $CI_BUILD_REF_NAME
+    ARCH: amd64
+    COMMIT_ID: ${CI_COMMIT_SHA:0:8}
+    CCACHE_BASEDIR: $CI_PROJECT_DIR
+
+.service-variables:
+    variables: &service-variables
+
+.base-variables:
+    variables: &base-variables
+
+.core-variables:
+    variables: &core-variables
+
+.module-deps-variables:
+    variables: &module-deps-variables
+
+.module-variables:
+    variables: &module-variables
+
+.dind_hub_variables:
+    variables:
+        <<: *common_variables
+        DOCKER_DIRVER: overlay2
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_TLS_CERTDIR: "/certs"
+        DOCKER_CERT_PATH: "/certs/client"
+        ROOT_IMG_IMAGE: ${STAGING_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+        IMG_NAME: ${ROOT_IMG_IMAGE}
+
+.Build logs: &save_build_logs
+    artifacts:
+        name: log
+        when: always
+        paths:
+            <<: *log_file
+
+# ---------------------------------------------------------------------
+#
+# Base template for all jobs that build a Docker image
+#
+# ---------------------------------------------------------------------
+
+.docker-hub-dind:
+    image: docker:19.03.0
+    services:
+        - docker:19.03.0-dind
+    stage: Build in docker image
     extends:
-        - .docker-hub-dind
-    <<: *pre_shared
-    script:
-        - echo '...'
+        - .agent-who
+        - .dind_hub_variables
 
-Outro CI:
-    stage: Outro
+# ---------------------------------------------------------------------
+#
+# service images
+#
+# ---------------------------------------------------------------------
+.docker:
+    stage: Build docker image
+    services:
+        - docker:19.03.0-dind
+    extends: .dind_hub_variables
+
+.docker-app-prerequisities:
+    image: ${ROOT_IMG_IMAGE}-dind:0.0.1
+    extends: .docker
+    # only:
+        # refs:
+            # - branches
+        # changes:
+            # - src/main/resources/docker/${ARCH}/Dockerfile
+
+# ---------------------------------------------------------------------
+#
+# base images
+#
+# ---------------------------------------------------------------------
+.create-docker-container:
     extends:
-        - .docker-hub-dind
-    <<: *post_shared
+        - .agent-who
+        - .docker-app-prerequisities
+    before_script:
+        - echo "Performing (${GOAL}) on (${MODULE}) (${CI_JOB_STAGE}[${CI_JOB_NAME}])"
+        - export VERSIONFILE=${CI_PROJECT_DIR}/src/main/resources/docker/${ARCH}/${MODULE_DIR}/VERSION_FILE
+        - "[ -f ${VERSIONFILE} ] && export SEM_VERSION=$(head ${VERSIONFILE}) || export SEM_VERSION=0.0.1"
+        - export BUILD_LOG="2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log"
+        - export DTR_PASSWORD=$DOCKER_PASSWORD
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     script:
-        - echo '...'
+        - |
+            if DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${ROOT_IMG_IMAGE}-common:latest >/dev/null; then
+                 make DDS_DEV_IMAGE=${ROOT_IMG_IMAGE}-common:latest GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
+            else
+                make GOAL=${GOAL} ${MODULE} 2>&1 | tee ${CI_PROJECT_DIR}/${MODULE}.log
+            fi
+    after_script:
+        - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 
+# ---------------------------------------------------------------------
+#
+# core images
+#
+# ---------------------------------------------------------------------
+
+# ---------------------------------------------------------------------
+#
+# deploy / cleanup
+#
+# ---------------------------------------------------------------------

@@ -49,34 +49,24 @@ stages:
 
 include:
     - local: .gitlab/ci/globals.yml
-    - local: .gitlab/ci/dind.yml
-    - local: .gitlab/ci/base.yml
+    # - local: .gitlab/ci/dind.yml
+    # - local: .gitlab/ci/base.yml
     # - local: .gitlab/ci/base-test.yml
     # - local: .gitlab/ci/dds.yml
     # - local: .gitlab/ci/dds-test.yml
 
-Fake Job :
-    stage: Unit testing
-    before_script:
-        - echo 'overwrite'
+Intro CI:
+    stage: Intro
+    extends:
+        - .docker-hub-dind
+        - .pre_shared
     script:
-        - echo 'script'
-    after_script:
-        - echo 'overwrite'
+        - echo '...'
 
-Create issue on failure:
-    stage: Quality assurance
-    script: curl --request POST "https://gitlab.com/api/v4/projects/${PROJECT_ID}/issues?private_token=${BOT_ACCESS_TOKEN}&title=Error%20in%20${CI_PROJECT_NAME}%20with%20pipeline%20${CI_PIPELINE_ID}%20for%20commit%20${CI_COMMIT_SHA}&labels&description=${CI_PIPELINE_URL}"
-    when: on_failure
-    only:
-        refs:
-            - develop
-            - master
-    dependencies: []
-
-# deploy:
-#     when: env.key?(:DO_DEPLOY) and env[:DO_DEPLOY]
-#     script:
-#         - echo "script content"
-#     only:
-#         - master@org/repo
+Outro CI:
+    stage: Outro
+    extends:
+        - .docker-hub-dind
+        - .post_shared
+    script:
+        - echo '...'
