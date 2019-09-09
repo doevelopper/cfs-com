@@ -331,6 +331,22 @@
             # - $CI_PROJECT_DIR/*.log
             # - tmp/*.log
 
+.test-docker-container:
+    extends:
+        - .agent-who
+        - .docker-app-prerequisities
+    before_script:
+        - export DTR_PASSWORD=$DOCKER_PASSWORD
+        - export SECOND_LEVEL="omg eprosima adlinktech"
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+    script:
+        - uname -a
+        - lsb_release -d
+        - lsb_release -sc
+        - pkg-config --list-all
+
+    after_script:
+        - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
 # ---------------------------------------------------------------------
 #
 # core images

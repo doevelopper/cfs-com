@@ -23,7 +23,7 @@
 
 docker:test:dds-base:
     stage: Test docker image
-    extends: .create-docker-container
+    extends: .test-docker-container
     variables:
         GOAL: run
         MODULE: "dds-base"
@@ -32,7 +32,7 @@ docker:test:dds-base:
 
 docker:test:rti-dds-base:
     stage: Test docker image
-    extends: .create-docker-container
+    extends: .test-docker-container
     variables:
         GOAL: run
         VERSION: 5.3.3

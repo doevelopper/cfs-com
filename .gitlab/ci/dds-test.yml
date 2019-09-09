@@ -23,7 +23,7 @@
 
 docker:test:omg-opendds:
     image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
-    extends: .create-docker-container
+    extends: .test-docker-container
     stage: Test docker image
     variables:
         VERSION: 0.0.1
@@ -31,14 +31,14 @@ docker:test:omg-opendds:
 
 docker:test:adlinktech-vortex:
     image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
-    extends: .create-docker-container
+    extends: .test-docker-container
     stage: Test docker image
     variables:
         VERSION: 0.0.1
-        MODULE_DIR: adlinktech		
+        MODULE_DIR: adlinktech
 
 docker:test:eprosima-rtps:
-    extends: .create-docker-container
+    extends: .test-docker-container
     image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
     stage: Test docker image
     variables:
@@ -46,7 +46,7 @@ docker:test:eprosima-rtps:
         MODULE_DIR: eprosima		
 
 docker:test:rti-connextDDS:
-    extends: .create-docker-container
+    extends: .test-docker-container
     image: ${ROOT_IMG_IMAGE}-${MODULE_DIR}:latest
     stage: Test docker image
     variables:

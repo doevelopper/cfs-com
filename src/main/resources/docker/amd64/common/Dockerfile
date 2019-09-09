@@ -37,8 +37,8 @@ ARG HTTPS_PROXY=$PROXY
 ARG NO_PROXY=$NOPROXY
 ARG CMAKE_MAJOR_VERSION=${CMAKE_MAJOR_VERSION:-3.15}
 ARG CMAKE_VERSION=${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.3}
-ARG MVN_VERSION=${MVN_VERSION:-3.6.1}
-ARG GRADLE_VERSION=${GRADLE_VERSION:-5.6.1}
+ARG MVN_VERSION=${MVN_VERSION:-3.6.2}
+ARG GRADLE_VERSION=${GRADLE_VERSION:-5.6.2}
 ARG BAZEL_VERSION=${BAZEL_VERSION:-0.29.0}
 ARG BOOST_VERSION_MAJ=1
 ARG BOOST_VERSION_MIN=69
@@ -48,7 +48,7 @@ ARG BOOST_RELEASE=${BOOST_VERSION_MAJ}_${BOOST_VERSION_MIN}_${BOOST_VERSION_PATC
 ARG APR_VERSION=1.7.0
 ARG APU_VERSION=1.6.1
 ARG Q_MAJOR_VERSION=${Q_MAJOR_VERSION:-5.13}
-ARG Q_VERSION=${Q_VERSION:-${Q_MAJOR_VERSION}.0}
+ARG Q_VERSION=${Q_VERSION:-${Q_MAJOR_VERSION}.1}
 ARG QT_SHA_256=0cd82c80287a783bd5db1339b6184803d57517c9450ffe16f505254853f0a41f
 ARG T_MD5=c839aed9d551bdc8411a0a33e5ae46f3
 
@@ -72,7 +72,7 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       libpulse-dev libva-dev libxv-dev libelf-dev elfutils libelf1 \
       libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
       libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
-      display-dhammapada fortunes \
+      display-dhammapada fortunes lsb-release \
       libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
       gnutls-bin ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30 \
    && apt-get clean --assume-yes  \
@@ -175,7 +175,7 @@ RUN cd /tmp \
    && cd gdb-8.3 \
    && ./configure --prefix=/usr/local \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf gdb-8.3.tar.gz gdb-8.3 \
    && Time="$(($(date +%s)-Time))" \
@@ -187,7 +187,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install> /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf uncrustify
 
@@ -197,7 +197,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cp --recursive --verbose cfg  /usr/local/bin || true \
    && cd /tmp \
    && rm -rf cppcheck
@@ -208,7 +208,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf doxygen
 
@@ -218,7 +218,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf googletest
 
@@ -228,7 +228,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DBENCHMARK_ENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr/local  \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf benchmark
 
@@ -240,7 +240,7 @@ RUN cd /tmp \
        -DCMAKE_CONFIGURATION_TYPES=Release -DGFLAGS_BUILD_TESTING=OFF \
        -DGFLAGS_BUILD_SHARED_LIBS=ON -DGFLAGS_BUILD_STATIC_LIBS=ON \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf gflags
 
@@ -250,7 +250,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf glog
 
@@ -279,7 +279,7 @@ RUN cd /tmp \
    && curl -L -O -k https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_RELEASE}.tar.gz \
    && tar xzf boost_${BOOST_RELEASE}.tar.gz \
    && cd boost_${BOOST_RELEASE} \
-   && ./bootstrap.sh --prefix=/usr/local --with-python=python3  > /dev/null 2>&1\
+   && ./bootstrap.sh --prefix=/usr/local --with-python=python3 \
    && ./b2 --help \
    && ./b2 link=shared threading=multi variant=release address-model=64 > /dev/null 2>&1 \
    && ./b2 install --prefix=/usr/local > /dev/null 2>&1 \
@@ -293,7 +293,7 @@ RUN cd /tmp \
    && cmake -E make_directory build \
    && cmake -E chdir build cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release\
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf sml
 
@@ -306,7 +306,7 @@ RUN cd /tmp \
    && cmake -E chdir build cmake -DCUKE_ENABLE_EXAMPLES=off \
       -DCMAKE_INSTALL_PREFIX=/usr/local .. \
    && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-   && cmake --build build --target install > /dev/null 2>&1 \
+   && cmake --build build --target install \
    && cd /tmp \
    && rm -rf cucumber-cpp
 
@@ -318,7 +318,7 @@ RUN cd /tmp \
    && make clean  > /dev/null 2>&1\
    && make > /dev/null 2>&1 \
 #   && make DESTDIR=/opt/afl  BINDIR=/opt/afl/bin DATAROOTDIR=/opt/afl/share LIBDIR=/opt/afl/lib install \
-   && make DESTDIR=/usr/local \
+   && make DESTDIR=/usr/local install \
    && cd /tmp \
    && rm -rf afl-2.52b* american-fuzzy-lop
 
@@ -352,7 +352,7 @@ RUN cd /tmp \
 #    && ./config --prefix=/usr/local shared enable-ec enable-ecdh enable-ecdsa \
    && ./config --prefix=/usr/local shared  \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf openssl
 
@@ -363,7 +363,7 @@ RUN cd /tmp \
    && ./configure --enable-samples --with-openssl=/usr --with-zlib=/usr --enable-silent-rules --prefix=/usr/local \
    && make clean  > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf protobuf
 
@@ -391,7 +391,7 @@ RUN cd /tmp \
         --enable-allocator-guard-pages --enable-pool-concurrency-check --enable-other-child  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf apr-${APR_VERSION}.tar.gz apr-${APR_VERSION}
 
@@ -401,7 +401,7 @@ RUN cd /tmp \
    && ./buildconf.sh > /dev/null 2>&1 \
    && ./configure CPPFLAGS=-DXML_LARGE_SIZE --without-docbook --prefix=/usr/local \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf libexpat
 
@@ -412,7 +412,7 @@ RUN cd /tmp \
    && ./configure --prefix=/usr/local --with-apr=/usr/local --with-expat=/usr/local  \
    && make clean > /dev/null 2>&1  \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf apr-util-${APU_VERSION}.tar.gz apr-util-${APU_VERSION}
 
@@ -424,7 +424,7 @@ RUN cd /tmp \
         --enable-char --enable-wchar_t --with-charset=utf-8 --with-logchar=utf-8  \
    && make clean > /dev/null 2>&1 \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -rf logging-log4cxx
 
@@ -445,7 +445,7 @@ RUN cd /tmp \
    && git clone https://chromium.googlesource.com/linux-syscall-support src/third_party/lss \
    && ./configure --prefix=/usr/local  \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp \
    && rm -Rf breakpad
 
@@ -479,7 +479,7 @@ RUN cd /tmp \
     && git clone https://git.videolan.org/git/x264.git \
     && cd x264 \
     && ./configure --prefix=/usr/local --bit-depth=all --chroma-format=all --enable-pic --enable-shared \
-    && make \
+    && make > /dev/null 2>&1 \
     && make install \
     && cd /tmp \
     && rm -rf x264
@@ -563,11 +563,10 @@ RUN cd /tmp \
     && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
     && cd gstreamer-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make -j`nproc` \
+    && make -j`nproc` > /dev/null 2>&1 \
     && make install  \
     && cd /tmp/ \
     && rm -rf gstreamer-*
-
 
 # orc
 RUN cd /tmp \
@@ -575,7 +574,7 @@ RUN cd /tmp \
     && cd orc \
     && ./autogen.sh --prefix=/usr/local \
       --disable-examples --enable-shared --disable-gtk-doc \
-    && make install  \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     && rm -rf orc
 
@@ -586,11 +585,10 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-base-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1 \
     && make install  \
     && cd /tmp/ \
     && rm -rf gst-*
-
 
 # libnice
 RUN cd /tmp \
@@ -599,10 +597,9 @@ RUN cd /tmp \
     && ./autogen.sh --prefix=/usr/local \
       --with-gstreamer --enable-static --enable-static-plugins \
       --enable-shared --without-gstreamer-0.10 --disable-gtk-doc \
-    && make install  \
+    && make install > /dev/null 2>&1 \
     && cd /tmp/ \
     && rm -rf libnice
-
 
 # gst-plugins-good
 RUN cd /tmp \
@@ -610,7 +607,7 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-good-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1 \
     && make install  \
     && cd /tmp/ \
     && rm -rf gst-*
@@ -622,7 +619,7 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-bad-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1 \
     && make install \
     && cd /tmp/ \
     && rm -rf gst-*
@@ -633,7 +630,7 @@ RUN cd /tmp \
     && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-ugly-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1  \
     && make install  \
     && cd /tmp/ \
     && rm -rf gst-*
@@ -644,7 +641,7 @@ RUN cd /tmp \
     && tar xvfJ gst-libav-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-libav-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1 \
     && make install  \
     && cd /tmp/ \
     && rm -rf gst-*
@@ -655,7 +652,7 @@ RUN cd /tmp \
     && tar xvfJ gst-rtsp-server-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-rtsp-server-${GST_VERSION} \
     && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make  \
+    && make > /dev/null 2>&1 \
     && make install  \
     && cd /tmp/ \
     && rm -rf gst-*
@@ -667,7 +664,7 @@ RUN cd /tmp \
     && ./autogen.sh \
     && ./configure --enable-maintainer-mode --prefix=/usr/local \
     && make -j `nproc` > /dev/null 2>&1 \
-    && make install > /dev/null 2>&1 \
+    && make install \
     && cd /tmp \
     && rm -rf gsl-2.6.tar.gz gsl-2.6
 
@@ -692,7 +689,7 @@ RUN cd /tmp \
         -DGINKGO_DEVEL_TOOLS=OFF -DGINKGO_BUILD_REFERENCE=ON \
         -DCMAKE_BUILD_TYPE=Release \
     && cmake --build build --target all --clean-first > /dev/null 2>&1 \
-    && cmake --build build --target install > /dev/null 2>&1 \
+    && cmake --build build --target install \
     && cd /tmp \
     && rm -rf ginkgo
 
@@ -720,9 +717,9 @@ RUN cd /tmp \
    && cd cgal \
    && cmake -E make_directory cgal-build \
    && cmake -E chdir cgal-build cmake -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=ON \
-      -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=ON \
-      -DWITH_demos=ON -DWITH_tests=ON \
+      -DCMAKE_CXX_FLAGS="-std=c++14" -DCGAL_HEADER_ONLY=OFF \
+      -DCMAKE_CXX_FLAGS_RELEASE=-DCGAL_NDEBUG -DWITH_examples=OFF \
+      -DWITH_demos=OFF -DWITH_tests=OFF \
       -DCMAKE_INSTALL_PREFIX=/usr/local .. \
    && cmake --build cgal-build --target all --clean-first > /dev/null 2>&1 \
    && cmake --build cgal-build --target install \
@@ -733,9 +730,9 @@ RUN cd /tmp \
    && git clone  --depth=1 git://git.linuxtv.org/v4l-utils.git \
    && cd v4l-utils \
    && autoreconf -vfi \
-   && ./configure --prefix=/usr/local > /dev/null 2>&1 \
+   && ./configure --prefix=/usr/local \
    && make > /dev/null 2>&1 \
-   && make install > /dev/null 2>&1 \
+   && make install \
    && cd /tmp/ \
    && rm -Rf v4l-utils
 

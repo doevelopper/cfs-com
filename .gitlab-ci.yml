@@ -30,7 +30,7 @@
 stages:
     - Intro
     - Build in docker image
-    - Build own dind image
+    - Build base image
     - Build docker image
     - Test docker image
     - Configure build
@@ -51,9 +51,9 @@ include:
     - local: .gitlab/ci/globals.yml
     - local: .gitlab/ci/dind.yml
     - local: .gitlab/ci/base.yml
-    # - local: .gitlab/ci/base-test.yml
+    - local: .gitlab/ci/base-test.yml
     - local: .gitlab/ci/dds.yml
-    # - local: .gitlab/ci/dds-test.yml
+    - local: .gitlab/ci/dds-test.yml
 
 Intro CI:
     stage: Intro
