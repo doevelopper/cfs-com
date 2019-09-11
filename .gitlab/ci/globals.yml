@@ -91,7 +91,7 @@
 
 # ---------------------------------------------------------------------
 #
-# Fancy stuffs 
+# Fancy stuffs
 #
 # ---------------------------------------------------------------------
 
@@ -319,7 +319,7 @@
                 echo "== SKipping build =="
                 exit 0
             else
-                make DOCKER_TRUSTED_REGISTRY=${DOCKER_TRUSTED_REGISTRY} DDS_DEV_IMAGE=${CHECK_IMG} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH} GOAL=${GOAL} PLATFORM=${PLATFORM}
+                make DOCKER_TRUSTED_REGISTRY=${DOCKER_TRUSTED_REGISTRY} DDS_DEV_IMAGE=${CHECK_IMG} DTR_NAMESPACE=${DTR_NAMESPACE} ARCH=${ARCH} GOAL=${GOAL} PLATFORM=${PLATFORM} ${MODULE}
             fi
     after_script:
         - docker logout ${DOCKER_TRUSTED_REGISTRY} || true
