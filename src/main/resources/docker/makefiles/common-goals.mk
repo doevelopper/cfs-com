@@ -52,7 +52,7 @@ ifneq ($(CI_RUNNER_TAGS),)
 endif
 
 BUILD_ARGS          += --build-arg LOG_OUTPUT=$(TTY_LOG)
-BUILD_ARGS          += --build-arg CI_DOMAIN=$(CI_RUNNER_TAGS)
+BUILD_ARGS          += --build-arg CI_DOMAIN="$(CI_RUNNER_TAGS)"
 
 ifneq ($(DDS_DEV_IMAGE),)
     BUILD_ARGS      += --build-arg DDS_DEV_IMAGE=$(DDS_DEV_IMAGE)
@@ -86,8 +86,7 @@ build: build-image dtr-login push dtr-logout ## Build and deploy Docker images b
 .PHONY: build-image
 build-image:
 	$(Q)echo "$(SH_CYAN) Build of $(BUILDER_FQIN) from $(BASE_IMAGE) $(SH_DEFAULT)"
-	# $(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile . 2>&1 | tee $(GIT_ROOTDIR)/$(shell basename $(CURDIR))_build_output.log
-	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file Dockerfile .
+	$(Q)$(DOCKER) build $(DOCKER_LABEL) $(BUILD_ARGS) --tag  $(BUILDER_FQIN):$(SEM_VERSION) --file ./Dockerfile . 2>&1 | tee $(GIT_ROOTDIR)/$(shell basename $(CURDIR))_build_output.log
 	$(Q)echo "Build of $(BUILDER_FQIN):$(SEM_VERSION) finished."
 
 .PHONY: push
