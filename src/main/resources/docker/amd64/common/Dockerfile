@@ -454,7 +454,7 @@ RUN cd /opt \
 ENV  PATH /opt/depot_tools:$PATH
 
 COPY qt-installer-script.qs /tmp
-COPY qt-opensource-linux-x64-${Q_VERSION}.run* /tmp
+#COPY qt-opensource-linux-x64-${Q_VERSION}.run* /tmp
 # RUN objdump -p ./qt-opensource-linux-x64-${Q_VERSION}.run | grep NEEDED
 
 RUN cd /tmp \
@@ -735,6 +735,21 @@ RUN cd /tmp \
    && make install \
    && cd /tmp/ \
    && rm -Rf v4l-utils
+
+RUN cd /tmp \
+    && git clone --depth=1 https://github.com/QuantStack/xsimd.git \
+    && cd xsimd \
+    && cmake -E make_directory xsimd-build \
+    && cmake -E chdir xsimd-build cmake -DCMAKE_BUILD_TYPE=Release \
+       -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+    && cmake --build xsimd-build --target all --clean-first > /dev/null 2>&1 \
+    && cmake --build xsimd-build --target install \
+    && cd /tmp/ \
+    && rm -Rf xsimd
+
+
+#RUN cd /tmp \
+#    && git clone --depth=1 --recurse-submodules  https://github.com/lemire/simdjson.git
 
 # RUN cd /tmp \
 #    && git clone --depth=1 https://github.com/opencv/opencv.git \

@@ -684,5 +684,5 @@ WORKDIR /home/developer
 # ENTRYPOINT ["/opt/rti_connext_dds-6.0.0/bin/rtipersistenceservice"]
 # CMD ["-cfgFile","/config.xml","-cfgName","gets_persistence"]
 
-CMD ["fortune"]
+CMD ["/bin/bash"]
 
