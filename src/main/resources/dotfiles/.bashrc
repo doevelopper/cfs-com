@@ -8,9 +8,9 @@ case $- in
       *) return;;
 esac
 
-GIT_PS1_SHOWDIRTYSTATE=1 
-GIT_PS1_SHOWUNTRACKEDFILES=1 
-GIT_PS1_SHOWSTASHSTATE=1 
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWSTASHSTATE=1
 GIT_PS1_SHOWUPSTREAM="verbose"
 
 #https://github.com/ryanoasis/public-bash-scripts
@@ -154,7 +154,7 @@ rightprompt()
 
 if [[ ${EUID} == 0 ]] ; then
     sq_color="\[\033[0;31m\]"
-else		
+else
     sq_color="\[\033[0;34m\]"
 fi
 
@@ -286,7 +286,7 @@ unset color_prompt force_color_prompt
 case "$TERM" in
 xterm*|rxvt*)
 #    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    |PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\033[0;           31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} ==     0 ]]; then echo '\[\033[01;31m\]root\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;             96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;                                                       31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]\\$\[\e[0m\]"
+    |PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\033[0;31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]root\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]\\$\[\e[0m\]"
     ;;
 *)
     ;;
@@ -371,6 +371,26 @@ alias fuckit='git commit -am "$(curl --silent --fail whatthecommit.com/index.txt
 alias autowip='git commit -am ""[WIP]$(curl --silent --fail whatthecommit.com/index.txt)"'
 alias autowipskip='git commit -am ""[WIP]$(curl --silent --fail whatthecommit.com/index.txt) [ci skip]"'
 alias autopush='!git add -A && git commit -m "$(curl --silent --fail https://whatthecommit.com/index.txt) && git flow feature publish"'
+
+alias gh='cd "$(git rev-parse --show-toplevel)"'
+# Show untracked files
+alias gu='git ls-files . --exclude-standard --others'
+# Show commits since last pull
+alias gnew="git log HEAD@{1}..HEAD@{0}"
+# Add uncommitted and unstaged changes to the last commit
+alias gcaa="git commit -a --amend -C HEAD"
+alias ggui="git gui"
+alias gcsam="git commit -S -am"
+alias gst="git stash"
+alias gstb="git stash branch"
+alias gstd="git stash drop"
+alias gstl="git stash list"
+alias gmu='git fetch origin -v; git fetch upstream -v; git merge upstream/master'
+alias gll='git log --graph --pretty=oneline --abbrev-commit'
+alias gg="git log --graph --pretty=format:'%C(bold)%h%Creset%C(magenta)%d%Creset %s %C(yellow)<%an> %C(cyan)(%cr)%Creset' --abbrev-commit --date=relative"
+
+
+
 #alias sapt='sudo apt-get'
 #alias saptu='sudo apt-get update && sudo apt-get upgrade && sudo apt-get autoremove && sudo apt-get autoclean'
 #alias saptg=`apt-get update`             #->  apt update

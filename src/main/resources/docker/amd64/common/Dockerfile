@@ -465,7 +465,7 @@ COPY qt-installer-script.qs /tmp
 #        fi
 
 RUN cd /tmp \
-   && curl -k -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run"; \
+   && curl -k -L -O "http://download.qt.io/official_releases/qt/${Q_MAJOR_VERSION}/${Q_VERSION}/qt-opensource-linux-x64-${Q_VERSION}.run" \
    && chmod +x ./qt-installer-script.qs \
    && chmod +x ./qt-opensource-linux-x64-${Q_VERSION}.run \
    && xvfb-run ./qt-opensource-linux-x64-${Q_VERSION}.run --script ./qt-installer-script.qs --platform minimal --verbose > /dev/null 2>&1 \
