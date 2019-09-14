@@ -573,9 +573,10 @@ RUN cd /tmp \
 RUN cd /tmp \
     && git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/orc.git \
     && cd orc \
-    && ./autogen.sh --prefix=/usr/local \
-      --disable-examples --enable-shared --disable-gtk-doc \
-    && make install > /dev/null 2>&1 \
+    && meson  --prefix=/usr/local build/ \
+    && ninja -C build/ \
+    && ninja -C build/ test \
+    && ninja -C build/ install \
     && cd /tmp/ \
     && rm -rf orc
 
