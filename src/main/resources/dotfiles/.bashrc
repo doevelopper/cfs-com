@@ -274,27 +274,19 @@ fi
 if [ "$color_prompt" = yes ]; then
 #    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 PS1="\[\033[0;31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]SuperUser\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\[\033[0;94m\t\[\033[01;33m\]@\[\033[01;96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\342\224\200(\[\033[1;36m\]\$(ls -1 | wc -l | sed 's: ::g') files, \$(ls -sh | head -n1 | sed 's/total //')b , Jobs \$(jobs | wc -l)\[\033[1;37m\])\[\033[0m\](\[\[\e[37;1m\]! \!\[\e[32;1m\])\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]\\$\[\033[0m\033[0;32m\] $(git_prompt) ▶\[\033[0m\]"
-#PS1="\[\033[0;31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]SuperUser\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\[\033[0;94m\t\[\033[01;33m\]@\[\033[01;96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\342\224\200(\[\033[1;36m\]\$(ls -1 | wc -l | sed 's: ::g') files, \$(ls -sh | head -n1 | sed 's/total //')b , Jobs \$(jobs | wc -l)\[\033[1;37m\])\[\033[0m\]\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]\\$\[\033[0m\033[0;32m\] $(git_prompt) ▶\[\033[0m\]"
-#PS1="\n\[\033[0;35m\]\342\224\214\342\224\200$([[ $? != 0 ]] && echo "[\[\033[0;37m\]\342\234\227\[\033[0;35m\]]\342\224\200")[\[\033[0;33m\]\t\[\033[0;35m\]]\342\224\200[\[\033[0;37m\]\h : \[\033[0;32m\]\w\[\033[0;35m\]]\n\342\224\224\342\224\200\342\224\200> \[\033[0;37m\]\$ \[\033[0m\]"
-#PS1="\[\033[0;31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} == 0 ]]; then echo '\[\033[01;31m\]Nick FURY\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\] $(__git_status) \\$\[\033[0m\033[0;32m\] ⇨▶\[\033[0m\]"
-#PS1="\[\033[0;31m\]\[\033[1;31m\]\[\033[1;30m\](\[\033[1;31m\]\u\[\033[0;31m\]@\[\033[1;31m\]\h\[\033[1;30m\]) -> \[\033[0m\]\[\033[0;31m\]$(__git_ps1 "${HOTBLK2}(${REGRED2}%s${HOTBLK2})")\[\033[0m\]\n\[\033[0;31m\]\[\033[1;31m\]\[\033[1;30m\](\[\033[0;31m\]\w\[\033[1;30m\])\[\033[0;31m\]>\[\033[0m\]"
-#PS1='\[\033[0;32m\]\[\033[0m\033[0;32m\]\u\[\033[0;36m\] @ \w\[\033[0;32m\]\n$(git branch 2>/dev/null | grep "^*" | colrm 1 2)\[\033[0;32m\]└─\[\033[0m\033[0;32m\] \$\[\033[0m\033[0;32m\]\[\033[0m\] '       
-#PS1='\[\033[0;32m\]\[\033[0m\033[0;32m\]\u\[\033[0;36m\] @ \[\033[0;36m\]\h \w\[\033[0;32m\]$(__git_ps1)\n\[\033[0;32m\]└─\[\033[0m\033[0;32m\] \$\[\033[0m\033[0;32m\] ▶\[\033[0m\] '
-#PS1='\[\033[0;32m\]\[\033[0m\033[0;32m\]\u\[\033[0;36m\] @ \w\[\033[0;32m\] - [$(git branch 2>/dev/null | grep "^*" | colrm 1 2)\[\033[0;32m\]]\[\033[0m\033[0;32m\] \$\[\033[0m\033[0;32m\]\[\033[0m\] '
-#PS1='\[\033[32m\]\u \[\033[36m\]@ \h \w\[\033[32m\]$(__git_ps1)\n└─ \$ ▶\[\033[0m\] '
 
-#PS1="\n\[\033[35m\] \$(/bin/date)\n\[\033[1;31m\]\u@\h: \[\033[1;34m\]\$(/usr/bin/tty | /bin/sed -e 's:/dev/::'): \[\033[1;34m\]\$(pwd) \[\033[1;36m\]\$(/bin/ls -1 | /usr/bin/wc -l |
-#    /bin/sed 's: ::g') files \[\033[1;33m\]\$(/bin/ls -lah | /bin/grep -m 1 total | /bin/sed 's/total //')b\[\033[0m\] \[\033[0m\] \[\033[0;32m\][git:$(git_branch)]\n\[\033[0;32m\] └─\[\033[0m\033[0;32m\] ▶\[\033[0m\]"
 else
 #    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-     PS1='┌──[\u@\h]─[\w]\n└──╼ \$ '
+#    PS1='┌──[\u@\h]─[\w]\n└──╼ \$ '
+     PS1='+--[\u@\h]-[\w]\n+--? \$ '
 fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    |PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]\[\033[0;           31m\]\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200\")[$(if [[ ${EUID} ==     0 ]]; then echo '\[\033[01;31m\]root\[\033[01;33m\]@\[\033[01;96m\]\h'; else echo '\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;             96m\]\h'; fi)\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;                                                       31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]\\$\[\e[0m\]"
     ;;
 *)
     ;;
@@ -319,16 +311,19 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias ll='ls -alh'                                                              # List files
-alias llr='ls -alhr'                                                            # List files (reverse)
-alias lls='ls -alhS'                                                            # List files by size
-alias llsr='ls -alhSr'                                                          # List files by size (reverse)
-alias lld='ls -alht'                                                            # List files by date
-alias lldr='ls -alhtr'                                                          # List files by date (reverse)
-alias lldc='ls -alhtU'                                                          # List files by date created
-alias lldcr='ls -alhtUr'                                                        # List files by date created (reverse)
-h() { history | grep "$1"; }                                                    # Shorthand for `history` with added grepping
-disk-usage() { du -hs "$@" | sort -nr; }                                        # List disk usage of all the files in a directory (use -hr to sort on server)
+alias ll='ls -alh'                                          # List files
+alias llr='ls -alhr'                                        # List files (reverse)
+alias lls='ls -alhS'                                        # List files by size
+alias llsr='ls -alhSr'                                      # List files by size (reverse)
+alias lld='ls -alht'                                        # List files by date
+alias lldr='ls -alhtr'                                      # List files by date (reverse)
+alias lldc='ls -alhtU'                                      # List files by date created
+alias lldcr='ls -alhtUr'                                    # List files by date created (reverse)
+h() { history | grep "$1"; }                                # Shorthand for `history` with added grepping
+disk-usage() { du -hs "$@" | sort -nr; }                    # List disk usage of all the files in a directory (use -hr to sort on server)
+alias em='emacs -nw'
+alias dd='dd status=progress'
+alias _='sudo'
 alias home='clear && cd ~ && ll'                                                # Home directory
 alias downloads='clear && cd ~/Downloads && ll'                                 # Downloads directory
 mktar() { tar cvzf "${1%%/}.tar.gz"  "${1%%/}/"; }    # Creates a *.tar.gz archive of a file or folder
@@ -338,7 +333,6 @@ alias mkbz2='tar -cvjf'
 alias mkgz='tar -cvzf'
 alias svi='sudo vi'
 alias vis='vim "+set si"'
-
 alias perm="stat -f '%Lp'"                                                      # View the permissions of a file/dir as a number
 alias atree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"             # List the file structure of the current directory
 alias lsd='ll | grep "^d"'                  # Preferred 'ls' implementation (only directories)
@@ -372,6 +366,11 @@ alias sagr='sudo apt-get remove' #packages
 alias sagd='sudo apt-get dist-upgrade'
 alias sagc='sudo apt-get clean'
 alias sagac='sudo apt-get autoclean'
+alias yolo='!git add -A && git commit -m "$(curl --silent --fail https://whatthecommit.com/index.txt)"'
+alias fuckit='git commit -am "$(curl --silent --fail whatthecommit.com/index.txt)"'
+alias autowip='git commit -am ""[WIP]$(curl --silent --fail whatthecommit.com/index.txt)"'
+alias autowipskip='git commit -am ""[WIP]$(curl --silent --fail whatthecommit.com/index.txt) [ci skip]"'
+alias autopush='!git add -A && git commit -m "$(curl --silent --fail https://whatthecommit.com/index.txt) && git flow feature publish"'
 #alias sapt='sudo apt-get'
 #alias saptu='sudo apt-get update && sudo apt-get upgrade && sudo apt-get autoremove && sudo apt-get autoclean'
 #alias saptg=`apt-get update`             #->  apt update
