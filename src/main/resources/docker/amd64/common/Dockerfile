@@ -39,7 +39,7 @@ ARG CMAKE_MAJOR_VERSION=${CMAKE_MAJOR_VERSION:-3.15}
 ARG CMAKE_VERSION=${CMAKE_VERSION:-${CMAKE_MAJOR_VERSION}.3}
 ARG MVN_VERSION=${MVN_VERSION:-3.6.2}
 ARG GRADLE_VERSION=${GRADLE_VERSION:-5.6.2}
-ARG BAZEL_VERSION=${BAZEL_VERSION:-0.29.0}
+ARG BAZEL_VERSION=${BAZEL_VERSION:-0.29.1}
 ARG BOOST_VERSION_MAJ=1
 ARG BOOST_VERSION_MIN=69
 ARG BOOST_VERSION_PATCH=0
@@ -71,10 +71,13 @@ RUN apt-get -qq -o Acquire::Check-Valid-Until="false" update --assume-yes \
       yasm nasm xotcl-dev tcl-expect-dev tcl-dev docbook2x dos2unix \
       libpulse-dev libva-dev libxv-dev libelf-dev elfutils libelf1 \
       libavformat-dev libavutil-dev libdlna-dev libavcodec-dev uvcdynctrl \
-      libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen graphviz xdo \
-      display-dhammapada fortunes lsb-release \
-      libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist \
+      libtsan0-dbg libtsan0 valgrind valgrind-dbg mscgen libgraphviz-dev xdo \
+      display-dhammapada fortunes lsb-release libpng-dev libghc-graphviz-dev \
+      libcrypto++-dev libgcrypt20-dev libpcap-dev libwiretap-dev bittwist tkpng \
       gnutls-bin ntopng pcaputils python-pcapy python-pypcap tcpick tcpspy libgnutls30 \
+      gobject-introspection liborc-0.4-dev liborc-0.4-dev-bin libgudev-1.0-dev libgudev3.0-cil-dev \
+      libogg-dev liboggz2-dev python-ogg libisocodes-dev gir1.2-isocodes-1.2 libpng++-dev \
+      libtheora-dev libtheora-bin libvorbis-dev python-pyvorbis libogg-vorbis-decoder-perl\
    && apt-get clean --assume-yes  \
    && apt-get --assume-yes --quiet clean \
    && apt-get --assume-yes --quiet autoremove \
@@ -153,6 +156,7 @@ RUN pip install -q --no-cache-dir conan \
    && pip install lizard \
    && pip install cpp-demangle \
    && pip install polysquare-cmake-linter \
+   && pip install -U Sphinx \
    && pip3 install cmakedoc \
    && pip install cpp-coveralls \
    && pip install coverxygen \
@@ -560,25 +564,21 @@ ARG GST_VERSION=1.16.0
 
 # http://www.linuxfromscratch.org/blfs/view/svn/multimedia/gstreamer10.html
 RUN cd /tmp \
-    && curl -L -O -k  https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
+    && curl -L -O -k https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${GST_VERSION}.tar.xz \
     && tar xvfJ gstreamer-${GST_VERSION}.tar.xz > /dev/null \
+	&& curl -L -O -k http://www.linuxfromscratch.org/patches/blfs/svn/gstreamer-1.16.0-buffer_size_reset_fix-1.patch \
     && cd gstreamer-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make -j`nproc` > /dev/null 2>&1 \
-    && make install  \
-    && cd /tmp/ \
-    && rm -rf gstreamer-*
-
-# orc
-RUN cd /tmp \
-    && git clone --depth=1 https://gitlab.freedesktop.org/gstreamer/orc.git \
-    && cd orc \
-    && meson  --prefix=/usr/local build/ \
-    && ninja -C build/ \
-    && ninja -C build/ test \
+	&& patch -Np1 -i ../gstreamer-1.16.0-buffer_size_reset_fix-1.patch  \
+	&& meson  --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/  > /dev/null 2>&1\
     && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf orc
+    && rm -rf gstreamer-*
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 # gst-plugins-base
@@ -586,11 +586,16 @@ RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-base-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-base-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install  \
+	&& meson  --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/  > /dev/null 2>&1\
+    && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf gst-*
+    && rm -rf gst-plugins-good-*
 
 # libnice
 RUN cd /tmp \
@@ -608,11 +613,16 @@ RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-good-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-good-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install  \
+	&& meson  --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/  > /dev/null 2>&1\
+    && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf gst-*
+    && rm -rf gst-plugins-good-*
 
 
 # gst-plugins-bad
@@ -620,33 +630,48 @@ RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-bad-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-bad-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install \
+	&& meson --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/  > /dev/null 2>&1\
+    && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf gst-*
+    && rm -rf gst-plugins-bad-*
 
 # gst-plugins-ugly
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-plugins-ugly-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-plugins-ugly-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make > /dev/null 2>&1  \
-    && make install  \
+	&& meson --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/  > /dev/null 2>&1\
+    && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf gst-*
+    && rm -rf gst-plugins-ugly-*
 
 # gst-libav
 RUN cd /tmp \
     && curl -L -O -k https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${GST_VERSION}.tar.xz \
     && tar xvfJ gst-libav-${GST_VERSION}.tar.xz > /dev/null \
     && cd gst-libav-${GST_VERSION} \
-    && ./configure --prefix=/usr/local --disable-gtk-doc \
-    && make > /dev/null 2>&1 \
-    && make install  \
+	&& meson --prefix=/usr/local build/ \
+	    -Dbuildtype=release \
+		-Dgst_debug=false   \
+		-Dgtk_doc=disabled  \
+		-Dpackage-origin=http://www.linuxfromscratch.org/blfs/view/svn/ \
+		-Dpackage-name="GStreamer 1.16.0 BLFS" \
+    && ninja -C build/ > /dev/null 2>&1\
+    && ninja -C build/ install \
     && cd /tmp/ \
-    && rm -rf gst-*
+    && rm -rf gst-libav-*
 
 # gst-rtsp-server
 RUN cd /tmp \
