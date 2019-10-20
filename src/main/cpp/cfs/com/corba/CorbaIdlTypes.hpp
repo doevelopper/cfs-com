@@ -51,6 +51,4 @@ namespace cfs::com::corba
     using String_ptr = ::CORBA::String_ptr;
     using String_var = ::CORBA::String_var;
     using StringSeq = ::CORBA::StringSeq;
-
-
 }

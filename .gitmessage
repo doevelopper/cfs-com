@@ -5,16 +5,16 @@
 # <footer>
 
 # Type should be one of the following:
-# * :sunny: Feat (new feature)
-# * :cyclone: Fix (bug fix)
-# * :factory: Fixing CI Build
-# * hotfix - Quick fixes to the codebase.
-# * :eyes: Docs (changes to documentation)
-# * :rooster: Style/cosmetic (formatting, missing semi colons, etc; no code change)
-# * :ocean: Refactor (refactoring production code)
-# * :fireworks: Add/Remove/Change (refactoring production code)
-# * :feet: test (adding missing tests, refactoring tests; no production code change)
-# * :wavy_dash: chore (updating build tasks ,configs, package manager, etc; no production code change)
+# * :sunny:        Feat (new feature)
+# * :cyclone:      Fix (bug fix)
+# * :factory:      Fixing CI Build
+# * :       :      hotfix - Quick fixes to the codebase.
+# * :eyes:         Docs (changes to documentation)
+# * :rooster:      Style/cosmetic (formatting, missing semi colons, etc; no code change)
+# * :ocean:        Refactor (refactoring production code)
+# * :fireworks:    Add/Remove/Change (refactoring production code)
+# * :feet: test    (adding missing tests, refactoring tests; no production code change)
+# * :wavy_dash:    chore (updating build tasks ,configs, package manager, etc; no production code change)
 # * :construction: wip(wip on feature branch)
 
 # --- KEYWORD
