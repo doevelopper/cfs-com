@@ -1,0 +1,42 @@
+#ifndef CFS_COM_RANDOM_GENERATOR_HPP
+#define CFS_COM_RANDOM_GENERATOR_HPP
+
+#include <random>
+#include <chrono>
+#include <string>
+#include <algorithm>
+#include <sstream>
+#include <locale>
+#include <iomanip>
+
+namespace cfs::com::demo
+{
+    class RandomGenerator
+    {
+    public:
+        RandomGenerator();
+        RandomGenerator(const RandomGenerator&) = default;
+        RandomGenerator(RandomGenerator&&) = default;
+        RandomGenerator& operator=(const RandomGenerator&) = default;
+        RandomGenerator& operator=(RandomGenerator&&) = default;
+        virtual ~RandomGenerator();
+
+        std::string timeSeed(std::string Format = "%Y-%m-%d");
+        template<typename T>
+        typename std::enable_if<std::is_integral<T>::value, T>::type GetRandom(T min, T max, bool UseDateSeed = true);
+
+        template<typename T>
+        typename std::enable_if<std::is_floating_point<T>::value, T>::type GetRandom(T min, T max, bool UseDateSeed = true);
+
+        bool random(bool UseDateSeed = true);
+
+    protected:
+
+    private:
+        std::mt19937 m_trueRand;
+        std::mt19937 m_dateSeed;
+
+    };
+}
+
+#endif
