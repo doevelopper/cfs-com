@@ -8,14 +8,13 @@ namespace cfs::com::corba
  * @brief  _var interface for local objects.
  */
     template <class T>
-
     class VarInterface
     {
     public:
 
         VarInterface();
         ~VarInterface();
-        VarInterface(const VarInterface<T> &)
+        VarInterface(const VarInterface<T> &);
         VarInterface<T>&operator = (T*t);
         VarInterface<T>& operator = (VarInterface<T> & t);
         T * operator ->();

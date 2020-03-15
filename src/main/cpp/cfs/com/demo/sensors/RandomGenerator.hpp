@@ -1,5 +1,5 @@
-#ifndef CFS_COM_RANDOM_GENERATOR_HPP
-#define CFS_COM_RANDOM_GENERATOR_HPP
+#ifndef CFS_COM_DEMO_SENSORS_RANDOMGENERATOR_HPP
+#define CFS_COM_DEMO_SENSORS_RANDOMGENERATOR_HPP
 
 #include <random>
 #include <chrono>
@@ -9,7 +9,7 @@
 #include <locale>
 #include <iomanip>
 
-namespace cfs::com::demo
+namespace cfs::com::demo::sensors
 {
     class RandomGenerator
     {
@@ -23,10 +23,12 @@ namespace cfs::com::demo
 
         std::string timeSeed(std::string Format = "%Y-%m-%d");
         template<typename T>
-        typename std::enable_if<std::is_integral<T>::value, T>::type GetRandom(T min, T max, bool UseDateSeed = true);
+        typename std::enable_if<std::is_integral<T>::value, T>::type
+        random(T min, T max, bool UseDateSeed = true);
 
         template<typename T>
-        typename std::enable_if<std::is_floating_point<T>::value, T>::type GetRandom(T min, T max, bool UseDateSeed = true);
+        typename std::enable_if<std::is_floating_point<T>::value, T>::type
+        random(T min, T max, bool UseDateSeed = true);
 
         bool random(bool UseDateSeed = true);
 

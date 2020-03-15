@@ -1,5 +1,7 @@
+#include <time.h>
+#include <cfs/com/demo/sensors/RandomGenerator.hpp>
 
-#include <cfs/com/demo/RandomGenerator.hpp>
+using namespace cfs::com::demo::sensors;
 
 RandomGenerator::RandomGenerator()
 {
@@ -8,17 +10,20 @@ RandomGenerator::RandomGenerator()
 
 std::string RandomGenerator::timeSeed(std::string format)
 {
-	std::stringstream ss;
 	auto now = std::chrono::system_clock::now();
 	auto now_c = std::chrono::system_clock::to_time_t(now);
 	std::tm time;
-	localtime_s(&time, &now_c);
+	//localtime_s(&time, &now_c);
+
+	std::stringstream ss;
 	ss << std::put_time(&time, format.c_str());
+
 	return ss.str();
 }
 
 template<typename T>
-typename std::enable_if<std::is_integral<T>::value, T>::type RandomGenerator::random(T min, T max, bool UseDateSeed)
+typename std::enable_if<std::is_integral<T>::value, T>::type
+RandomGenerator::random(T min, T max, bool UseDateSeed)
 {
     std::uniform_int_distribution<T> RandDist(min, max);
 
@@ -29,7 +34,8 @@ typename std::enable_if<std::is_integral<T>::value, T>::type RandomGenerator::ra
 }
 
 template<typename T>
-typename std::enable_if<std::is_floating_point<T>::value, T>::type RandomGenerator::random(T min, T max, bool UseDateSeed)
+typename std::enable_if<std::is_floating_point<T>::value, T>::type
+RandomGenerator::random(T min, T max, bool UseDateSeed)
 {
 	std::uniform_real_distribution<T> RandDist(min, max);
 
