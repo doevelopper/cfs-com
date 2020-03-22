@@ -56,7 +56,7 @@ RM = /opt/bin/cmake -E remove -f
 
 .PHONY: compile
 compile: ## Build projects main sources
-	@bazel build //...
+	@bazel --action_evn=ACE_ROOT build //...
 
 .PHONY: test
 test: compile ## Build projects test sources and run unit test

@@ -1,0 +1,39 @@
+name: GitHub CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 7 * * SUN'
+env:
+  DOC_ROOT: ${{ github.workspace }}/ACE
+  ACE_ROOT: ${{ github.workspace }}/ACE/ACE
+  MPC_ROOT: ${{ github.workspace }}/ACE/MPC
+  TAO_ROOT: ${{ github.workspace }}/ACE/TAO
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name: [
+          opendds,
+          vortexdds,
+          fastRtps,
+          rtidds,
+          cyclonedds
+        ]
+        include:
+            - name: opendds
+              os: docker.io/doevelopper/cfs-dev-tools-eprosima:0.0.1
+              CC: gcc
+              CXX: g++
+        env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+        steps:
+            - uses: actions/checkout@v2

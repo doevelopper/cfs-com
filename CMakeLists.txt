@@ -99,7 +99,7 @@ find_package(Doxygen
 )
 
 find_package( OpenDDS REQUIRED)
-find_package( OpenSpliceVortexDDS REQUIRED)
+#find_package( OpenSpliceVortexDDS REQUIRED)
 #find_package( GoogleTestFwk)
 #find_package(RTIConnexDDS REQUIRED)
 include(GoogleTest) #gtest_discover_tests
@@ -107,11 +107,6 @@ include(CTest)
 include(goals)
 include(CPPCheck)
 include(CodingStyle)
-
-apply_style_targets(
-    ${PROJECT_NAME}-hal
-    ${CMAKE_CURRENT_BINARY_DIR}
-)
 
 add_subdirectory (src/main/cpp)
 add_subdirectory (src/test/cpp)

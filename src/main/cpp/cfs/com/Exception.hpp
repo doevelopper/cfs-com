@@ -13,26 +13,26 @@ namespace cfs::com
 
     public:
 
-        Exception(void);
-        Exception(const Exception& other);
-        Exception(Exception&& other);
-        Exception& operator=(Exception& rhs);
-        Exception& operator=(Exception&& rhs);
-/*!
- * @cond
- */
-        virtual
-        ~Exception(void) throw();
-/*!
- * @endcond
- */
+        Exception();
+        Exception(const std::type_info & type);
+        Exception(const std::string & message,
+                const std::type_info & type = typeid(Exception));
+        Exception(const std::string & message,
+                       const std::exception & reason,
+                       const std::type_info & type = typeid(Exception));
+
+        Exception(const Exception& other) = delete;
+        Exception(Exception&& other) = delete;
+        Exception& operator=(Exception& rhs) = delete;
+        Exception& operator=(Exception&& rhs) = delete;
+        virtual ~Exception();
 
         Exception(std::uint32_t);
         Exception( std::uint32_t, std::string & );
 
     protected:
 
-        virtual const char * what() const throw();
+        virtual const char * what() const noexcept override;
         std::uint32_t code() const;
         void code( std::uint32_t );
         const std::string & reason() const;
@@ -41,7 +41,11 @@ namespace cfs::com
     private:
 
         void swap( Exception & other) noexcept;
-
+        static std::string prepareMessage(const std::type_info & type,
+                                     const std::string & message);
+        static std::string prepareMessage(const std::type_info & type,
+                                     const std::string & message,
+                                     const std::exception & cause);
         std::uint32_t m_code;
         std::string m_reason;
     };

@@ -57,35 +57,35 @@ target_compile_options(cfs.com.main
 add_custom_command(
     TARGET cfs.com.main
     PRE_LINK
-    COMMAND 
+    COMMAND
         ${CMAKE_COMMAND} -E echo  pre-linked to actual target
-#    COMMAND 
+#    COMMAND
 #        ${CMAKE_COMMAND} -P prelink-cript.cmake
-    COMMENT 
+    COMMENT
         "Running PRE_LINK action "
 )
 
 add_custom_command(
     TARGET cfs.com.main
     PRE_BUILD
-    COMMAND 
+    COMMAND
         ${CMAKE_COMMAND} -E echo   pre-built to actual target
 #    COMMAND
 #        ${CMAKE_COMMAND} -P pre-build-cript.cmake
 
-    COMMENT 
+    COMMENT
         "Running PRE_BUILD action"
 )
 
 add_custom_command(
     TARGET cfs.com.main
     POST_BUILD
-    COMMAND 
+    COMMAND
         ${CMAKE_COMMAND} -E echo  post-build to actual target
 #    COMMAND
 #        ${CMAKE_COMMAND} -P post-build-cript.cmake
 
-    COMMENT 
+    COMMENT
         "Running POST_BUILD action "
 )
 
@@ -128,7 +128,7 @@ add_executable(cfs.com.main.bin
     cfs/com/main.cpp
 )
 
-target_link_libraries(cfs.com.main.bin 
+target_link_libraries(cfs.com.main.bin
     cfs.com.main
 )
 

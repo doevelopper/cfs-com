@@ -9,10 +9,9 @@ module cfs
         const string GPS_MODE_UNLOCKED = "Unlocked";
         const string GPS_MODE_TRACKING = "Tracking";
 
-        @topic
         struct GPSInfo
         {
-            @key string source_id;       /** NAV source identifier */
+            string source_id;  /** NAV source identifier */
             short satellite_count;
             double freq_variance; 	/** Frequency Stability/Variance of Reference Source */
             double time_variance; 	/** Timing Stability/Variance of Reference Source */
@@ -44,10 +43,9 @@ module cfs
             KELVIN
         };
 
-        @topic
         struct Sensor_information
         {
-            @key string<256> ID; //@key
+            string<256> ID; //@key
             double ambientTemperature;
             double objectTemperature;
             double accelerometerX;
@@ -59,12 +57,12 @@ module cfs
             TemperatureScale scale;
         };
 
-        @topic
         struct Message
         {
-            @key long time;  // @key
+            long time;  // @key
             string content;
         };
 
-    };
-};
+        #pragma keylist TempSensorType id
+    }
+}

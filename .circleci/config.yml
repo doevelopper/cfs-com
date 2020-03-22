@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+        - image: docker.io/doevelopper/cfs-dev-tools-omg:0.0.1
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - bazel-cache
+      - run: bazel test --test_output=errors //...
+
