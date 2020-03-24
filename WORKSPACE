@@ -1,7 +1,14 @@
-workspace(name = "cfscom")
+workspace(
+    name = "cfscom"
+)
 
 load("//src/main/resources/bazel:repositories.bzl", "cfs_com_repositories")
 cfs_com_repositories()
+
+# Check that the user has a version between our minimum supported version of
+# Bazel and our maximum supported version of Bazel.
+load("//src/main/resources/bazel:version.bzl", "MAX_VERSION", "MIN_VERSION", "check_version")
+check_version(MIN_VERSION, MAX_VERSION)
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@rules_proto_grpc//:repositories.bzl", "rules_proto_grpc_toolchains", "rules_proto_grpc_repos")

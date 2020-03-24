@@ -14,6 +14,8 @@ cc_test(
         "cfs/com/Test.hpp",
         "cfs/com/demo/sensors/RandomGeneratorTest.cpp",
         "cfs/com/demo/sensors/RandomGeneratorTest.hpp",
+        "cfs/com/GTestEventListener.cpp",
+        "cfs/com/GTestEventListener.hpp",
     ],
 
     includes = [

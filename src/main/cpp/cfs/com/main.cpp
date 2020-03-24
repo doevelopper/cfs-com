@@ -1,6 +1,8 @@
 
 #include <cstdlib>
 #include <iostream>
+//#include <cfs/com/Initialize.hpp>
+
 #include <cfs/com/demo/sensors/RandomGenerator.hpp>
 
 int main(int argc, char *argv[])

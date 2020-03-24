@@ -91,7 +91,29 @@ def cfs_com_repositories():
         remote = "https://github.com/atlassian/bazel-tools.git",
     #    shallow_since = "10 Feb 2020",
     )
+    _maybe(
+        git_repository,
+        name = "boringssl",
+        # Use the github mirror because the official source at
+        # https://boringssl.googlesource.com/boringssl does not allow
+        # unauthenticated git clone and the archives suffer from
+        # https://github.com/google/gitiles/issues/84 preventing the use of
+        # sha256sum on archives.
+        remote = "https://github.com/google/boringssl",
+        # Commits must come from the master-with-bazel branch.
+        # branch = "master-with-bazel",
+        commit = "e0c35d6c06fd800de1092f0b4d4326570ca2617a",
+        shallow_since = "1566966435 +0000",
+    )
 
+    _maybe(
+        http_archive,
+        name = "com_github_tencent_rapidjson",
+        build_file = "@io_kythe//third_party:rapidjson.BUILD",
+        sha256 = "8e00c38829d6785a2dfb951bb87c6974fa07dfe488aa5b25deec4b8bc0f6a3ab",
+        strip_prefix = "rapidjson-1.1.0",
+        url = "https://github.com/Tencent/rapidjson/archive/v1.1.0.zip",
+    )
     # cpplint from google style guide
     #new_local_repository(
     #    name = "google_styleguide",
@@ -138,6 +160,32 @@ def cfs_com_repositories():
             "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.7.1.tar.gz",
             "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
         ],
+    )
+    _maybe(
+        http_archive,
+        name = "bazel_toolchains",
+        sha256 = "1342f84d4324987f63307eb6a5aac2dff6d27967860a129f5cd40f8f9b6fd7dd",
+        strip_prefix = "bazel-toolchains-2.2.0",
+        urls = [
+            "https://github.com/bazelbuild/bazel-toolchains/releases/download/2.2.0/bazel-toolchains-2.2.0.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/2.2.0/bazel-toolchains-2.2.0.tar.gz",
+        ],
+    )
+
+#    _maybe(
+#        http_archive,
+#        name = "com_google_absl",
+#        urls = ["https://github.com/abseil/abseil-cpp/archive/c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a.zip"],
+#        strip_prefix = "abseil-cpp-c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a",
+#        sha256 = "8400c511d64eb4d26f92c5ec72535ebd0f843067515244e8b50817b0786427f9",
+#    )
+
+# Abseil
+    _maybe(
+        http_archive,
+        name = "com_google_absl",
+        urls = ["https://github.com/abseil/abseil-cpp/archive/master.zip"],
+        strip_prefix = "abseil-cpp-master",
     )
 
 def _maybe(repo_rule, name, **kwargs):

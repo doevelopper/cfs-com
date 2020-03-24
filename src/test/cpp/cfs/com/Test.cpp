@@ -1,5 +1,6 @@
 
 #include <cfs/com/Test.hpp>
+#include <cfs/com/GTestEventListener.hpp>
 
 cfs::com::test::Test::Test()
     : m_testSuites(std::string())
@@ -24,7 +25,7 @@ int
 cfs::com::test::Test::run (int argc, char * argv[])
 {
     ::testing::InitGoogleTest(&argc, argv);
-
+    testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
     return RUN_ALL_TESTS();
 }
 
