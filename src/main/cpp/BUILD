@@ -91,6 +91,10 @@ cc_library(
     srcs = [
 #        "cfs/com/Initialize.cpp",
         "cfs/com/Exception.cpp",
+        "cfs/com/Shutdown.cpp",
+        "cfs/com/ShutdownSubject.cpp",
+        "cfs/com/Component.cpp",
+        "cfs/com/AbstractTask.cpp",
         "cfs/com/corba/VarInterface.cpp",
         "cfs/com/DataReader.cpp",
         "cfs/com/DataWriter.cpp",
@@ -107,6 +111,10 @@ cc_library(
     hdrs = [
 #        "cfs/com/Initialize.hpp",
         "cfs/com/Exception.hpp",
+        "cfs/com/Shutdown.hpp",
+        "cfs/com/ShutdownSubject.hpp",
+        "cfs/com/Component.hpp",
+        "cfs/com/AbstractTask.hpp",
         "cfs/com/corba/VarInterface.hpp",
         "cfs/com/DataReader.hpp",
         "cfs/com/DataWriter.hpp",

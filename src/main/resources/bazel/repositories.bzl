@@ -188,6 +188,19 @@ def cfs_com_repositories():
         strip_prefix = "abseil-cpp-master",
     )
 
+    # Based on https://github.com/tensorflow/tensorflow/blob/master/third_party/eigen.BUILD
+    _maybe(
+        http_archive,
+        name = "org_tuxfamily_eigen",
+        build_file = "@cloud_robotics//third_party:eigen.BUILD",
+        sha256 = "ca7beac153d4059c02c8fc59816c82d54ea47fe58365e8aded4082ded0b820c4",
+        strip_prefix = "eigen-eigen-f3a22f35b044",
+        urls = [
+            "http://mirror.bazel.build/bitbucket.org/eigen/eigen/get/f3a22f35b044.tar.gz",
+            "https://bitbucket.org/eigen/eigen/get/f3a22f35b044.tar.gz",
+        ],
+    )
+
 def _maybe(repo_rule, name, **kwargs):
     """Declares an external repository if it hasn't been declared already."""
     if name not in native.existing_rules():

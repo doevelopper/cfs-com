@@ -5,6 +5,9 @@ ColumnLimit: 120
 DerivePointerAlignment: false
 PointerAlignment: Left
 SortIncludes: false
+Standard: Cpp17
+UseTab: Never
+IndentWidth: '4'
 ...
 
 ---

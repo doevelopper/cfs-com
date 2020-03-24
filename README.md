@@ -100,7 +100,7 @@ DDS abstraction layer helps to have less significant changes.
 
 It aims to use
 - [ ]  RTI Connext DDS
-- [ ]  PrismTech OpenSplice DDS
+- [ ]  PrismTech OpenSplice DDS (cyclonedds ???)
 - [ ]  OpenDDS
 - [ ]  Twin Oaks Computing CoreDX DDS
 - [ ]  eProsima Fast-RTPS

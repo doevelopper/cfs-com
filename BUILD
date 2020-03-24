@@ -56,16 +56,49 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+config_setting(
+    name = "optimized",
+    values = {"compilation_mode": "opt"},
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "dds_idl",
+    srcs = glob(["src/main/idl/cfs/com/*.idl"]),
+    visibility = ["//visibility:public"],
+)
+
+# DDS_VENDOR_RTI
+# DDS_VENDOR_ADLINK_OSPL
+# DDS_VENDOR_OCI
+# DDS_VENDOR_MILSOFT
+# DDS_VENDOR_KONGSBERG
+# DDS_VENDOR_TWINOAKS
+# DDS_VENDOR_LAKOTA
+# DDS_VENDOR_ICOUP
+# DDS_VENDOR_ETRI
+# DDS_VENDOR_RTI_MICRO
+# DDS_VENDOR_ADLINK_JAVA
+# DDS_VENDOR_ADLINK_GATEWAY
+# DDS_VENDOR_ADLINK_LITE
+# DDS_VENDOR_TECHNICOLOR
+# DDS_VENDOR_EPROSIMA
+# DDS_VENDOR_ECLIPSE
+# DDS_VENDOR_ADLINK_CLOUD
+
 COPTS = [
     "-D_GNU_SOURCE",
 ] + select({
-        ":with_opendds": ["-DOPENDDS=1"],
+        ":with_opendds": ["-DCFS_OPENDDS_DDS=1"],
         "//conditions:default": [""],
 }) + select({
-        ":with_fastrtps": [""],
+        ":with_fastrtps": ["-DCFS_FASTRTPS_DDS"],
         "//conditions:default": [""],
 }) + select({
-        ":with_rtidds": ["-DRTI_LINUX -DRTIDDS"],
+        ":with_vortexdds": ["-DCFS_OPENSPLICE_DDS"],
+        "//conditions:default": [""],
+}) + select({
+        ":with_rtidds": ["-DRTI_LINUX -DCFS_RTI_DDS"],
         "//conditions:default": [""],
 })
 
@@ -87,3 +120,15 @@ LINKOPTS = [
         ],
         "//conditions:default": [],
 })
+
+#genrule(
+#    name = "assert_optimized",
+#    outs = ["dummy.txt"],
+#    cmd = select({
+#        ":optimized": "echo > $@",
+#        "//conditions:default": """echo 'ERROR: Cartographer must be built with \
+#`-c opt` or it will not produce results for real-time.' 1>&2; false""",
+#    }),
+#    visibility = ["//visibility:public"],
+#)
+
