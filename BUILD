@@ -68,6 +68,20 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+config_setting(
+    name = "x86_64",
+    values = {
+        "define": "ARCH=x86_64",
+    },
+)
+
+config_setting(
+    name = "aarch64",
+    values = {
+        "define": "ARCH=aarch64",
+    },
+)
+
 # DDS_VENDOR_RTI
 # DDS_VENDOR_ADLINK_OSPL
 # DDS_VENDOR_OCI

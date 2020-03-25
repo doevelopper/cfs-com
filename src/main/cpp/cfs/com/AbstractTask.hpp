@@ -29,7 +29,7 @@ class AbstractTask : public Shutdown
 
  protected:
     virtual void on_shutdown();
-    virtual bool try_canceled() = 0;
+    virtual bool isCanceled() = 0;
     virtual void sleep(const Duration &duration) = 0;
     virtual int execution() = 0;
  private:
