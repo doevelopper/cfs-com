@@ -13,6 +13,9 @@
    try
     {
         throw std::system_error(EFAULT, std::generic_category());
+
+        throw std::system_error(std::make_error_code(std::errc::invalid_argument),
+        "Now what am I to do with that argument?");  // optional what() message
     }
     catch (std::system_error& error)
     {

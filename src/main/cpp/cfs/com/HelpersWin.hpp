@@ -1,0 +1,5 @@
+#ifndef CFS_COM_HELPERSWIN_HPP
+#define CFS_COM_HELPERSWIN_HPP
+
+#endif
+

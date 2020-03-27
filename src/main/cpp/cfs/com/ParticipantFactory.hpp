@@ -35,6 +35,7 @@ namespace cfs::com
     protected:
 
     private:
+        std::shared_ptr<DDS::DomainParticipantFactoryInterface> DomainParticipantFactoryPtr;
 
     };
 

@@ -134,7 +134,17 @@ cc_library(
         "cfs/com/demo/sensors/RandomGenerator.hpp",
         "cfs/com/corba/CorbaIdlTypes.hpp",
         "cfs/com/TypeTraits.hpp",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:windows": [
+            "cfs/com/HelpersWin.hpp",
+        ],
+        "@bazel_tools//src/conditions:darwin": [
+            "cfs/com/HelpersMacOS.hpp",
+        ],
+        "//conditions:default": [
+            "cfs/com/HelpersLinux.hpp",
+        ],
+    }),
     copts = DEFAULT_COPTS + [
         "-DLOG_LEVEL=1",
         "-lapr-1",

@@ -104,6 +104,8 @@ run --python_path=/usr/bin/python3
 # pass environment variables to the build/test environment
 #test --test_env=TRAVIS
 #test --test_env=DISPLAY
+build --host_force_python=PY3
+test --host_force_python=PY3
 
 # By default, an optimized C++ build with Bazel will build each library twice,
 # with and without -fPIC. --force_pic avoids the unnecessary actions and

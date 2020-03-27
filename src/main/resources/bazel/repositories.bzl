@@ -3,6 +3,8 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
+gtest_version = "1.10.0"
+
 def cfs_com_repositories():
     """Declares external repositories that project depends on. This
     function should be loaded and called from WORKSPACE files."""
@@ -159,10 +161,10 @@ def cfs_com_repositories():
         http_archive,
         name = "com_google_googletest",
         sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
-        strip_prefix = "googletest-release-1.10.0",
+        strip_prefix = "googletest-release-{}".format(gtest_version),
         urls = [
-            "https://mirror.bazel.build/github.com/google/googletest/archive/release-1.10.0.tar.gz",
-            "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
+            "https://mirror.bazel.build/github.com/google/googletest/archive/release-{}.tar.gz".format(gtest_version),
+            "https://github.com/google/googletest/archive/release-{}.tar.gz".format(gtest_version),
         ],
     )
 
@@ -231,12 +233,19 @@ def cfs_com_repositories():
     _maybe(
         http_archive,
         name = "bazel_toolchains",
-        sha256 = "1342f84d4324987f63307eb6a5aac2dff6d27967860a129f5cd40f8f9b6fd7dd",
-        strip_prefix = "bazel-toolchains-2.2.0",
+        sha256 = "81e08efc3b26cdb14fe4188574d5797dbf8b348a79ecbe50e66f7992ab210fbe",
+        strip_prefix = "bazel-toolchains-2.2.2",
         urls = [
-            "https://github.com/bazelbuild/bazel-toolchains/releases/download/2.2.0/bazel-toolchains-2.2.0.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/2.2.0/bazel-toolchains-2.2.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-toolchains/releases/download/2.2.2/bazel-toolchains-2.2.2.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/2.2.2/bazel-toolchains-2.2.2.tar.gz",
         ],
+    )
+
+    _maybe(
+        http_archive,
+        name = "rules_foreign_cc",
+        strip_prefix = "rules_foreign_cc-master",
+        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/master.zip",
     )
 
     #    _maybe(

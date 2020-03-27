@@ -48,3 +48,9 @@ gazelle_dependencies()
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
+
+new_local_repository(
+    name = "opendds",
+    build_file = "//src/main/resources/bazel/opendds.BUILD",  #
+    path = "/opt/dds/opendds/include/",
+)
