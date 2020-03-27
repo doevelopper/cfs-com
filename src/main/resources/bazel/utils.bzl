@@ -12,7 +12,6 @@ def dropExtension(p):
     "TODO: handle multiple . in name"
     return p.partition(".")[0]
 
-
 def opd_bin_tool(name):
     _clang_tool(
         name = name,

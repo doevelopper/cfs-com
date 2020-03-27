@@ -54,6 +54,11 @@ test:coverage --linkopt=-lgcov
 test:coverage --linkopt=-lgcc
 test:coverage --linkopt=-lc
 
+# Support for debugging NodeJS tests
+# Add the Bazel option `--config=debug` to enable this
+test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
+
+
 # +------------------------------------------------------------+
 # | Build Configurations                                       |
 # +------------------------------------------------------------+
@@ -108,7 +113,7 @@ build --force_pic
 build --color=yes
 query --keep_going
 build:memcheck --strip=never --test_timeout=3600
-
+build --workspace_status_command=./src/main/resources/scripts/workspace-status.sh
 build:asan --strip=never
 build:asan --copt -fsanitize=address
 build:asan --copt -DADDRESS_SANITIZER

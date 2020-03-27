@@ -1,84 +1,87 @@
-
 licenses(["notice"])
+
 exports_files(["LICENSE"])
+
 load("//src/main/resources/bazel:cpplint.bzl", "cpplint")
+
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_cc//cc:defs.bzl",
+load(
+    "@rules_cc//cc:defs.bzl",
     "cc_binary",
-    "cc_library"
+    "cc_library",
 )
-
-load("@rules_pkg//:pkg.bzl",
+load(
+    "@rules_pkg//:pkg.bzl",
+    "pkg_deb",
     "pkg_tar",
-    "pkg_deb"
 )
-
-load("//src/main/resources/bazel:copts.bzl",
+load(
+    "//src/main/resources/bazel:copts.bzl",
     "DEFAULT_COPTS",
-    "TEST_COPTS",
     "EXCEPTIONS_FLAG",
     "EXCEPTIONS_FLAG_LINKOPTS",
+    "TEST_COPTS",
 )
-
-load("//src/main/resources/bazel:tao.bzl",
+load(
+    "//src/main/resources/bazel:tao.bzl",
     "tao_idl_gen",
 )
 
 # cc_import(
-    # name = "opendds",
-    # hdrs = glob([
-        # "/opt/dds/opendds/include/**/*.h",
-        # "/opt/dds/opendds/include/**/*.hpp",
-    # ]),
-   ##static_library = "lib.a",
-    # shared_library = [
-        # "/opt/dds/opendds/lib/libACE.so",
-        # "/opt/dds/opendds/lib/tao_java.jar",
-        # "/opt/dds/opendds/lib/OpenDDS_DCPS.jar",
-        # "/opt/dds/opendds/lib/i2jrt.jar",
-        # "/opt/dds/opendds/lib/libACE.so",
-        # "/opt/dds/opendds/lib/libACE_XML_Utils.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_DCPS_Java.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Dcps.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_FACE.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Federator.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_InfoRepoDiscovery.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_InfoRepoLib.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_InfoRepoServ.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Model.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Multicast.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_QOS_XML_XSC_Handler.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Rtps.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_RtpsRelay.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Rtps_Udp.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Security.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Shmem.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Tcp.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_Udp.so",
-        # "/opt/dds/opendds/lib/libOpenDDS_monitor.so",
-        # "/opt/dds/opendds/lib/libTAO.so",
-        # "/opt/dds/opendds/lib/libTAO_AnyTypeCode.so",
-        # "/opt/dds/opendds/lib/libTAO_Async_IORTable.so",
-        # "/opt/dds/opendds/lib/libTAO_BiDirGIOP.so",
-        # "/opt/dds/opendds/lib/libTAO_CSD_Framework.so",
-        # "/opt/dds/opendds/lib/libTAO_CSD_ThreadPool.so",
-        # "/opt/dds/opendds/lib/libTAO_CodecFactory.so",
-        # "/opt/dds/opendds/lib/libTAO_Codeset.so",
-        # "/opt/dds/opendds/lib/libTAO_DynamicInterface.so",
-        # "/opt/dds/opendds/lib/libTAO_IDL_BE.so",
-        # "/opt/dds/opendds/lib/libTAO_IDL_FE.so",
-        # "/opt/dds/opendds/lib/libTAO_IORManip.so",
-        # "/opt/dds/opendds/lib/libTAO_IORTable.so",
-        # "/opt/dds/opendds/lib/libTAO_ImR_Client.so",
-        # "/opt/dds/opendds/lib/libTAO_Messaging.so",
-        # "/opt/dds/opendds/lib/libTAO_PI.so",
-        # "/opt/dds/opendds/lib/libTAO_PortableServer.so",
-        # "/opt/dds/opendds/lib/libTAO_Svc_Utils.so",
-        # "/opt/dds/opendds/lib/libTAO_Valuetype.so",
-        # "/opt/dds/opendds/lib/libidl2jni_runtime.so",
-        # "/opt/dds/opendds/lib/libtao_java.so",
-    # ],
+# name = "opendds",
+# hdrs = glob([
+# "/opt/dds/opendds/include/**/*.h",
+# "/opt/dds/opendds/include/**/*.hpp",
+# ]),
+##static_library = "lib.a",
+# shared_library = [
+# "/opt/dds/opendds/lib/libACE.so",
+# "/opt/dds/opendds/lib/tao_java.jar",
+# "/opt/dds/opendds/lib/OpenDDS_DCPS.jar",
+# "/opt/dds/opendds/lib/i2jrt.jar",
+# "/opt/dds/opendds/lib/libACE.so",
+# "/opt/dds/opendds/lib/libACE_XML_Utils.so",
+# "/opt/dds/opendds/lib/libOpenDDS_DCPS_Java.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Dcps.so",
+# "/opt/dds/opendds/lib/libOpenDDS_FACE.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Federator.so",
+# "/opt/dds/opendds/lib/libOpenDDS_InfoRepoDiscovery.so",
+# "/opt/dds/opendds/lib/libOpenDDS_InfoRepoLib.so",
+# "/opt/dds/opendds/lib/libOpenDDS_InfoRepoServ.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Model.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Multicast.so",
+# "/opt/dds/opendds/lib/libOpenDDS_QOS_XML_XSC_Handler.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Rtps.so",
+# "/opt/dds/opendds/lib/libOpenDDS_RtpsRelay.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Rtps_Udp.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Security.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Shmem.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Tcp.so",
+# "/opt/dds/opendds/lib/libOpenDDS_Udp.so",
+# "/opt/dds/opendds/lib/libOpenDDS_monitor.so",
+# "/opt/dds/opendds/lib/libTAO.so",
+# "/opt/dds/opendds/lib/libTAO_AnyTypeCode.so",
+# "/opt/dds/opendds/lib/libTAO_Async_IORTable.so",
+# "/opt/dds/opendds/lib/libTAO_BiDirGIOP.so",
+# "/opt/dds/opendds/lib/libTAO_CSD_Framework.so",
+# "/opt/dds/opendds/lib/libTAO_CSD_ThreadPool.so",
+# "/opt/dds/opendds/lib/libTAO_CodecFactory.so",
+# "/opt/dds/opendds/lib/libTAO_Codeset.so",
+# "/opt/dds/opendds/lib/libTAO_DynamicInterface.so",
+# "/opt/dds/opendds/lib/libTAO_IDL_BE.so",
+# "/opt/dds/opendds/lib/libTAO_IDL_FE.so",
+# "/opt/dds/opendds/lib/libTAO_IORManip.so",
+# "/opt/dds/opendds/lib/libTAO_IORTable.so",
+# "/opt/dds/opendds/lib/libTAO_ImR_Client.so",
+# "/opt/dds/opendds/lib/libTAO_Messaging.so",
+# "/opt/dds/opendds/lib/libTAO_PI.so",
+# "/opt/dds/opendds/lib/libTAO_PortableServer.so",
+# "/opt/dds/opendds/lib/libTAO_Svc_Utils.so",
+# "/opt/dds/opendds/lib/libTAO_Valuetype.so",
+# "/opt/dds/opendds/lib/libidl2jni_runtime.so",
+# "/opt/dds/opendds/lib/libtao_java.so",
+# ],
 # )
 
 #tao_idl_gen(
@@ -89,7 +92,7 @@ load("//src/main/resources/bazel:tao.bzl",
 cc_library(
     name = "cfs-com-main",
     srcs = [
-#        "cfs/com/Initialize.cpp",
+        #        "cfs/com/Initialize.cpp",
         "cfs/com/Exception.cpp",
         "cfs/com/Error.cpp",
         "cfs/com/Shutdown.cpp",
@@ -109,9 +112,8 @@ cc_library(
         "cfs/com/Topic.cpp",
         "cfs/com/demo/sensors/RandomGenerator.cpp",
     ],
-
     hdrs = [
-#        "cfs/com/Initialize.hpp",
+        #        "cfs/com/Initialize.hpp",
         "cfs/com/Exception.hpp",
         "cfs/com/Error.hpp",
         "cfs/com/Shutdown.hpp",
@@ -133,7 +135,6 @@ cc_library(
         "cfs/com/corba/CorbaIdlTypes.hpp",
         "cfs/com/TypeTraits.hpp",
     ],
-
     copts = DEFAULT_COPTS + [
         "-DLOG_LEVEL=1",
         "-lapr-1",
@@ -143,10 +144,11 @@ cc_library(
         "-I/usr/local/include/",
         '-DOS="os"',
     ],
-
     defines = ["CURL_STATICLIB"],
-
-    linkopts =  select({
+    includes = [
+        ".",
+    ],
+    linkopts = select({
         "//:windows": [
             "-DEFAULTLIB:ws2_32.lib",
             "-DEFAULTLIB:advapi32.lib",
@@ -160,13 +162,9 @@ cc_library(
         ],
     }),
 
-	includes = [
-		".",
-	],
-
     #deps = [
-        ##"@opendds_package//src/main/resources/bazel:ace_tao_opendds",
-        #"@opendds_package//:ace_tao_opendds",
+    ##"@opendds_package//src/main/resources/bazel:ace_tao_opendds",
+    #"@opendds_package//:ace_tao_opendds",
     #],
     #deps = [":private"],
 )
@@ -180,9 +178,8 @@ cc_binary(
     name = "cfs-com-main.bin",
     srcs = ["cfs/com/main.cpp"],
     copts = [
-       "-std=c++17",
+        "-std=c++17",
     ],
-
     deps = [
         ":cfs-com-main",
     ],
@@ -192,7 +189,6 @@ cc_binary(
     #    "//conditions:default": 1,
     #}),
 )
-
 
 #cc_library(
 #    name = "lib",
@@ -209,29 +205,29 @@ cc_binary(
 
 pkg_tar(
     name = "cfs-com-main-libs",
-    strip_prefix = "/src/main/cpp",
-    package_dir = "/opt/lib",
     srcs = ["//src/main/cpp:cfs-com-main"],
     mode = "0755",
+    package_dir = "/opt/lib",
+    strip_prefix = "/src/main/cpp",
 )
 
 pkg_tar(
     name = "cfs-com-main-hdrs-pkg",
-#    testonly = True,
+    #    testonly = True,
     srcs = glob([
         "**/*.hpp",
     ]),
+    mode = "0644",
     # extension = "tar.gz",
     package_dir = "/opt/include",
     strip_prefix = "/src/main/cpp",
     tags = ["manual"],
     visibility = ["//visibility:public"],
-    mode = "0644",
 )
 
 pkg_tar(
     name = "cfs-com-main-bin-pkg",
-#    testonly = True,
+    #    testonly = True,
     srcs = [
         # ":cfs-algo-main",
         ":cfs-com-main.bin",
@@ -246,9 +242,9 @@ pkg_tar(
     name = "cfs-com",
     extension = "tar.gz",
     deps = [
-        ":cfs-com-main-libs",
-        ":cfs-com-main-hdrs-pkg",
         ":cfs-com-main-bin-pkg",
+        ":cfs-com-main-hdrs-pkg",
+        ":cfs-com-main-libs",
     ],
 )
 
@@ -266,6 +262,4 @@ pkg_deb(
     visibility = ["//visibility:public"],
 )
 
-
 #cpplint()
-

@@ -1,4 +1,5 @@
 licenses(["notice"])  # Apache 2
+
 package(default_visibility = ["//visibility:public"])
 
 exports_files([
@@ -84,8 +85,8 @@ config_setting(
 
 config_setting(
     name = "windows",
-    values = {"cpu": "x64_windows"},
     constraint_values = ["@bazel_tools//platforms:windows"],
+    values = {"cpu": "x64_windows"},
     visibility = ["//visibility:private"],
 )
 
@@ -111,17 +112,17 @@ COPTS = [
     "-D_GNU_SOURCE",
     #"-DEXTERN_SYMBOL=__attribute__((__visibility__(\\"default\\")))",
 ] + select({
-        ":with_opendds": ["-DCFS_OPENDDS_DDS=1"],
-        "//conditions:default": [""],
+    ":with_opendds": ["-DCFS_OPENDDS_DDS=1"],
+    "//conditions:default": [""],
 }) + select({
-        ":with_fastrtps": ["-DCFS_FASTRTPS_DDS"],
-        "//conditions:default": [""],
+    ":with_fastrtps": ["-DCFS_FASTRTPS_DDS"],
+    "//conditions:default": [""],
 }) + select({
-        ":with_vortexdds": ["-DCFS_OPENSPLICE_DDS"],
-        "//conditions:default": [""],
+    ":with_vortexdds": ["-DCFS_OPENSPLICE_DDS"],
+    "//conditions:default": [""],
 }) + select({
-        ":with_rtidds": ["-DRTI_LINUX -DCFS_RTI_DDS"],
-        "//conditions:default": [""],
+    ":with_rtidds": ["-DRTI_LINUX -DCFS_RTI_DDS"],
+    "//conditions:default": [""],
 })
 
 LINKOPTS = [
@@ -130,17 +131,17 @@ LINKOPTS = [
     "-lcrypto",
 ] + select({
     ":darwin": [""],
-    "//conditions:default": [ "-lrt", ],
+    "//conditions:default": ["-lrt"],
 }) + select({
-        ":with_opendds": [
-            "-lACE",
-        ],
-        "//conditions:default": [],
+    ":with_opendds": [
+        "-lACE",
+    ],
+    "//conditions:default": [],
 }) + select({
-        ":with_rtidds": [
-            "-ldummy",
-        ],
-        "//conditions:default": [],
+    ":with_rtidds": [
+        "-ldummy",
+    ],
+    "//conditions:default": [],
 })
 
 #genrule(
@@ -159,4 +160,3 @@ load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
 buildifier(
     name = "buildifier",
 )
-

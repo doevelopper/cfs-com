@@ -58,4 +58,3 @@ def blacklist_version(version, reason):
             "The version of Bazel you're using is incompatible with Kythe because:",
             reason,
         ]))
-

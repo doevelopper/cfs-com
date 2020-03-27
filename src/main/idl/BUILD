@@ -1,21 +1,21 @@
 licenses(["notice"])
+
 exports_files(["LICENSE"])
+
 package(default_visibility = ["//visibility:public"])
 
 load(
     "@rules_cc//cc:defs.bzl",
     "cc_binary",
-    "cc_library"
+    "cc_library",
 )
-
 
 cc_library(
     name = "lib",
- #    srcs = ["x.cc"],
+    #    srcs = ["x.cc"],
     hdrs = [":gen_header"],
-#-lOpenDDS_Rtps_Udp -lOpenDDS_Rtps -lOpenDDS_Multicast -lOpenDDS_Udp -lOpenDDS_Tcp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
-#LDLIBS:=-lOpenDDS_Rtps -lOpenDDS_Rtps_Udp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
-
+    #-lOpenDDS_Rtps_Udp -lOpenDDS_Rtps -lOpenDDS_Multicast -lOpenDDS_Udp -lOpenDDS_Tcp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
+    #LDLIBS:=-lOpenDDS_Rtps -lOpenDDS_Rtps_Udp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
 )
 
 genrule(

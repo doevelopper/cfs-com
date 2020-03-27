@@ -1,14 +1,12 @@
 # Thanks to https://stackoverflow.com/questions/49937820/include-headers-h-installed-in-non-standard-location
 
 package(
-    default_visibility = ["//visibility:public"]
+    default_visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "ace_tao_opendds",
     srcs = [
-        "/opt/dds/opendds/lib/libACE.so",
-        "/opt/dds/opendds/lib/tao_java.jar",
         "/opt/dds/opendds/lib/OpenDDS_DCPS.jar",
         "/opt/dds/opendds/lib/i2jrt.jar",
         "/opt/dds/opendds/lib/libACE.so",
@@ -52,14 +50,11 @@ cc_library(
         "/opt/dds/opendds/lib/libTAO_Valuetype.so",
         "/opt/dds/opendds/lib/libidl2jni_runtime.so",
         "/opt/dds/opendds/lib/libtao_java.so",
+        "/opt/dds/opendds/lib/tao_java.jar",
     ],
-
     hdrs = glob([
         "/opt/dds/opendds/include/**/*.h",
         "/opt/dds/opendds/include/**/*.hpp",
     ]),
-
     includes = ["/opt/dds/opendds/include/"],
-
 )
-

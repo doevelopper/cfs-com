@@ -1,21 +1,13 @@
-
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_deb")
-load("@com_github_atlassian_bazel_tools//multirun:def.bzl", "multirun", "command")
+load("@rules_pkg//:pkg.bzl", "pkg_deb", "pkg_tar")
+load("@com_github_atlassian_bazel_tools//multirun:def.bzl", "command", "multirun")
 
 cc_binary(
-
     name = "cfs-com-integration-test.bin",
-
     srcs = [
         "cfs/com/features/step_definitions/Steps.cpp",
         "cfs/com/features/step_definitions/Steps.hpp",
     ],
-
-    includes = [
-        ".",
-    ],
-
     copts = [
         "-std=c++17",
         "-DLOG_LEVEL=1",
@@ -25,7 +17,9 @@ cc_binary(
         "-D_REENTRANT",
         "-I/usr/local/include/",
     ],
-
+    includes = [
+        ".",
+    ],
     linkopts = [
         "-L/usr/local/lib",
         "-lapr-1",
@@ -42,7 +36,6 @@ cc_binary(
         "-lboost_filesystem",
         "-lcucumber-cpp",
     ],
-
     deps = [
         "//src/main/cpp:cfs-com-main",
     ],
@@ -69,11 +62,11 @@ pkg_tar(
 
 command(
     name = "cs-integration-test",
-    command = "//src/it:cfs-com-integration-test.bin",
     arguments = [
         "--port",
         "3902",
     ],
+    command = "//src/it:cfs-com-integration-test.bin",
     environment = {
         "ABC": "DEF",
     },
@@ -84,13 +77,13 @@ command(
 
 command(
     name = "cucumber-bin",
-    command = "cucumber",
     arguments = [
         "--out",
         "Feature-Tests-Report.html",
         "--strict",
         "$(pwd)/features",
     ],
+    command = "cucumber",
     environment = {
         "ABC": "DEF",
     },
@@ -107,4 +100,3 @@ multirun(
     ],
     #parallel = True,
 )
-

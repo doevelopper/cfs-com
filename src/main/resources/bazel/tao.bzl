@@ -1,13 +1,11 @@
-
 def _file_name(filePathName):
-    if '/' in filePathName:
-        return filePathName.rsplit('/', -1)[1]
+    if "/" in filePathName:
+        return filePathName.rsplit("/", -1)[1]
     else:
         return filePathName
 
 def _base_name(fileName):
-    return fileName.split('.')[0]
-
+    return fileName.split(".")[0]
 
 def tao_idl_gen(name, src, **kwargs):
     """Compile IDL sources for use with the ACE ORB (TAO)
@@ -19,17 +17,19 @@ def tao_idl_gen(name, src, **kwargs):
     for idl in src:
         base_name = _base_name(_file_name(idl))
         native.genrule(
-            name = base_name ,
+            name = base_name,
             srcs = [idl],
-            outs = [ "%C.cpp" % base_name,
-                 "%C.h" % base_name,
-                 "%C.inl" % base_name,
-                 "%S.cpp" % base_name,
-                 "%S.h" % base_name,
+            outs = [
+                "%C.cpp" % base_name,
+                "%C.h" % base_name,
+                "%C.inl" % base_name,
+                "%S.cpp" % base_name,
+                "%S.h" % base_name,
             ],
             cmd = "/opt/dds/opendds/bin/tao_idl $@ -o $(GENDIR)/cfs/com",
-        **kwargs
-    )
+            **kwargs
+        )
+
 """
  cmd = "tao_idl -Wb,pre_include=$(ACE_ROOT)/ace/pre.h -Wb,post_include=$(ACE_ROOT)/ace/post.h -I$(TAO_ROOT) -Sa -St -I$(DDS_ROOT) $@ -o $(GENDIR)/cfs/com",
 #       cmd = "./$(location create_foo.pl) > \"$@\"",
@@ -47,4 +47,3 @@ cc_binary(
     data = [":logo_miniature"],
 )
 """
-

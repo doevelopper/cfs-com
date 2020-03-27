@@ -104,4 +104,3 @@ def cfs_com_rule_repositories():
             "https://github.com/bazelbuild/rules_python/archive/4b84ad270387a7c439ebdccfd530e2339601ef27.tar.gz",
         ],
     )
-

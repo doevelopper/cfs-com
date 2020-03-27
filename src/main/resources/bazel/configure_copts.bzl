@@ -1,4 +1,3 @@
-
 load(
     "//src/main/resources/bazel:copts.bzl",
     "GCC_FLAGS",
@@ -19,5 +18,3 @@ TEST_COPTS = DEFAULT_COPTS + select({
 DEFAULT_LINKOPTS = select({
     "//conditions:default": [],
 })
-
-

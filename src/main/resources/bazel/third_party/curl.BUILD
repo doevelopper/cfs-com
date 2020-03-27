@@ -1,4 +1,3 @@
-
 # Compiler options for building libcurl.
 # copied from: https://github.com/census-instrumentation/opencensus-cpp/blob/master/opencensus/curl.bzl
 
@@ -223,4 +222,3 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
 )
-

@@ -4,7 +4,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 def cfs_com_repositories():
-
     """Declares external repositories that project depends on. This
     function should be loaded and called from WORKSPACE files."""
 
@@ -82,20 +81,20 @@ def cfs_com_repositories():
     _maybe(
         http_archive,
         name = "io_bazel_rules_go",
-        sha256 = "9fb16af4d4836c8222142e54c9efa0bb5fc562ffc893ce2abeac3e25daead144",
+        sha256 = "142dd33e38b563605f0d20e89d9ef9eda0fc3cb539a14be1bdb1350de2eda659",
         urls = [
-            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.0/rules_go-0.19.0.tar.gz",
-            "https://github.com/bazelbuild/rules_go/releases/download/0.19.0/rules_go-0.19.0.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.22.2/rules_go-v0.22.2.tar.gz",
+            "https://github.com/bazelbuild/rules_go/releases/download/v0.22.2/rules_go-v0.22.2.tar.gz",
         ],
     )
 
     _maybe(
         http_archive,
         name = "bazel_gazelle",
-        sha256 = "be9296bfd64882e3c08e3283c58fcb461fa6dd3c171764fcc4cf322f60615a9b",
+        sha256 = "d8c45ee70ec39a57e7a05e5027c32b1576cc7f16d9dd37135b0eddde45cf1b10",
         urls = [
-        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
-        "https://github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.20.0/bazel-gazelle-v0.20.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.20.0/bazel-gazelle-v0.20.0.tar.gz",
         ],
     )
 
@@ -104,7 +103,7 @@ def cfs_com_repositories():
         name = "com_github_atlassian_bazel_tools",
         commit = "b05c89cea96b66b5fa9f7814b7f29d069c5c282d",
         remote = "https://github.com/atlassian/bazel-tools.git",
-    #    shallow_since = "10 Feb 2020",
+        #    shallow_since = "10 Feb 2020",
     )
     _maybe(
         git_repository,
@@ -240,15 +239,15 @@ def cfs_com_repositories():
         ],
     )
 
-#    _maybe(
-#        http_archive,
-#        name = "com_google_absl",
-#        urls = ["https://github.com/abseil/abseil-cpp/archive/c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a.zip"],
-#        strip_prefix = "abseil-cpp-c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a",
-#        sha256 = "8400c511d64eb4d26f92c5ec72535ebd0f843067515244e8b50817b0786427f9",
-#    )
+    #    _maybe(
+    #        http_archive,
+    #        name = "com_google_absl",
+    #        urls = ["https://github.com/abseil/abseil-cpp/archive/c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a.zip"],
+    #        strip_prefix = "abseil-cpp-c512f118dde6ffd51cb7d8ac8804bbaf4d266c3a",
+    #        sha256 = "8400c511d64eb4d26f92c5ec72535ebd0f843067515244e8b50817b0786427f9",
+    #    )
 
-# Abseil
+    # Abseil
     _maybe(
         http_archive,
         name = "com_google_absl",

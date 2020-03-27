@@ -20,4 +20,3 @@ cc_library(
     ],
     includes = ["include"],
 )
-
