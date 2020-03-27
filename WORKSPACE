@@ -1,6 +1,6 @@
 
 workspace(
-    name = "cfscom"
+    name = "cfs_com"
 )
 
 load("//src/main/resources/bazel:repositories.bzl", "cfs_com_repositories")
@@ -29,3 +29,14 @@ multirun_dependencies()
      # "rules_pkg",
      # "rules_python",
 # )
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+go_rules_dependencies()
+go_register_toolchains()
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+gazelle_dependencies()
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+protobuf_deps()
+

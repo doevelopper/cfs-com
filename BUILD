@@ -82,6 +82,13 @@ config_setting(
     },
 )
 
+config_setting(
+    name = "windows",
+    values = {"cpu": "x64_windows"},
+    constraint_values = ["@bazel_tools//platforms:windows"],
+    visibility = ["//visibility:private"],
+)
+
 # DDS_VENDOR_RTI
 # DDS_VENDOR_ADLINK_OSPL
 # DDS_VENDOR_OCI
@@ -102,6 +109,7 @@ config_setting(
 
 COPTS = [
     "-D_GNU_SOURCE",
+    #"-DEXTERN_SYMBOL=__attribute__((__visibility__(\\"default\\")))",
 ] + select({
         ":with_opendds": ["-DCFS_OPENDDS_DDS=1"],
         "//conditions:default": [""],

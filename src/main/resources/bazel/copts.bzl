@@ -273,15 +273,15 @@ CHECK_MEMORY_FLAGS = [
 DEFAULT_COPTS = select({
 #    "//config:windows": MSVC_FLAGS,
 #    "//config:llvm_compiler": LLVM_FLAGS,
-    "//conditions:default": GCC_FLAGS,
+    "//conditions:default": GCC_FLAGS + WERROR,
 })
 
 # in absence of modules (--compiler=gcc or -c opt), cc_tests leak their copts
 # to their (included header) dependencies and fail to build outside eastl
 TEST_COPTS = DEFAULT_COPTS + select({
     "//config:windows": MSVC_TEST_FLAGS,
-    "//config:llvm_compiler": LLVM_TEST_FLAGS,
-    "//conditions:default": GCC_TEST_FLAGS,
+    "//config:llvm_compiler": LLVM_TEST_FLAGS + WERROR,
+    "//conditions:default": GCC_TEST_FLAGS + WERROR,
 })
 
 EXCEPTIONS_FLAG = select({

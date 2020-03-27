@@ -82,6 +82,21 @@ def cfs_com_repositories():
     _maybe(
         http_archive,
         name = "io_bazel_rules_go",
+        sha256 = "9fb16af4d4836c8222142e54c9efa0bb5fc562ffc893ce2abeac3e25daead144",
+        urls = [
+            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.0/rules_go-0.19.0.tar.gz",
+            "https://github.com/bazelbuild/rules_go/releases/download/0.19.0/rules_go-0.19.0.tar.gz",
+        ],
+    )
+
+    _maybe(
+        http_archive,
+        name = "bazel_gazelle",
+        sha256 = "be9296bfd64882e3c08e3283c58fcb461fa6dd3c171764fcc4cf322f60615a9b",
+        urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/0.18.1/bazel-gazelle-0.18.1.tar.gz",
+        ],
     )
 
     _maybe(
@@ -114,6 +129,44 @@ def cfs_com_repositories():
         strip_prefix = "rapidjson-1.1.0",
         url = "https://github.com/Tencent/rapidjson/archive/v1.1.0.zip",
     )
+
+    _maybe(
+        http_archive,
+        name = "com_github_tencent_rapidjson",
+        build_file = "//:src/main/resources/bazel/third_party/rapidjson.BUILD",
+        strip_prefix = "rapidjson-master",
+        urls = ["https://github.com/Tencent/rapidjson/archive/master.zip"],
+    )
+
+    _maybe(
+        http_archive,
+        name = "com_github_google_benchmark",
+        sha256 = "f8e525db3c42efc9c7f3bc5176a8fa893a9a9920bbd08cef30fb56a51854d60d",
+        strip_prefix = "benchmark-1.4.1",
+        urls = [
+            "https://github.com/google/benchmark/archive/v1.4.1.tar.gz",
+        ],
+    )
+
+    _maybe(
+        http_archive,
+        name = "font_roboto",
+        build_file = "bower.BUILD",
+        url = "https://github.com/polymerelements/font-roboto/archive/v1.1.0.tar.gz",
+        strip_prefix = "font-roboto-1.1.0",
+    )
+
+    _maybe(
+        http_archive,
+        name = "com_google_googletest",
+        sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
+        strip_prefix = "googletest-release-1.10.0",
+        urls = [
+            "https://mirror.bazel.build/github.com/google/googletest/archive/release-1.10.0.tar.gz",
+            "https://github.com/google/googletest/archive/release-1.10.0.tar.gz",
+        ],
+    )
+
     # cpplint from google style guide
     #new_local_repository(
     #    name = "google_styleguide",
@@ -151,16 +204,31 @@ def cfs_com_repositories():
         type = "zip",
     )
 
+    #_maybe(
+    #    http_archive,
+    #    name = "com_google_protobuf",
+    #    sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
+    #    strip_prefix = "protobuf-3.7.1",
+    #    urls = [
+    #        "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.7.1.tar.gz",
+    #        "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
+    #    ],
+    #)
+
     _maybe(
         http_archive,
         name = "com_google_protobuf",
-        sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
-        strip_prefix = "protobuf-3.7.1",
-        urls = [
-            "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.7.1.tar.gz",
-            "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
-        ],
+        strip_prefix = "protobuf-master",
+        urls = ["https://github.com/protocolbuffers/protobuf/archive/master.zip"],
     )
+
+    _maybe(
+        http_archive,
+        name = "com_github_bazelbuild_buildtools",
+        strip_prefix = "buildtools-master",
+        url = "https://github.com/bazelbuild/buildtools/archive/master.zip",
+    )
+
     _maybe(
         http_archive,
         name = "bazel_toolchains",

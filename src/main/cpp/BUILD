@@ -91,6 +91,7 @@ cc_library(
     srcs = [
 #        "cfs/com/Initialize.cpp",
         "cfs/com/Exception.cpp",
+        "cfs/com/Error.cpp",
         "cfs/com/Shutdown.cpp",
         "cfs/com/ShutdownSubject.cpp",
         "cfs/com/Component.cpp",
@@ -112,6 +113,7 @@ cc_library(
     hdrs = [
 #        "cfs/com/Initialize.hpp",
         "cfs/com/Exception.hpp",
+        "cfs/com/Error.hpp",
         "cfs/com/Shutdown.hpp",
         "cfs/com/ShutdownSubject.hpp",
         "cfs/com/Component.hpp",
@@ -139,12 +141,24 @@ cc_library(
         "-llog4cxx",
         "-D_REENTRANT",
         "-I/usr/local/include/",
+        '-DOS="os"',
     ],
 
-    linkopts = [
-        "-L/usr/local/lib",
-        "-L/opt/dds/opendds/lib/",
-    ],
+    defines = ["CURL_STATICLIB"],
+
+    linkopts =  select({
+        "//:windows": [
+            "-DEFAULTLIB:ws2_32.lib",
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+            "-DEFAULTLIB:Normaliz.lib",
+        ],
+        "//conditions:default": [
+            "-lpthread",
+            "-L/usr/local/lib",
+            "-L/opt/dds/opendds/lib/",
+        ],
+    }),
 
 	includes = [
 		".",
@@ -172,6 +186,11 @@ cc_binary(
     deps = [
         ":cfs-com-main",
     ],
+
+    #linkstatic = select({
+    #    "//tools/config:linkshared": 0,
+    #    "//conditions:default": 1,
+    #}),
 )
 
 

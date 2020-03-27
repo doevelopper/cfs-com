@@ -20,7 +20,7 @@ const char* Error::name() const noexcept
 
 std::string Error::message(int ev) const
 {
-    switch (static_cast<cfs::com::DdsErrs>(ev))
+    switch (static_cast<cfs::com::ErrorCode>(ev))
     {
         case ErrorCode::None:
 
@@ -38,9 +38,9 @@ std::string Error::message(int ev) const
 
 std::error_condition Error::default_error_condition(int ev) const noexcept
 {
-    switch (static_cast<cfs::com::DdsErrs>(ev))
+    switch (static_cast<cfs::com::ErrorCode>(ev))
     {
-        case DdsErrs::None:
+        case ErrorCode::None:
 
         //return SubsystemError::SubsysInternal;
         default:
@@ -52,7 +52,7 @@ std::error_condition Error::default_error_condition(int ev) const noexcept
 bool Error::equivalent(const std::error_code& code,
                   int condition) const noexcept
 {
-    switch (static_cast<Severity>(condition))
+    switch (static_cast<cfs::com::ErrorCode>(condition))
     {
 //       case Severity::Heisenbug:
 //	    return ((code == SubsystemError::SubsysInternal)
@@ -67,9 +67,10 @@ bool Error::equivalent(const std::error_code& code,
     }
 }
 
-std::error_code Error::make_error_code(cfs::com::DdsErrs e)
+std::error_code Error::make_error_code(cfs::com::ErrorCode e)
 {
     return {static_cast<int>(e), errorCategory};
+    //return (std::error_code(static_cast<int>(e), Error::get()));
 }
 
 std::system_error Error::make_syserr(int e, const char * msg)

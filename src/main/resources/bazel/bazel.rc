@@ -109,3 +109,20 @@ build --color=yes
 query --keep_going
 build:memcheck --strip=never --test_timeout=3600
 
+build:asan --strip=never
+build:asan --copt -fsanitize=address
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -O0
+build:asan --copt -fno-omit-frame-pointer
+build:asan --copt -g
+build:asan --linkopt -fsanitize=address
+build:asan --cc_output_directory_tag=asan
+
+#build --spawn_strategy=standalone
+#test --spawn_strategy=standalone
+#run --spawn_strategy=standalone
+
+#build --genrule_strategy=standalone
+#test --genrule_strategy=standalone
+#run --genrule_strategy=standalone
+

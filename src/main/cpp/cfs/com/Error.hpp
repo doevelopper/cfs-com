@@ -1,11 +1,25 @@
 
 #ifndef CFS_COM_ERROR_HPP
 #define CFS_COM_ERROR_HPP
-
+#include <iostream>
+#include <sstream>
 #include <type_traits>
 #include <string>
 #include <memory>
 #include <system_error>
+
+/*
+
+   try
+    {
+        throw std::system_error(EFAULT, std::generic_category());
+    }
+    catch (std::system_error& error)
+    {
+        std::cout << "Error: " << error.code() << " - " << error.what() << '\n';
+        assert(error.code() == std::errc::bad_address);
+    }
+*/
 
 namespace cfs::com
 {
@@ -122,6 +136,15 @@ namespace cfs::com
         std::string localizedFailureReason( void ) const;
 
 //        virtual Error * clone() const = 0;
+        // Throws the system error under a given error code.
+        template <typename... ArgsT>
+        void throwError(const char* msg, const std::size_t line, cfs::com::ErrorCode c, ArgsT&&... args)
+        {
+            std::ostringstream oss;
+            oss << "[" << msg << ":" << line << "] ";
+            (oss << ... << args);
+            throw std::system_error(c, oss.str());
+        }
 
     protected:
 

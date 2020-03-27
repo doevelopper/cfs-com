@@ -23,6 +23,18 @@
 
 ## Screenshots (if appropriate):
 
+## Risk
+
+- Risk Level is one of: Low | Medium | High
+- Low: Small bug fix or small optional feature.
+    Medium: New features that are not enabled(for example: new filter). Small-medium
+    features added to existing components(for example: modification to an existing filter).
+- High: Complicated changes such as flow control, rewrites of critical
+    components, etc.
+
+Note: The above is only a rough guide for choosing a level,
+please ask if you have any concerns about the risk of the PR.
+
 ## Types of changes
 
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->

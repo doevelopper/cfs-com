@@ -38,9 +38,10 @@ TEST_F(RandomGeneratorTest, test_Simple)
 //    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
 //    std::this_thread::sleep_for(std::chrono::seconds(5));
     //testee->random<int>(0, 5, false);
-    EXPECT_TRUE(testee->random(false));
+    //EXPECT_TRUE(testee->random(false));
     EXPECT_TRUE(testee->random(true));
 
     RandomGenerator generator;
     //testee->random<float>(0.0f, 5.0f, false);
 }
+
