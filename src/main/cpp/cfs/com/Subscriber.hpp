@@ -1,11 +1,12 @@
 
 #ifndef CFS_COM_SUBSCRIBER_HPP
 #define CFS_COM_SUBSCRIBER_HPP
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
 class Subscriber
 {
-	//LOG4CXX_DECLARE_STATIC_LOGGER
+	LOG4CXX_DECLARE_STATIC_LOGGER
  public:
     Subscriber() = default;
     Subscriber(const Subscriber&) = default;

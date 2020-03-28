@@ -4,6 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 gtest_version = "1.10.0"
+bzl_tc_version = "2.2.2"
 
 def cfs_com_repositories():
     """Declares external repositories that project depends on. This
@@ -234,10 +235,10 @@ def cfs_com_repositories():
         http_archive,
         name = "bazel_toolchains",
         sha256 = "81e08efc3b26cdb14fe4188574d5797dbf8b348a79ecbe50e66f7992ab210fbe",
-        strip_prefix = "bazel-toolchains-2.2.2",
+        strip_prefix = "bazel-toolchains-{}".format(bzl_tc_version),
         urls = [
-            "https://github.com/bazelbuild/bazel-toolchains/releases/download/2.2.2/bazel-toolchains-2.2.2.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/2.2.2/bazel-toolchains-2.2.2.tar.gz",
+            "htps://github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version,bzl_tc_version),
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version,bzl_tc_version),
         ],
     )
 

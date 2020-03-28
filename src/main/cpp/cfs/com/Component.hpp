@@ -3,7 +3,7 @@
 
 #include <string>
 #include <cfs/com/ShutdownSubject.hpp>
-
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
     /*
@@ -17,7 +17,7 @@ namespace cfs::com
 
 class Component : public ShutdownSubject
 {
-	//LOG4CXX_DECLARE_STATIC_LOGGER
+	LOG4CXX_DECLARE_STATIC_LOGGER
  public:
     Component() = delete;
     Component(const std::string & name);

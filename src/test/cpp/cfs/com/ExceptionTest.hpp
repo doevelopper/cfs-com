@@ -1,5 +1,5 @@
 #ifndef CFS_COM_EXCEPTIONTEST_HPP
-#ifndef CFS_COM_EXCEPTIONTEST_HPP
+#define CFS_COM_EXCEPTIONTEST_HPP
 
 #include <gmock/gmock.h>
 #include <cfs/com/Exception.hpp>

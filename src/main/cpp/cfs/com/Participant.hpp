@@ -1,7 +1,7 @@
 
 #ifndef CFS_COM_PARTICIPANT_HPP
 #define CFS_COM_PARTICIPANT_HPP
-
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
 /*!
@@ -10,6 +10,9 @@ namespace cfs::com
 
     class DomainParticipant
     {
+
+        LOG4CXX_DECLARE_STATIC_LOGGER
+
     public:
 
         DomainParticipantPtr createParticipant (

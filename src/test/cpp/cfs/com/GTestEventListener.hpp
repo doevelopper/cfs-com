@@ -7,11 +7,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cfs/com/LoggingService.hpp>
+
 namespace cfs::com::test
 {
     class GTestEventListener final : public testing::EmptyTestEventListener
     {
-
+        LOG4CXX_DECLARE_STATIC_LOGGER
     public:
         GTestEventListener();
         ~GTestEventListener();

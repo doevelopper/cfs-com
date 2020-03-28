@@ -4,11 +4,14 @@
 
 #include <vector>
 #include <gmock/gmock.h>
+#include <cfs/com/LoggingService.hpp>
 
 namespace cfs::com::test
 {
     class Test
     {
+
+        LOG4CXX_DECLARE_STATIC_LOGGER
 
     public:
 
@@ -27,6 +30,8 @@ namespace cfs::com::test
 
         std::string m_testSuites;
         unsigned int m_numberOfTestIteration;
+        static const unsigned long LOGGER_WATCH_DELAY;
+        LoggingService *           m_loggerService;
     };
 
 }

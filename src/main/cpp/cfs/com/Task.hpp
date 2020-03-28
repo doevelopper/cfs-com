@@ -8,7 +8,7 @@ namespace cfs::com
 {
     class Task : virtual public AbstractTask
     {
-	    //LOG4CXX_DECLARE_STATIC_LOGGER
+	    LOG4CXX_DECLARE_STATIC_LOGGER
     public:
         Task() = delete;
         Task(const Task&) = default;

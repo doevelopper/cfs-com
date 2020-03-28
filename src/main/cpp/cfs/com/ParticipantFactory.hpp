@@ -3,7 +3,7 @@
 #define CFS_COM_PARTICIPANTFACTORY_HPP
 
 #include <memory>
-
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
     using std::shared_ptr<DDS::DomainParticipantFactoryInterface> DomainParticipantFactoryPtr;
@@ -24,6 +24,8 @@ namespace cfs::com
 
     class ParticipantFactory
     {
+
+        LOG4CXX_DECLARE_STATIC_LOGGER
 
     public:
 

@@ -1,6 +1,9 @@
 
 #ifndef CFS_COM_TOPIC_HPP
 #define CFS_COM_TOPIC_HPP
+
+#include <cfs/com/LoggingService.hpp>
+
 namespace cfs::com
 {
 
@@ -8,7 +11,7 @@ namespace cfs::com
 
     class Topic
     {
-	    //LOG4CXX_DECLARE_STATIC_LOGGER
+	    LOG4CXX_DECLARE_STATIC_LOGGER
     public:
         Topic() = default;
         Topic(const Topic&) = default;

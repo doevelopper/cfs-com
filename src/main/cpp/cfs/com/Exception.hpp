@@ -4,12 +4,14 @@
 
 #include <stdexcept>
 #include <string>
+#include <cfs/com/LoggingService.hpp>
 
 namespace cfs::com
 {
 
     class Exception : public std::exception
     {
+        LOG4CXX_DECLARE_STATIC_LOGGER
 
     public:
 

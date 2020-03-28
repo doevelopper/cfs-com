@@ -1,12 +1,12 @@
 
 #ifndef CFS_COM_DATAREADER_HPP
 #define CFS_COM_DATAREADER_HPP
-
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
 class DataReader
 {
-	//LOG4CXX_DECLARE_STATIC_LOGGER
+	LOG4CXX_DECLARE_STATIC_LOGGER
  public:
 
     DataReader() = default;

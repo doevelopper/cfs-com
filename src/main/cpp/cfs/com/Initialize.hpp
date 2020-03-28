@@ -3,6 +3,9 @@
 
 #include <cstdint>
 #include <atomic>
+
+#include <cfs/com/LoggingService.hpp>
+
 namespace cfs::com
 {
     enum class Phase : std::uint8_t
@@ -24,7 +27,7 @@ namespace cfs::com
 
     class Initialize
     {
-	    //LOG4CXX_DECLARE_STATIC_LOGGER
+	    LOG4CXX_DECLARE_STATIC_LOGGER
      public:
 
         explicit Initialize(int* argc, char** argv, bool flags = true);
@@ -42,7 +45,7 @@ namespace cfs::com
      protected:
 
      private:
-        static std::atomic<cfs::com::Phase> m_phase{cfs::com::Phase::INIT};
+        static constexpr std::atomic<cfs::com::Phase> m_phase{cfs::com::Phase::INIT};
 
     };
 }

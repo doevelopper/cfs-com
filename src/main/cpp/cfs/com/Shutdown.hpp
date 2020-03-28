@@ -3,7 +3,7 @@
 
 #include <list>
 #include <mutex>
-
+#include <cfs/com/LoggingService.hpp>
 
 namespace cfs::com
 {
@@ -22,7 +22,7 @@ namespace cfs::com
 
     class Shutdown
     {
-	    //LOG4CXX_DECLARE_STATIC_LOGGER
+	    LOG4CXX_DECLARE_STATIC_LOGGER
     public:
         /*!
          * @brief The default constructor.

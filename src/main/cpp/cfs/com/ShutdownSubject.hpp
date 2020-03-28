@@ -21,7 +21,7 @@ namespace cfs::com
 
     class ShutdownSubject
     {
-	    //LOG4CXX_DECLARE_STATIC_LOGGER
+	    LOG4CXX_DECLARE_STATIC_LOGGER
     public:
         ShutdownSubject();
         ShutdownSubject(const ShutdownSubject&) = default;

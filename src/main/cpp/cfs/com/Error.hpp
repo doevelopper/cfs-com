@@ -1,12 +1,15 @@
 
 #ifndef CFS_COM_ERROR_HPP
 #define CFS_COM_ERROR_HPP
+
 #include <iostream>
 #include <sstream>
 #include <type_traits>
 #include <string>
 #include <memory>
 #include <system_error>
+
+#include <cfs/com/LoggingService.hpp>
 
 /*
 
@@ -122,6 +125,8 @@ namespace cfs::com
 
     class Error : std::error_category
     {
+
+        LOG4CXX_DECLARE_STATIC_LOGGER
 
     public:
 

@@ -1,11 +1,16 @@
 
 #ifndef CFS_COM_PUBLISHER_HPP
 #define CFS_COM_PUBLISHER_HPP
+
+#include <cfs/com/LoggingService.hpp>
+
 namespace cfs::com
 {
 class Publisher
 {
-	//LOG4CXX_DECLARE_STATIC_LOGGER
+
+	LOG4CXX_DECLARE_STATIC_LOGGER
+
  public:
     Publisher() = default;
     Publisher(const Publisher&) = default;

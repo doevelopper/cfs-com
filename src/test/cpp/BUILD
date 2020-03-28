@@ -6,13 +6,15 @@ licenses(["notice"])  # Apache License
 cc_test(
     name = "cfs-com-unit-test.bin",
     srcs = [
-        "cfs/com/GTestEventListener.cpp",
-        "cfs/com/GTestEventListener.hpp",
+        "cfs/com/unitTest.cpp",
         "cfs/com/Test.cpp",
         "cfs/com/Test.hpp",
-        "cfs/com/demo/sensors/RandomGeneratorTest.cpp",
-        "cfs/com/demo/sensors/RandomGeneratorTest.hpp",
-        "cfs/com/unitTest.cpp",
+        #"cfs/com/GTestEventListener.cpp",
+        #"cfs/com/GTestEventListener.hpp",
+        #"cfs/com/demo/sensors/RandomGeneratorTest.cpp",
+        #"cfs/com/demo/sensors/RandomGeneratorTest.hpp",
+        #"cfs/com/ExceptionTest.cpp",
+        #"cfs/com/ExceptionTest.hpp",
     ],
     copts = [
         "-std=c++17",

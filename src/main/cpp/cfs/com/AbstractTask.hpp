@@ -6,6 +6,7 @@
 #include <cfs/com/Component.hpp>
 //#include <cfs/com/ShutdownSubject.hpp>
 #include <cfs/com/Shutdown.hpp>
+#include <cfs/com/LoggingService.hpp>
 namespace cfs::com
 {
     using Clock = std::chrono::steady_clock;
@@ -14,7 +15,7 @@ namespace cfs::com
 
 class AbstractTask : public Shutdown
 {
-	//LOG4CXX_DECLARE_STATIC_LOGGER
+	LOG4CXX_DECLARE_STATIC_LOGGER
  public:
     AbstractTask(Component * component = nullptr);
     AbstractTask() = delete;
