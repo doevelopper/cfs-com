@@ -237,8 +237,8 @@ def cfs_com_repositories():
         sha256 = "81e08efc3b26cdb14fe4188574d5797dbf8b348a79ecbe50e66f7992ab210fbe",
         strip_prefix = "bazel-toolchains-{}".format(bzl_tc_version),
         urls = [
-            "htps://github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version,bzl_tc_version),
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version,bzl_tc_version),
+            "htps://github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version, bzl_tc_version),
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-toolchains/releases/download/{}/bazel-toolchains-{}.tar.gz".format(bzl_tc_version, bzl_tc_version),
         ],
     )
 

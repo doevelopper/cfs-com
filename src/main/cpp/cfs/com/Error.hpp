@@ -157,9 +157,9 @@ namespace cfs::com
     protected:
 
         const char* name() const noexcept override final;
-        std::string message(int ev) const override final;
-        std::error_condition default_error_condition(int ev) const noexcept override;
-        bool equivalent(const std::error_code& code, int condition) const noexcept override;
+        // std::string message(int ev) const override final;
+        // std::error_condition default_error_condition(int ev) const noexcept override;
+        // bool equivalent(const std::error_code& code, int condition) const noexcept override;
         /*!
          * @brief Acquires the singleton instance of the error category
          */
@@ -181,7 +181,7 @@ namespace cfs::com
     };
 
 
-    const Error errorCategory {};
+    // const Error errorCategory {};
 }
 
 

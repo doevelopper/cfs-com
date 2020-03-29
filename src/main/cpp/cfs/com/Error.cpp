@@ -2,6 +2,7 @@
 #include <cfs/com/Error.hpp>
 
 using namespace cfs::com;
+
 log4cxx::LoggerPtr Error::logger = log4cxx::Logger::getLogger(std::string("cfs.com.Error"));
 
 Error::Error()
@@ -19,7 +20,7 @@ const char* Error::name() const noexcept
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
     return "Error: ";
 }
-
+/*
 std::string Error::message(int ev) const
 {
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
@@ -50,13 +51,11 @@ std::error_condition Error::default_error_condition(int ev) const noexcept
 
         //return SubsystemError::SubsysInternal;
         default:
-
             return {};
     }
 }
 
-bool Error::equivalent(const std::error_code& code,
-                  int condition) const noexcept
+bool Error::equivalent(const std::error_code& code, int condition) const noexcept
 {
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
 
@@ -70,7 +69,6 @@ bool Error::equivalent(const std::error_code& code,
 //       case Severity::Bohrbug
 //       case Severity::Mandelbug
         default:
-
             return (false);
     }
 }
@@ -111,3 +109,4 @@ std::system_error Error::make_syserr(const char * msg)
     return make_syserr(errno, msg);
 }
 
+*/

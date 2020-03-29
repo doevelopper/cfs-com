@@ -1,4 +1,5 @@
 ---
+BasedOnStyle: None
 Language:        Cpp
 AccessModifierOffset: -2
 ColumnLimit: 120
@@ -26,4 +27,9 @@ SpacesInContainerLiterals: false
 AllowShortFunctionsOnASingleLine: false
 ReflowComments: false
 ...
+---
+Language: JavaScript
+# Use 100 columns for JS.
+ColumnLimit: 100
+---
 
