@@ -31,6 +31,8 @@ void GTestEventListener::OnTestStart(const testing::TestInfo& test_info)
     m_currentTestCaseName = test_info.test_case_name();
     m_currentTestName =  test_info.name();
 
+    //std::string tcn = std::string(test_info.name()) + "." + std::string(test_info.test_case_name());
+
     LOG4CXX_TRACE(logger, "Test case: (" << m_currentTestCaseName << ") Test suite: (" << m_currentTestName << ")");
 }
 
@@ -59,9 +61,10 @@ void GTestEventListener::OnTestEnd(const testing::TestInfo& test_info)
     m_currentTestName.clear();
 }
 
-void GTestEventListener::OnTestProgramEnd(const testing::UnitTest& /*unit_test*/)
+void GTestEventListener::OnTestProgramEnd(const testing::UnitTest& unit_test)
 {
     LOG4CXX_TRACE(logger, "Test case finished: Pass(" << m_testCount
-            << "), Failed(" << m_failedTestCount << ")");
+            << "), Failed(" << m_failedTestCount << ")"
+            << " for elapsed time: (" << unit_test.elapsed_time() << " )");
 }
 

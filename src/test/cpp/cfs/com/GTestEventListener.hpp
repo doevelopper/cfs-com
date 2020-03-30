@@ -22,6 +22,7 @@ namespace cfs::com::test
         void OnTestPartResult(const testing::TestPartResult& test_part_result) override;
         void OnTestEnd(const testing::TestInfo& test_info) override;
         void OnTestProgramEnd(const testing::UnitTest& /*unit_test*/) override;
+        //void OnTestIterationEnd(const UnitTest& unit_test, int iteration) override;
 
     protected:
 

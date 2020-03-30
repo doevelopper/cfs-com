@@ -54,6 +54,12 @@ test:coverage --linkopt=-lgcov
 test:coverage --linkopt=-lgcc
 test:coverage --linkopt=-lc
 
+test --test_env='LC_ALL=en_US.UTF-8'
+test --test_env='LANG=en_US.UTF-8'
+build --test_env='LC_ALL=en_US.UTF-8'
+build --test_env='LANG=en_US.UTF-8'
+test --test_env=PATH
+
 # Support for debugging NodeJS tests
 # Add the Bazel option `--config=debug` to enable this
 test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results

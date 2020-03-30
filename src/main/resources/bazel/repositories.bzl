@@ -278,6 +278,13 @@ def cfs_com_repositories():
         ],
     )
 
+    _maybe(
+        http_archive,
+        name = "rules_cc",
+        strip_prefix = "rules_cc-master",
+        urls = ["https://github.com/bazelbuild/rules_cc/archive/master.zip"],
+    )
+
 def _maybe(repo_rule, name, **kwargs):
     """Declares an external repository if it hasn't been declared already."""
     if name not in native.existing_rules():

@@ -1,29 +1,37 @@
 licenses(["notice"])
-
 exports_files(["LICENSE"])
-
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@rules_cc//cc:defs.bzl",
-    "cc_binary",
-    "cc_library",
+load("//src/main/resources/bazel:generate_idl.bzl", "tao_idl_gen")
+
+tao_idl_gen(
+    name = "idl_generated",
+    idls = [
+        "cfs/com/Messenger.idl",
+        "cfs/com/ShapeInfo.idl",
+    ],
 )
 
-cc_library(
-    name = "lib",
-    #    srcs = ["x.cc"],
-    hdrs = [":gen_header"],
+#load(
+#    "@rules_cc//cc:defs.bzl",
+#    "cc_binary",
+#    "cc_library",
+#)
+
+#cc_library(
+#    name = "lib",
+#    #    srcs = ["x.cc"],
+#    hdrs = [":gen_header"],
     #-lOpenDDS_Rtps_Udp -lOpenDDS_Rtps -lOpenDDS_Multicast -lOpenDDS_Udp -lOpenDDS_Tcp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
     #LDLIBS:=-lOpenDDS_Rtps -lOpenDDS_Rtps_Udp -lOpenDDS_InfoRepoDiscovery -lOpenDDS_Dcps -lTAO_BiDirGIOP -lTAO_PI -lTAO_CodecFactory -lTAO_PortableServer -lTAO_AnyTypeCode -lTAO -lACE
-)
+#)
 
-genrule(
-    name = "gen_header",
-    srcs = [],
-    outs = ["x.h"],
-    cmd = "echo 'int x();' > $@",
-)
+#genrule(
+#    name = "gen_header",
+#    srcs = [],
+#    outs = ["x.h"],
+#    cmd = "echo 'int x();' > $@",
+#)
 
 #create_dirs:
 #	@mkdir -p $(GEN_DIR)

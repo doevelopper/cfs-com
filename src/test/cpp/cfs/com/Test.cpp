@@ -32,9 +32,11 @@ int Test::run (int argc, char * argv[])
 {
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
     ::testing::InitGoogleTest(&argc, argv);
-    //testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
+    testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
-    return RUN_ALL_TESTS();
+    int ret_val = RUN_ALL_TESTS();
+
+    return(ret_val);
 }
 
 void Test::showUsage(std::string name)

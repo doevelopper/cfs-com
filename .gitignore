@@ -1014,3 +1014,7 @@ MigrationBackup/
 # End of https://www.gitignore.io/api/qt,ada,vim,c++,gcov,cmake,emacs,maven,bazel,gradle,python,opencv,pycharm,vagrant,valgrind,clion+all,kdevelop4,qtcreator,pycharm+all,visualstudio,visualstudiocode,openframeworks+visualstudio
 
 cfs-algo-build/*
+/bazel-bazel-test
+/bazel-bin
+/bazel-out
+/bazel-testlogs

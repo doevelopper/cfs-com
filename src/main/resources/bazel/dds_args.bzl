@@ -8,10 +8,9 @@ COMMON_IDL_FLAG = [
     "--idl-version 4",
     "-Sa",
     "-St",
-
 ]
-DEFAULT_TAO_IDL_ARGS = COMMON_IDL_FLAG  + select({
-    "//conditions:default":[
+DEFAULT_TAO_IDL_ARGS = COMMON_IDL_FLAG + select({
+    "//conditions:default": [
         "-Wb,pre_include=ace/pre.h",
         "-Wb,post_include=ace/post.h",
         "-I$TAO_ROOT",
@@ -26,9 +25,8 @@ DEFAULT_TAO_IDL_ARGS = COMMON_IDL_FLAG  + select({
     ],
 })
 
-DEFAULT_OPENDDS_IDL_ARGS = COMMON_IDL_FLAG  + select({
-    "//conditions:default":[
+DEFAULT_OPENDDS_IDL_ARGS = COMMON_IDL_FLAG + select({
+    "//conditions:default": [
         "-Lc++11",
     ],
 })
-

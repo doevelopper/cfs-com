@@ -84,11 +84,6 @@ load(
 # ],
 # )
 
-#tao_idl_gen(
-#    name = "idl_generated",
-#    src = "Sensor.idl",
-#)
-
 cc_library(
     name = "cfs-com-main",
     srcs = [
