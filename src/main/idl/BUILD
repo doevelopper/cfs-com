@@ -8,7 +8,7 @@ tao_idl_gen(
     name = "idl_generated",
     idls = [
         "cfs/com/Messenger.idl",
-        "cfs/com/ShapeInfo.idl",
+        "cfs/com/Msg.idl",
     ],
 )
 

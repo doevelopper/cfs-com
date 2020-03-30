@@ -16,3 +16,28 @@ licenses(["notice"])  # Apache 2.0
 
 #package(default_visibility = ["//:__subpackages__"])
 package(default_visibility = ["//visibility:public"])
+
+config_setting(
+    name = "linux",
+    constraint_values = ["@bazel_tools//platforms:linux"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "freebsd",
+    constraint_values = ["@bazel_tools//platforms:freebsd"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "osx",
+    constraint_values = ["@bazel_tools//platforms:osx"],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "windows",
+    constraint_values = ["@bazel_tools//platforms:windows"],
+    visibility = ["//visibility:public"],
+)
+
