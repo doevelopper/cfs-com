@@ -1,0 +1,59 @@
+# Instruction Set Architecture
+build:isa_arm-neon --copt=-D__ARM_NEON
+build:isa_arm-neon --copt=-D__ARM_NEON__
+build:isa_arm-neon --copt=-mfpu=neon
+build:isa_arm-neon --copt=-mfloat-abi=softfp
+
+build:isa_aarch64-neon --copt=-D__ARM_NEON
+build:isa_aarch64-neon --copt=-D__ARM_NEON__
+
+build:isa_sse4 --copt=-msse2
+build:isa_sse4 --copt=-msse3
+build:isa_sse4 --copt=-msse4
+
+build:isa_avx --config=isa_sse4
+build:isa_avx --copt=-mavx
+
+build:isa_avx2 --config=isa_avx
+build:isa_avx2 --copt=-mavx2
+build:isa_avx2 --copt=-mfma
+
+build:isa_avx512 --config=isa_avx2
+#build:isa_avx512 --copt=-march=skylake-avx512
+#build:isa_avx512 --copt=-mprefer-vector-width=512
+build:isa_avx512 --copt=-mavx512cd
+build:isa_avx512 --copt=-mavx512vl
+build:isa_avx512 --copt=-mavx512dq
+build:isa_avx512 --copt=-mavx512bw
+build:isa_avx512 --copt=-mavx512ifma
+build:isa_avx512 --copt=-mavx512vbmi
+
+# Platforms
+build --incompatible_enable_cc_toolchain_resolution # enable platforms
+
+build:linux_avx2 --config=isa_avx2
+build:linux_avx2 --platform_suffix=-linux_avx2
+
+build:linux_avx512 --config=isa_avx512
+build:linux_avx512 --platform_suffix=-linux_avx512
+
+build:android --force_pic
+build:android --linkopt=-ldl
+build:android --linkopt=-lm
+
+build:android_arm --config=android
+build:android_arm --platforms=//platforms:android_arm
+build:android_arm --config=isa_arm-neon
+build:android_arm --platform_suffix=-android_arm
+
+build:android_aarch64 --config=android
+build:android_aarch64 --platforms=//platforms:android_aarch64
+build:android_aarch64 --config=isa_aarch64-neon
+build:android_aarch64 --platform_suffix=-android_aarch64
+
+run:linaro --run_under="qemu-aarch64 -E LD_LIBRARY_PATH=/linaro/aarch64-linux-gnu/libc/lib"
+
+run:linaro_aarch64 --config=linaro
+build:linaro_aarch64 --platforms=//platforms:linux_aarch64
+build:linaro_aarch64 --config=isa_aarch64-neon
+build:linaro_aarch64 --platform_suffix=-linaro_aarch64

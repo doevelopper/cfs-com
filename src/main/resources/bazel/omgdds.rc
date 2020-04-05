@@ -1,0 +1,58 @@
+build --test_env=ACE_ROOT=/opt/dds/opendds/share/ace
+build --test_env=TAO_ROOT=/opt/dds/opendds/share/tao
+build --test_env=DDS_ROOT=/opt/dds/opendds/share/dds
+build --test_env=LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/dds/opendds/lib
+build --test_env=CPATH=$CPATH:/opt/dds/opendds/include
+build --test_env=SSL_ROOT=/usr/local
+build --test_env=BOOST_ROOT=/usr/local
+build --test_env=GLIB_ROOT=/usr
+build --test_env=XERCESCROOT=/usr/local
+build --test_env=PROTOBUF_HOME=/usr/local
+build --test_env=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ACE_ROOT}/tao:${ACE_ROOT}/lib:${ACE_ROOT}/TAO/orbsvcs:${MPC_ROOT}:${CIAO_ROOT}:${DANCE_ROOT}:${DDS_ROOT}
+
+test --test_env=ACE_ROOT=/opt/dds/opendds/share/ace
+test --test_env=TAO_ROOT=/opt/dds/opendds/share/tao
+test --test_env=DDS_ROOT=/opt/dds/opendds/share/dds
+test --test_env=LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/dds/opendds/lib
+test --test_env=CPATH=$CPATH:/opt/dds/opendds/include
+test --test_env=SSL_ROOT=/usr/local
+test --test_env=BOOST_ROOT=/usr/local
+test --test_env=GLIB_ROOT=/usr
+test --test_env=XERCESCROOT=/usr/local
+test --test_env=PROTOBUF_HOME=/usr/local
+test --test_env=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ACE_ROOT}/tao:${ACE_ROOT}/lib:${ACE_ROOT}/TAO/orbsvcs:${MPC_ROOT}:${CIAO_ROOT}:${DANCE_ROOT}:${DDS_ROOT}
+
+run --test_env=ACE_ROOT=/opt/dds/opendds/share/ace
+run --test_env=TAO_ROOT=/opt/dds/opendds/share/tao
+run --test_env=DDS_ROOT=/opt/dds/opendds/share/dds
+run --test_env=LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/dds/opendds/lib
+run --test_env=CPATH=$CPATH:/opt/dds/opendds/include
+run --test_env=SSL_ROOT=/usr/local
+run --test_env=BOOST_ROOT=/usr/local
+run --test_env=GLIB_ROOT=/usr
+run --test_env=XERCESCROOT=/usr/local
+run --test_env=PROTOBUF_HOME=/usr/local
+run --test_env=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ACE_ROOT}/tao:${ACE_ROOT}/lib:${ACE_ROOT}/TAO/orbsvcs:${MPC_ROOT}:${CIAO_ROOT}:${DANCE_ROOT}:${DDS_ROOT}
+
+# test --test_env=DDS_ROOT=/tmp/OpenDDS
+# test --test_env=QT5_INCDIR=/opt/Qt/5.14.1/gcc_64/include
+# test --test_env=QT5_LIBDIR=/opt/Qt/5.14.1/gcc_64/lib
+# test --test_env=TAO_ROOT=/tmp/ACE_TAO/TAO
+# test --test_env=LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/Qt/5.14.1/gcc_64/lib:/tmp/ACE_TAO/ACE/lib:/tmp/OpenDDS/lib:/usr/local/bin
+# test --test_env=JAVA_PLATFORM=linux
+# test --test_env=SSL_ROOT=/usr/local
+# test --test_env=MPC_ROOT=/tmp/MPC
+# test --test_env=QT5_SUFFIX=
+# test --test_env=PATH=${PATH}:/tmp/ACE_TAO/ACE/bin:/tmp/OpenDDS/bin
+# test --test_env=DANCE_ROOT=unused
+# test --test_env=QTDIR=/opt/Qt/5.14.1/gcc_64
+# test --test_env=QT5_BINDIR=/opt/Qt/5.14.1/gcc_64/bin
+# test --test_env=BOOST_ROOT=/usr/local
+# test --test_env=GLIB_LIB_DIR=lib/x86_64-linux-gnu
+# test --test_env=ACE_ROOT=/tmp/ACE_TAO/ACE
+# test --test_env=GLIB_ROOT=/usr
+# test --test_env=RAPIDJSON_ROOT=/tmp/OpenDDS/tools/rapidjson
+# test --test_env=JAVA_HOME=/opt/jdk1.8.0_212
+# test --test_env=XERCESCROOT=/usr/local
+# test --test_env=CIAO_ROOT=unused
+

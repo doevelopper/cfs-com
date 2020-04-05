@@ -2,6 +2,8 @@
 #ifndef CFS_COM_CORBA_VARSEQUENCEINTERFACE_HPP
 #define CFS_COM_CORBA_VARSEQUENCEINTERFACE_HPP
 
+#include <cfs/com/corba/CorbaIdlTypes.hpp>
+
 namespace cfs::com::corba
 {
     template <class T>

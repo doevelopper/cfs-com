@@ -1,6 +1,8 @@
 
 #include <cfs/com/corba/VarStringInterface.hpp>
 
+using namespace cfs::com::corba;
+
 VarStringInterface::VarStringInterface ()
     : m_ptr (0)
 {
@@ -22,8 +24,7 @@ VarStringInterface::~VarStringInterface ()
     if (m_ptr) string_free (m_ptr);
 }
 
-VarStringInterface &
-VarStringInterface::operator = (char * p)
+VarStringInterface & VarStringInterface::operator = (char * p)
 {
     if (p != m_ptr) {
         if(m_ptr) string_free(m_ptr);
@@ -33,8 +34,7 @@ VarStringInterface::operator = (char * p)
     return *this;
 }
 
-VarStringInterface &
-VarStringInterface::operator =(const VarStringInterface & s)
+VarStringInterface & VarStringInterface::operator =(const VarStringInterface & s)
 {
     if(this != &s)
     {
@@ -52,20 +52,17 @@ VarStringInterface::operator char * ()
     return m_ptr;
 }
 
-char&
-VarStringInterface::operator[] (ULong index)
+char& VarStringInterface::operator[] (ULong index)
 {
     return m_ptr[index];
 }
 
-char
-VarStringInterface::operator[] (ULong index) const
+char VarStringInterface::operator[] (ULong index) const
 {
     return m_ptr[index];
 }
 
-char*
-VarStringInterface::string_alloc(::CORBA::ULong len)
+char* VarStringInterface::string_alloc(::CORBA::ULong len)
 {
     char* str = new char[len+1];
     str[len] = '\0';
@@ -73,16 +70,14 @@ VarStringInterface::string_alloc(::CORBA::ULong len)
     return str;
 }
 
-char*
-VarStringInterface::stringDup(const char* s)
+char* VarStringInterface::stringDup(const char* s)
 {
     char* dest = ::VarStringInterface::string_alloc(strlen(s));
 
     return strcpy(dest, s);
 }
 
-void
-VarStringInterface::stringFree(char* s)
+void VarStringInterface::stringFree(char* s)
 {
     delete [] s;
 }

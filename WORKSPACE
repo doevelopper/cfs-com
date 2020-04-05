@@ -6,6 +6,10 @@ load("//src/main/resources/bazel:repositories.bzl", "cfs_com_repositories")
 
 cfs_com_repositories()
 
+load("//src/main/resources/bazel:sw_qa_repositories.bzl", "qa_repositories")
+
+qa_repositories()
+
 # Check that the user has a version between our minimum supported version of
 # Bazel and our maximum supported version of Bazel.
 load("//src/main/resources/bazel:version.bzl", "MAX_VERSION", "MIN_VERSION", "check_version")

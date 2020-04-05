@@ -1,4 +1,5 @@
-# -*- python -*-
+# modified from
+#   https://github.com/ApolloAuto/apollo/blob/master/tools/cpplint.bzl
 
 # From https://bazel.build/versions/master/docs/be/c-cpp.html#cc_library.srcs
 _SOURCE_EXTENSIONS = [source_ext for source_ext in """
@@ -40,10 +41,10 @@ def _add_linter_rules(source_labels, source_filenames, name, data = None):
     tags = ["cpplint"]
 
     # Google cpplint.
-    cpplint_cfg = ["//src/main/resources/configs:CPPLINT.cfg"] + native.glob(["CPPLINT.cfg"])
+    cpplint_cfg = ["//src/main/resources/configs:CPPLINT.cfg"] #+ native.glob(["CPPLINT.cfg"])
     native.py_test(
         name = name + "_cpplint",
-        srcs = ["@google_styleguide//:cpplint"],
+        srcs = ["@cpplint"],
         data = data + cpplint_cfg + source_labels,
         args = _EXTENSIONS_ARGS + source_filenames,
         main = "cpplint.py",

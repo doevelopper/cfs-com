@@ -2,6 +2,8 @@
 #ifndef CFS_COM_CORBA_VARSTRINGINTERFACE_HPP
 #define CFS_COM_CORBA_VARSTRINGINTERFACE_HPP
 
+#include <cfs/com/corba/CorbaIdlTypes.hpp>
+
 namespace cfs::com::corba
 {
 

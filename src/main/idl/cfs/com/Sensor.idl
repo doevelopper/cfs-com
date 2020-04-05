@@ -62,9 +62,18 @@ module cfs
         @topic
         struct Message
         {
-            @key long time;  // @key
+            @key
+            long time;  // @key
             string content;
         };
+
+        struct Distance
+        {
+            @key
+            long sensorId; 		//@key
+            float value;	// Distance in meters
+        }
+
 
     };
 };

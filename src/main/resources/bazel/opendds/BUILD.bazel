@@ -1,0 +1,12 @@
+
+#toolchain_type(
+#    name = "idl_type_generator",
+#    visibility = ["//visibility:public"],
+#)
+
+#idl2cpp(
+#    name = "generate_idl",
+#    visibility = ["//visibility:public"],
+#)
+
+

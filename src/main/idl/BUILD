@@ -2,10 +2,10 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 package(default_visibility = ["//visibility:public"])
 
-load("//src/main/resources/bazel:generate_idl.bzl", "tao_idl_gen")
+load("//src/main/resources/bazel/opendds:generate_idl.bzl", "tao_idl_gen")
 
 tao_idl_gen(
-    name = "idl_generated",
+    name = "cfs-com-idl-main",
     idls = [
         "cfs/com/Messenger.idl",
         "cfs/com/Msg.idl",

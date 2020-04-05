@@ -37,6 +37,10 @@ test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # To enable the lint test, the BUILD *must* load the cpplint.bzl by having
 # 'load("//tools:cpplint.bzl", "cpplint")' at the beginning and 'cpplint()'
 # at the end.
+# Cpplint
+# modified from
+#   https://github.com/ApolloAuto/apollo/blob/d605ff43e65ab4943622dd2fba33d35d29f37e7d/tools/bazel.rc#L21
+
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
 
@@ -53,17 +57,29 @@ test:coverage --linkopt=-coverage
 test:coverage --linkopt=-lgcov
 test:coverage --linkopt=-lgcc
 test:coverage --linkopt=-lc
+# Coverage
+#coverage --combined_report=lcov
+#coverage --coverage_report_generator=@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main
+#coverage --experimental_cc_coverage
 
 test --test_env='LC_ALL=en_US.UTF-8'
 test --test_env='LANG=en_US.UTF-8'
 build --test_env='LC_ALL=en_US.UTF-8'
 build --test_env='LANG=en_US.UTF-8'
 test --test_env=PATH
+build --action_env=PATH
+build --action_env=PATH=/bin:/usr/bin:/opt/dds/opendds/bin
 
 # Support for debugging NodeJS tests
 # Add the Bazel option `--config=debug` to enable this
 test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
 
+# Enable heap check for test
+#test --test_env=HEAPCHECK=normal
+#test --test_env=PPROF_PATH=/usr/local/bin/gperftools/bin/pprof
+
+#test:disable_test_heap_check --test_env=HEAPCHECK=
+#test:disable_test_heap_check --test_env=PPROF_PATH=
 
 # +------------------------------------------------------------+
 # | Build Configurations                                       |
@@ -138,4 +154,7 @@ build:asan --cc_output_directory_tag=asan
 #build --genrule_strategy=standalone
 #test --genrule_strategy=standalone
 #run --genrule_strategy=standalone
+
+#build --workspace_status_command="python ./src/main/resources/scripts/workspace_status.py" --strategy=Closure=worker
+#build --repository_cache=~/.cfs/bazel-cache/repository
 

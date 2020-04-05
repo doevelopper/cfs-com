@@ -2,8 +2,6 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
-load("//src/main/resources/bazel:cpplint.bzl", "cpplint")
-
 package(default_visibility = ["//visibility:public"])
 
 load(
@@ -23,9 +21,15 @@ load(
     "EXCEPTIONS_FLAG_LINKOPTS",
     "TEST_COPTS",
 )
+
 load(
-    "//src/main/resources/bazel:tao.bzl",
+    "//src/main/resources/bazel/opendds:tao.bzl",
     "tao_idl_gen",
+)
+
+load(
+    "//src/main/resources/bazel/cpplint:cpplint.bzl",
+    "cpplint"
 )
 
 # cc_import(
@@ -97,6 +101,7 @@ cc_library(
         "cfs/com/AbstractTask.cpp",
         "cfs/com/Task.cpp",
         "cfs/com/corba/VarInterface.cpp",
+        #"cfs/com/corba/VarSequenceInterface.cpp",
         "cfs/com/DataReader.cpp",
         "cfs/com/DataWriter.cpp",
         ##"cfs/com/Participant.cpp",
@@ -130,6 +135,7 @@ cc_library(
         "cfs/com/Topic.hpp",
         "cfs/com/demo/sensors/RandomGenerator.hpp",
         "cfs/com/corba/CorbaIdlTypes.hpp",
+        "cfs/com/corba/VarSequenceInterface.hpp",
         "cfs/com/TypeTraits.hpp",
     ] + select({
         "@bazel_tools//src/conditions:windows": [

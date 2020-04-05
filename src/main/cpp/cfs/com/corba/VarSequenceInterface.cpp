@@ -1,6 +1,8 @@
 
 #include <cfs/com/corba/VarSequenceInterface.hpp>
 
+using namespace cfs::com::corba;
+
 template <class T>
 VarSequenceInterface<T>::VarSequenceInterface()
     : m_pointee (nullptr)

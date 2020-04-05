@@ -1,0 +1,60 @@
+
+load(":qt_defs.bzl", "qt_import")
+
+
+[alias(
+    name = name,
+    actual = select({
+        "//conditions:default": "bin/%s" % name,
+    }),
+    visibility = ["//visibility:public"],
+) for name in [
+    "lconvert",
+    "moc",
+    "rcc",
+    "uic",
+  ]
+]
+
+
+
+qt_import(
+    name = "qt_concurrent",
+    module = "Concurrent",
+)
+
+qt_import(
+    name = "qt_core",
+    module = "Core",
+)
+
+qt_import(
+    name = "qt_gui",
+    module = "Gui",
+)
+
+qt_import(
+    name = "qt_network",
+    module = "Network",
+)
+
+qt_import(
+    name = "qt_svg",
+    module = "Svg",
+)
+
+qt_import(
+    name = "qt_test",
+    module = "Test",
+)
+
+qt_import(
+    name = "qt_widgets",
+    module = "Widgets",
+)
+
+qt_import(
+    name = "qt_xml",
+    module = "Xml",
+)
+

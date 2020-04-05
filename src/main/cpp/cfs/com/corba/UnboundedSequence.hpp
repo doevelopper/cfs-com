@@ -9,7 +9,7 @@ namespace cfs::com::corba
     {
     using T& = refType;
     using const T& = constRefType;
-    public
+        public:
     UnboundedSequence(ULong max);
     UnboundedSequence(ULong max, ULong length, T* value, Boolean release = false);
     UnboundedSequence(const UnboundedSequence<T>& );

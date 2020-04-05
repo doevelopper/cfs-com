@@ -1,3 +1,7 @@
+#ifndef CFS_COM_CORBA_CORBAIDLTYPES_HPP
+#define CFS_COM_CORBA_CORBAIDLTYPES_HPP
+
+#include <tao/corba.h>
 
 namespace cfs::com::corba
 {
@@ -52,3 +56,6 @@ namespace cfs::com::corba
     using String_var = ::CORBA::String_var;
     using StringSeq = ::CORBA::StringSeq;
 }
+
+#endif
+
