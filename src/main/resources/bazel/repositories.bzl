@@ -222,6 +222,7 @@ def cfs_com_repositories():
         name = "com_google_protobuf",
         strip_prefix = "protobuf-master",
         urls = ["https://github.com/protocolbuffers/protobuf/archive/master.zip"],
+        sha256 = "934e5beeb9178437d86943a88f9e8e4d037372dd34cf03c3f31e35bb5df9614f",
     )
 
     _maybe(
@@ -229,6 +230,7 @@ def cfs_com_repositories():
         name = "com_github_bazelbuild_buildtools",
         strip_prefix = "buildtools-master",
         url = "https://github.com/bazelbuild/buildtools/archive/master.zip",
+        sha256 = "a051099f108786f0f05cef5725818e0c136e102cef00071eb7bb214a99551965",
     )
 
     _maybe(
@@ -283,6 +285,7 @@ def cfs_com_repositories():
         name = "rules_cc",
         strip_prefix = "rules_cc-master",
         urls = ["https://github.com/bazelbuild/rules_cc/archive/master.zip"],
+        sha256 = "20e134e1348022090fd38bcf354dd88f4d95808ad905c62cb1a359b03c4ad058",
     )
 
 def _maybe(repo_rule, name, **kwargs):
