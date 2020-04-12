@@ -62,13 +62,13 @@ test:coverage --linkopt=-lc
 #coverage --coverage_report_generator=@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main
 #coverage --experimental_cc_coverage
 
-test --test_env='LC_ALL=en_US.UTF-8'
-test --test_env='LANG=en_US.UTF-8'
-build --test_env='LC_ALL=en_US.UTF-8'
-build --test_env='LANG=en_US.UTF-8'
+#test --test_env='LC_ALL=en_US.UTF-8'
+#test --test_env='LANG=en_US.UTF-8'
+#build --test_env='LC_ALL=en_US.UTF-8'
+#build --test_env='LANG=en_US.UTF-8'
 test --test_env=PATH
 build --action_env=PATH
-build --action_env=PATH=/bin:/usr/bin:/opt/dds/opendds/bin
+#build --action_env=PATH=/bin:/usr/bin:/opt/dds/opendds/bin
 
 # Support for debugging NodeJS tests
 # Add the Bazel option `--config=debug` to enable this

@@ -1,6 +1,7 @@
 
 #include <cfs/com/Test.hpp>
 #include <cfs/com/GTestEventListener.hpp>
+#include <cfs/com/ConfigurableEventListener.hpp>
 
 using namespace cfs::com::test;
 
@@ -31,8 +32,23 @@ Test::~Test()
 int Test::run (int argc, char * argv[])
 {
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
+
     ::testing::InitGoogleTest(&argc, argv);
-    testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
+
+    testing::TestEventListeners& listeners = testing::UnitTest::GetInstance()->listeners();
+
+    auto default_printer = listeners.Release(listeners.default_result_printer());
+
+    /*testing::TestEventListener * listener =*/ ConfigurableEventListener::Builder(default_printer)
+        .showEnvironment()
+        .showTestCases()
+        .showTestNames()
+        .showSuccesses()
+        .showInlineFailures()
+        .build();
+
+    //testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
+    listeners.Append(new GTestEventListener);
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
     int ret_val = RUN_ALL_TESTS();
 
