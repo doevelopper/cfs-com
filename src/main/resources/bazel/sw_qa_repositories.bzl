@@ -27,5 +27,3 @@ def _maybe(repo_rule, name, **kwargs):
     """Declares an external repository if it hasn't been declared already."""
     if name not in native.existing_rules():
         repo_rule(name = name, **kwargs)
-
-

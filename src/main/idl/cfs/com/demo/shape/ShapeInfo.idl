@@ -1,0 +1,38 @@
+
+module cfs
+{
+    module com
+    {
+        module demo
+        {
+            module shape
+            {
+
+                @topic
+                struct ShapeType
+                {
+                    @key 
+					string color;
+                    long x;
+                    long y;
+                    long shapesize;
+                };
+
+                @topic
+                struct ShapeInfo
+                {
+                    string  shapeType;
+                    long    id;
+                    long    posX;
+                    long    posY;
+                    long    directionX;
+                    long    directionY;
+                    long    color;
+                    long    size;
+                };
+
+            };
+        };
+    };
+};
+

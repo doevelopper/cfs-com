@@ -259,6 +259,14 @@ def cfs_com_repositories():
     #        sha256 = "8400c511d64eb4d26f92c5ec72535ebd0f843067515244e8b50817b0786427f9",
     #    )
 
+    # CCTZ (Time-zone framework).
+    _maybe(
+        http_archive,
+        name = "com_googlesource_code_cctz",
+        urls = ["https://github.com/google/cctz/archive/master.zip"],
+        strip_prefix = "cctz-master",
+    )
+
     # Abseil
     _maybe(
         http_archive,
@@ -286,6 +294,14 @@ def cfs_com_repositories():
         strip_prefix = "rules_cc-master",
         urls = ["https://github.com/bazelbuild/rules_cc/archive/master.zip"],
         sha256 = "20e134e1348022090fd38bcf354dd88f4d95808ad905c62cb1a359b03c4ad058",
+    )
+
+    _maybe(
+        http_archive,
+        name = "com_github_google_rules_install",
+        urls = ["https://github.com/google/bazel_rules_install/releases/download/0.3/bazel_rules_install-0.3.tar.gz"],
+        sha256 = "ea2a9f94fed090859589ac851af3a1c6034c5f333804f044f8f094257c33bdb3",
+        strip_prefix = "bazel_rules_install-0.3",
     )
 
 def _maybe(repo_rule, name, **kwargs):

@@ -14,7 +14,7 @@ def _doxygen_archive_impl(ctx):
         "out_dir_path=$(cd %s; pwd)" % out_dir_path,
         "pushd %s" % doxyfile.dirname,
         "sed -e \"s:@@OUTPUT_DIRECTORY@@:$out_dir_path/core-api/:\" <%s" +
-            " | doxygen -" % doxyfile.basename,
+        " | doxygen -" % doxyfile.basename,
         "popd",
         "tar czf %s -C %s codeswitch-api" % (out_file.path, out_dir_path),
     ]
@@ -24,20 +24,20 @@ def _doxygen_archive_impl(ctx):
         command = " && ".join(commands),
     )
 
-
 doxygen_archive = rule(
     implementation = _doxygen_archive_impl,
     attrs = {
         "doxyfile": attr.label(
             mandatory = True,
             allow_files = True,
-            single_file = True),
+            single_file = True,
+        ),
         "srcs": attr.label_list(
             mandatory = True,
-            allow_files = True),
+            allow_files = True,
+        ),
     },
     outputs = {
         "out": "%{name}.tar.gz",
     },
 )
-

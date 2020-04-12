@@ -41,6 +41,16 @@ cc_binary(
     ],
 )
 
+#sh_test(
+#    name = "feature-testing",
+#    srcs = ["integration_test.sh"],
+#    args = [
+#        "$(location :cfs-com-integration-test.bin)",
+#        "--port 3902  >/dev/null &",
+#        "cucumber --format progress --backtrace --format html --color --out Feature-Tests-Report.html --strict cfs/com/features ",
+#        "lsof -ti tcp:3902 | ([[ $? == 0 ]] && xargs kill -9 || echo Not Cucumber s PID to kill found )",
+#)
+
 pkg_tar(
     name = "cfs-com-integration-test.bin-pkg",
     # testonly = True,

@@ -21,16 +21,20 @@ load(
     "EXCEPTIONS_FLAG_LINKOPTS",
     "TEST_COPTS",
 )
-
 load(
     "//src/main/resources/bazel/opendds:tao.bzl",
     "tao_idl_gen",
 )
-
 load(
     "//src/main/resources/bazel/cpplint:cpplint.bzl",
-    "cpplint"
+    "cpplint",
 )
+
+#cc_import(
+#    name = "acelib",
+#    hdrs = glob(["/usr/local/include/ace/**/*.h"]),
+#    shared_library = "libACE.so",
+#)
 
 # cc_import(
 # name = "opendds",
@@ -100,7 +104,7 @@ cc_library(
         "cfs/com/Component.cpp",
         "cfs/com/AbstractTask.cpp",
         "cfs/com/Task.cpp",
-        "cfs/com/corba/VarInterface.cpp",
+        #"cfs/com/corba/VarInterface.cpp",
         #"cfs/com/corba/VarSequenceInterface.cpp",
         "cfs/com/DataReader.cpp",
         "cfs/com/DataWriter.cpp",
@@ -134,8 +138,8 @@ cc_library(
         "cfs/com/SubscriberListener.hpp",
         "cfs/com/Topic.hpp",
         "cfs/com/demo/sensors/RandomGenerator.hpp",
-        "cfs/com/corba/CorbaIdlTypes.hpp",
-        "cfs/com/corba/VarSequenceInterface.hpp",
+        #"cfs/com/corba/CorbaIdlTypes.hpp",
+        #"cfs/com/corba/VarSequenceInterface.hpp",
         "cfs/com/TypeTraits.hpp",
     ] + select({
         "@bazel_tools//src/conditions:windows": [
@@ -170,10 +174,16 @@ cc_library(
             "-lapr-1",
             "-laprutil-1",
             "-llog4cxx",
+            #"-lACE",
+            #"-lTAO",
             "-L/usr/local/lib",
-            "-L/opt/dds/opendds/lib/",
         ],
     }),
+
+#    deps = [
+#	     "@acelib//:ace"
+#	     "@taolib//:tao"
+#    ],
 
     #deps = [
     ##"@opendds_package//src/main/resources/bazel:ace_tao_opendds",
@@ -274,5 +284,14 @@ pkg_deb(
     version = "0.0.1",
     visibility = ["//visibility:public"],
 )
+
+
+load("@com_github_google_rules_install//installer:def.bzl", "installer")
+
+#installer(
+#    name = "install_cfs_main",
+#    compilation_mode = "",
+#    data = [":cfs-com-main"],
+#)
 
 #cpplint()

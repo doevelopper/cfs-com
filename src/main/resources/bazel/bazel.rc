@@ -105,6 +105,19 @@ build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
+build --cxxopt=-std=c++17
+#build --cxxopt=-Wall
+#build --cxxopt=-Wextra
+#build --cxxopt=-Wpedantic
+#build --cxxopt=-fdiagnostics-color
+
+build:dbg --cxxopt=-std=c++14
+build:dbg --cxxopt=-Wall
+build:dbg --cxxopt=-Wextra
+build:dbg --cxxopt=-Wpedantic
+build:dbg --cxxopt=-fdiagnostics-color
+build:dbg --compilation_mode=dbg
+
 # Strict check on type conversion.
 # absl/strings/str_cat.h breaks the rule.
 # build --per_file_copt=^modules/.*\.cc,-modules/tools/visualizer/.*\.cc,^cyber/.*\.cc@-Werror=conversion
@@ -115,7 +128,7 @@ build --copt="-Werror=switch"
 # We require C++17, but bazel defaults to C++0x (pre-C++11).
 build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --client_env=BAZEL_CXXOPTS=-std=c++17
 # Enable colorful output of GCC
-# build --cxxopt="-fdiagnostics-color=always"
+build --cxxopt="-fdiagnostics-color=always"
 
 # +------------------------------------------------------------+
 # | Python Configurations                                      |

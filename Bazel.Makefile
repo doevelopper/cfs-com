@@ -59,8 +59,20 @@ compile: ## Build projects main sources
 	@bazel --action_evn=ACE_ROOT build //...
 
 .PHONY: test
-test: compile ## Build projects test sources and run unit test
+test: ## Build projects test sources and run unit test
 	@bazel test //... --test_output=all
+
+.PHONY: coverage
+coverage:  ## Generates code coverage report
+	@bazel coverage --instrument_test_target --combined_report=lcov --coverage_report_generator=@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main //...
+
+
+.PHONY: genhtml
+genhtml: coverage  ## Generate HTML view from LCOV coverage data files
+	@rm -rf coverage_report
+	@mkdir coverage_report
+	@genhtml bazel-out/_coverage/_coverage_report.dat --output-directory coverage_report/
+	@firefox ./coverage_report/index.html > /dev/null 2>&1 &
 
 .PHONY: clean
 clean: ## Cleaned up the objects and intermediary files

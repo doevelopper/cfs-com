@@ -1,5 +1,3 @@
-
-
 def copy_bash(ctx, src, dst):
     ctx.actions.run_shell(
         tools = [src],
@@ -66,4 +64,3 @@ def executable_label(label):
         cfg = "host",
         allow_files = True,
     )
-

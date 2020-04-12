@@ -35,8 +35,7 @@ VarSequenceInterface<T>::~VarSequenceInterface()
 }
 
 template <class T>
-VarSequenceInterface<T> &
-VarSequenceInterface<T>::operator=(T* t)
+VarSequenceInterface<T> & VarSequenceInterface<T>::operator=(T* t)
 {
     if(t != m_pointee)
     {
@@ -51,8 +50,7 @@ VarSequenceInterface<T>::operator=(T* t)
 }
 
 template <class T>
-VarSequenceInterface<T> &
-VarSequenceInterface<T>::operator=(const VarSequenceInterface<T>& t)
+VarSequenceInterface<T> & VarSequenceInterface<T>::operator=(const VarSequenceInterface<T>& t)
 {
     if(this != &t)
     {
@@ -79,3 +77,4 @@ VarSequenceInterface<T>::operator->()
 {
     return (m_pointee);
 }
+

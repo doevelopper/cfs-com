@@ -84,4 +84,3 @@ config_setting(
     ],
     visibility = ["//visibility:public"],
 )
-

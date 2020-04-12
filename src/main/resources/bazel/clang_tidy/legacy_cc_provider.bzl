@@ -65,4 +65,3 @@ def get_compile_flags(dep):
         options.append("-iquote {}".format(quote_include))
 
     return options
-

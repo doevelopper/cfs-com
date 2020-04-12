@@ -3,4 +3,3 @@ sh_binary(
     srcs = ["command_wrapper.sh"],
     visibility = ["//visibility:public"],
 )
-

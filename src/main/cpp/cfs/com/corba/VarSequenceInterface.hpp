@@ -22,21 +22,21 @@ namespace cfs::com::corba
         typename T::_subscript_type
         operator [] (::CORBA::ULong index)
         {
-            assert (m_ptr);
+            assert (m_pointee);
 
-            return m_ptr->operator[] (index);
+            return m_pointee->operator[] (index);
         }
         typename T::_const_subscript_type
         operator [] (::CORBA::ULong index) const
         {
-            assert (m_ptr);
+            assert (m_pointee);
 
-            return ((const T *)m_ptr)->operator[] (index);
+            return ((const T *)m_pointee)->operator[] (index);
         }
     protected:
 
 /** pointee */
-        T * m_ptr;
+        T * m_pointee;
     };
 
 }

@@ -166,4 +166,3 @@ clang_tidy = rule(
     },
     implementation = _clang_tidy_impl,
 )
-

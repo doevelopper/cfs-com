@@ -17,12 +17,19 @@ namespace cfs::com::test
     public:
         GTestEventListener();
         ~GTestEventListener();
+        void OnEnvironmentsSetUpStart(const testing::UnitTest& /*unit_test*/) override;
+        void OnEnvironmentsSetUpEnd(const testing::UnitTest& /*unit_test*/) override;
+        void OnTestSuiteStart(const testing::TestSuite& /*test_suite*/) override;
+		void OnTestSuiteEnd(const testing::TestSuite& /*test_suite*/) override;
         void OnTestProgramStart(const testing::UnitTest& /*unit_test*/) override;
-        void OnTestStart(const testing::TestInfo& test_info) override;
-        void OnTestPartResult(const testing::TestPartResult& test_part_result) override;
-        void OnTestEnd(const testing::TestInfo& test_info) override;
         void OnTestProgramEnd(const testing::UnitTest& /*unit_test*/) override;
-        //void OnTestIterationEnd(const UnitTest& unit_test, int iteration) override;
+        void OnTestStart(const testing::TestInfo& test_info) override;
+        void OnTestEnd(const testing::TestInfo& test_info) override;
+        void OnTestPartResult(const testing::TestPartResult& test_part_result) override;
+		void OnTestIterationStart(const testing::UnitTest& /*unit_test*/, int /*iteration*/) override;
+        void OnTestIterationEnd(const testing::UnitTest& unit_test, int iteration) override;
+        void OnEnvironmentsTearDownStart(const testing::UnitTest& /*unit_test*/) override;
+		void OnEnvironmentsTearDownEnd(const testing::UnitTest& /*unit_test*/) override;
 
     protected:
 
