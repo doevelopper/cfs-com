@@ -144,10 +144,13 @@ bool LoggingService::initLogger ()
 
     if( configurationPath.empty() /*&& getenv(log4cxx.properties)*/ )
     {
-        log4cxx::PatternLayoutPtr layout (new log4cxx::PatternLayout (
-                                              "%d{yyyy-MM-dd HH:mm:ss.SSS} (%-6c) [%-6p] [%15.15t] (%-10.20l) -- %m%n"));
+        //log4cxx::PatternLayoutPtr layout (new log4cxx::PatternLayout (
+        //"%d{yyyy-MM-dd HH:mm:ss.SSS} (%-6c) [%-6p] [%15.15t] (%-10.20l) -- %m%n"));
         // log4cxx::PatternLayoutPtr layout( new log4cxx::PatternLayout(
         // "[%-6.6p] %d{HH:mm:ss.SSS} [%15.15t] (%20.20c)  (%-10.20l) - %-20.20M - %m%n"));
+
+        log4cxx::PatternLayoutPtr layout (new log4cxx::PatternLayout (
+                                              LOG4CXX_STR("[%-6p] %d{yyyy-MM-dd HH:mm:ss.SSS} [%15.15t] -- %m%n")));
 
         log4cxx::ConsoleAppenderPtr consoleAppender (new log4cxx::ConsoleAppender (layout));
 

@@ -13,6 +13,8 @@ cc_test(
         "cfs/com/GTestEventListener.hpp",
         "cfs/com/ConfigurableEventListener.cpp",
         "cfs/com/ConfigurableEventListener.hpp",
+        "cfs/com/CustomEnvironment.cpp",
+        "cfs/com/CustomEnvironment.hpp",
         "cfs/com/demo/sensors/RandomGeneratorTest.cpp",
         "cfs/com/demo/sensors/RandomGeneratorTest.hpp",
         "cfs/com/ExceptionTest.cpp",

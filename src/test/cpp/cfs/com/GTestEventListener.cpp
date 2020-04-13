@@ -55,7 +55,7 @@ void GTestEventListener::OnTestSuiteEnd(const testing::TestSuite& /*test_suite*/
 void GTestEventListener::OnTestProgramStart(const testing::UnitTest& /*unit_test*/)
 {
     // LOG4CXX_TRACE(logger, "unit test started" );
-	LOG4CXX_INFO(logger, "UT to run: " << ::testing::UnitTest::GetInstance()->test_case_to_run_count() <<")");
+	LOG4CXX_INFO(logger, "UT to run: " << ::testing::UnitTest::GetInstance()->test_case_to_run_count());
 }
 
 void GTestEventListener::OnTestProgramEnd(const testing::UnitTest& unit_test)
@@ -103,20 +103,20 @@ void GTestEventListener::OnTestPartResult( const testing::TestPartResult& test_p
 
 void GTestEventListener::OnTestIterationEnd(const testing::UnitTest& unit_test, int iteration)
 {
-    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );	
+    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
 }
 
 void GTestEventListener::OnTestIterationStart(const testing::UnitTest& /*unit_test*/, int /*iteration*/)
 {
-    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );	
+    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
 }
-		
+
 void GTestEventListener::OnEnvironmentsTearDownStart(const testing::UnitTest& /*unit_test*/)
 {
-    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );	
+    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
 }
 
 void GTestEventListener::OnEnvironmentsTearDownEnd(const testing::UnitTest& /*unit_test*/)
 {
-    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );	
+    LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__ );
 }

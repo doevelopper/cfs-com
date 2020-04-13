@@ -2,6 +2,7 @@
 #include <cfs/com/Test.hpp>
 #include <cfs/com/GTestEventListener.hpp>
 #include <cfs/com/ConfigurableEventListener.hpp>
+#include <cfs/com/CustomEnvironment.hpp>
 
 using namespace cfs::com::test;
 
@@ -34,6 +35,7 @@ int Test::run (int argc, char * argv[])
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
 
     ::testing::InitGoogleTest(&argc, argv);
+    //::testing::InitGoogleMock(&argc, argv);
 
     testing::TestEventListeners& listeners = testing::UnitTest::GetInstance()->listeners();
 
@@ -49,6 +51,8 @@ int Test::run (int argc, char * argv[])
 
     //testing::UnitTest::GetInstance()->listeners().Append(new GTestEventListener);
     listeners.Append(new GTestEventListener);
+    // gtest takes ownership of the TestEnvironment ptr - we don't delete it.
+    /*::testing::Environment* const env*/ ::testing::AddGlobalTestEnvironment(new CustomEnvironment);
     LOG4CXX_TRACE(logger, __LOG4CXX_FUNC__);
     int ret_val = RUN_ALL_TESTS();
 
