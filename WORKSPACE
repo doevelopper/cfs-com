@@ -233,3 +233,20 @@ new_local_repository(
     path = "/usr/local",
 )
 
+new_local_repository(
+    name = "openssl_shared",
+    path = "/usr/loal/lib",
+    build_file_content = """
+    cc_library(
+        name = "ssl",
+        hdrs = glob(["/usr/local/include/openssl/**/*.h"]),
+        copts = ["-I/usr/local/include/openssl"],
+        linkopts = [
+            "-lcrypto",
+            "-lssl"
+        ],
+        visibility = ["//visibility:public"],
+        linkstatic = False,
+)
+"""
+)

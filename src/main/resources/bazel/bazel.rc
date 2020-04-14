@@ -66,8 +66,8 @@ test:coverage --linkopt=-lc
 #test --test_env='LANG=en_US.UTF-8'
 #build --test_env='LC_ALL=en_US.UTF-8'
 #build --test_env='LANG=en_US.UTF-8'
-test --test_env=PATH
-build --action_env=PATH
+# test --test_env=PATH
+# build --action_env=PATH
 #build --action_env=PATH=/bin:/usr/bin:/opt/dds/opendds/bin
 
 # Support for debugging NodeJS tests
@@ -126,7 +126,8 @@ build:dbg --compilation_mode=dbg
 # Enable C++17
 #build --cxxopt="-std=c++17"
 # We require C++17, but bazel defaults to C++0x (pre-C++11).
-build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --client_env=BAZEL_CXXOPTS=-std=c++17
+#build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --client_env=BAZEL_CXXOPTS=-std=c++17
+build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"
 
