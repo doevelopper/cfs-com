@@ -1,0 +1,34 @@
+
+build  --action_env=PATH
+#build  --action_env=PATH=/bin:/usr/bin:/opt/dds/opendds/bin
+#build  --test_env='LC_ALL=en_US.UTF-8'
+#build  --test_env='LANG=en_US.UTF-8'
+
+#                    pass environment variables to the build/test environment
+#test --test_env=TRAVIS
+#test --test_env=DISPLAY
+#test   --test_env='LC_ALL=en_US.UTF-8'
+#test   --test_env='LANG=en_US.UTF-8'
+#                    Enable heap check for test
+#test   --test_env=HEAPCHECK=normal
+#test   --test_env=PPROF_PATH=/usr/local/bin/gperftools/bin/pprof
+#test   --test_env=PATH
+#test:disable_test_heap_check --test_env=HEAPCHECK=
+#test:disable_test_heap_check --test_env=PPROF_PATH=
+
+# build --spawn_strategy=standalone
+# test --spawn_strategy=standalone
+# run --spawn_strategy=standalone
+
+# build  --action_env=ACE_ROOT=/usr/local/share/ace
+# build  --action_env=TAO_ROOT=/usr/local/share/tao
+build  --action_env=DDS_ROOT=/usr/local/share/dds
+# build  --action_env=CIAO_ROOT=/usr/local/share/ciao
+# build  --action_env=DANCE_ROOT=/usr/local/share/dance
+# build  --action_env=LD_LIBRARY_PATH:$LD_LIBRARY_PATH:/usr/local/lib/:/opt/dds/opendds/lib
+# build  --action_env=CPATH=$CPATH:/opt/dds/opendds/include:/usr/local/include
+# build  --action_env=BOOST_ROOT=/usr/local
+# build  --action_env=GLIB_ROOT=/usr
+# build  --action_env=XERCESCROOT=/usr/local
+# build  --action_env=PROTOBUF_HOME=/usr/local
+# build  --action_env=SSL_ROOT=/usr/local
