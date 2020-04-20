@@ -15,15 +15,18 @@ namespace cfs::com
 
     public:
 
+        using DomainParticipantPtr  = std::shared_ptr<DDS::DomainParticipant>;
+
         DomainParticipantPtr createParticipant (
             ::DomainParticipantFactoryPtr factoryPtr,
-            DDS::DomainId_t domainId );
+            DDS::DomainId_t domainId
+        );
 
         DomainParticipantPtr createParticipant(
             ::DomainParticipantFactoryPtr factoryPtr,
             DDS::DomainId_t domainId,
             const DDS::DomainParticipantQos&  qos
-            );
+        );
 
         DomainParticipantPtr createParticipant(
             ::DomainParticipantFactoryPtr factoryPtr,
@@ -31,7 +34,12 @@ namespace cfs::com
             const DDS::DomainParticipantQos& qos,
             DDS::DomainParticipantListener* pListener,
             DDS::StatusMask mask
-            );
+        );
+
+        void getDefaultParticipantQos (
+            ::DomainParticipantFactoryPtr factoryPtr,
+            cons std::string config
+        );
     }
 
 }

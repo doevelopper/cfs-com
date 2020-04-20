@@ -1,5 +1,4 @@
 def _hash_gen_impl(ctx):
-
     computed = []
     ctx.actions.run_shell(
         outputs = [ctx.outputs.md5],

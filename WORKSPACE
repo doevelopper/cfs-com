@@ -53,7 +53,6 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-
 load("@com_github_google_rules_install//:deps.bzl", "install_rules_dependencies")
 
 install_rules_dependencies()
@@ -235,7 +234,6 @@ new_local_repository(
 
 new_local_repository(
     name = "openssl_shared",
-    path = "/usr/loal/lib",
     build_file_content = """
     cc_library(
         name = "ssl",
@@ -248,5 +246,6 @@ new_local_repository(
         visibility = ["//visibility:public"],
         linkstatic = False,
 )
-"""
+""",
+    path = "/usr/loal/lib",
 )

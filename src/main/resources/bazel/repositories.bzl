@@ -106,6 +106,7 @@ def cfs_com_repositories():
         name = "com_github_atlassian_bazel_tools",
         commit = "b05c89cea96b66b5fa9f7814b7f29d069c5c282d",
         remote = "https://github.com/atlassian/bazel-tools.git",
+        shallow_since = "1581302766 +1100",
         #    shallow_since = "10 Feb 2020",
     )
     _maybe(

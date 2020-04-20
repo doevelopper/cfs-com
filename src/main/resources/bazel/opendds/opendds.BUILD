@@ -1,18 +1,14 @@
-
-
 sh_binary(
     name = "tao-idl-bin",
     srcs = ["bin/tao_idl"],
     visibility = ["//visibility:public"],
 )
 
-
 sh_binary(
     name = "opendds-idl-bin",
     srcs = ["bin/opendds_idl"],
     visibility = ["//visibility:public"],
 )
-
 
 sh_binary(
     name = "ace-perf",
@@ -25,7 +21,6 @@ sh_binary(
     srcs = ["bin/idl2jni"],
     visibility = ["//visibility:public"],
 )
-
 
 sh_binary(
     name = "tao-catior",
@@ -45,7 +40,6 @@ sh_binary(
     visibility = ["//visibility:public"],
 )
 
-
 sh_binary(
     name = "tao-idl3-to-xm",
     srcs = ["bin/tao_idl3_to_xmi"],
@@ -64,7 +58,6 @@ sh_binary(
     visibility = ["//visibility:public"],
 )
 
-
 sh_binary(
     name = "tao-nsgroup",
     srcs = ["bin/tao_nsgroup"],
@@ -78,32 +71,32 @@ sh_binary(
 )
 
 # cc_library(
-    # name = "opendds_shared",
-    # srcs = glob([
-        # "/opt/dds/opendds/lib/lib*",
-    # ]),
-    # hdrs = glob(
-        # [
-            # "/opt/dds/opendds/include/*.hpp",
-        # ] + [
-            # "/opt/dds/opendds/include/*.h",
-        # ] + [
-            # "/opt/dds/opendds/include/**/*.hpp",
-        # ] + [
-            # "/opt/dds/opendds/include/**/*.h",
-        # ] + [
-            # "/opt/dds/opendds/include/**/**/**/*.hpp",
-        # ] + [
-            # "/opt/dds/opendds/include/**/**/**/*.h",
-        # ] + [
-            # "/opt/dds/opendds/include/**/**/*.hpp",
-        # ] + [
-            # "/opt/dds/opendds/include/**/**/*.h",
-        # ],
-    # ),
-    # includes = [
-        # "/opt/dds/opendds/include",
-    # ],
-    # strip_include_prefix = "/opt/dds/opendds/include/",
-    # visibility = ["//visibility:public"],
+# name = "opendds_shared",
+# srcs = glob([
+# "/opt/dds/opendds/lib/lib*",
+# ]),
+# hdrs = glob(
+# [
+# "/opt/dds/opendds/include/*.hpp",
+# ] + [
+# "/opt/dds/opendds/include/*.h",
+# ] + [
+# "/opt/dds/opendds/include/**/*.hpp",
+# ] + [
+# "/opt/dds/opendds/include/**/*.h",
+# ] + [
+# "/opt/dds/opendds/include/**/**/**/*.hpp",
+# ] + [
+# "/opt/dds/opendds/include/**/**/**/*.h",
+# ] + [
+# "/opt/dds/opendds/include/**/**/*.hpp",
+# ] + [
+# "/opt/dds/opendds/include/**/**/*.h",
+# ],
+# ),
+# includes = [
+# "/opt/dds/opendds/include",
+# ],
+# strip_include_prefix = "/opt/dds/opendds/include/",
+# visibility = ["//visibility:public"],
 # )

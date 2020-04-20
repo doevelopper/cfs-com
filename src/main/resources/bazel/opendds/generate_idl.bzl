@@ -1,10 +1,8 @@
-
 # https://docs.bazel.build/versions/master/skylark/rules.html#actions
 # https://docs.bazel.build/versions/master/skylark/lib/actions.html
 
-
 TAO_IDL_BIN = select({
-#    "//conditions:default": "/usr/local/bin/tao_idl",
+    #    "//conditions:default": "/usr/local/bin/tao_idl",
     "//conditions:default": "@ace_tao_opendds_binaries//:tao-idl-bin",
 })
 
@@ -105,7 +103,7 @@ def _GenDir(ctx):
     if _IsNewExternal(ctx):
         # We are using the fact that Bazel 0.4.4+ provides repository-relative paths
         # for ctx.genfiles_dir.
-        return ctx.genfiles_dir.path + ( "/" + ctx.attr.idls[0] if ctx.attr.idls and ctx.attr.idls[0] else "")
+        return ctx.genfiles_dir.path + ("/" + ctx.attr.idls[0] if ctx.attr.idls and ctx.attr.idls[0] else "")
 
     # This means that we're either in the old version OR the new version in the local repo.
     # Either way, appending the source path to the genfiles dir works.
@@ -120,7 +118,7 @@ def _SourceDir(ctx):
         return _GetPath(ctx, ctx.attr.idls[0])
     return _GetPath(ctx, ctx.label.package + "/" + ctx.attr.idls[0])
 
-def idl_library( name, idls, **kwargs):
+def idl_library(name, idls, **kwargs):
     if len(idls) > 1:
         fail("Only one idls value supported", "idls")
 
@@ -132,19 +130,19 @@ def idl_library( name, idls, **kwargs):
         env = select({
             # "//toolchain:windows_x86_64": {},
             "//conditions:default": {
-#                "PATH": "external/com_intel_plaidml_conda_unix/env/bin"
-                "ACE_ROOT" : "/usr/local/share/ace",
-                "TAO_ROOT" : "/usr/local/share/tao",
-                "DDS_ROOT" : "/usr/local/share/dds",
-                "CIAO_ROOT" : "/usr/local/share/ciao",
-                "DANCE_ROOT" : "/usr/local/share/dance",
-                "LD_LIBRARY_PATH" :" $LD_LIBRARY_PATH:/usr/local/lib/:/opt/dds/opendds/lib",
-                "CPATH" : "$CPATH:/opt/dds/opendds/include:/usr/local/include",
-                "BOOST_ROOT" : "/usr/local",
-                "GLIB_ROOT" : "/usr",
-                "XERCESCROOT" : "/usr/local",
-                "PROTOBUF_HOME" : "/usr/local",
-                "SSL_ROOT" : "/usr/local",
+                #                "PATH": "external/com_intel_plaidml_conda_unix/env/bin"
+                "ACE_ROOT": "/usr/local/share/ace",
+                "TAO_ROOT": "/usr/local/share/tao",
+                "DDS_ROOT": "/usr/local/share/dds",
+                "CIAO_ROOT": "/usr/local/share/ciao",
+                "DANCE_ROOT": "/usr/local/share/dance",
+                "LD_LIBRARY_PATH": " $LD_LIBRARY_PATH:/usr/local/lib/:/opt/dds/opendds/lib",
+                "CPATH": "$CPATH:/opt/dds/opendds/include:/usr/local/include",
+                "BOOST_ROOT": "/usr/local",
+                "GLIB_ROOT": "/usr",
+                "XERCESCROOT": "/usr/local",
+                "PROTOBUF_HOME": "/usr/local",
+                "SSL_ROOT": "/usr/local",
             },
         }),
         **kwargs
@@ -157,20 +155,19 @@ def idl_library( name, idls, **kwargs):
         **kwargs
     )
 
-def _use_tao_idl_4_generate_idl2cpp(ctx, from_typesupport_idl ):
+def _use_tao_idl_4_generate_idl2cpp(ctx, from_typesupport_idl):
     pass
 
 def _use_opendds_idl_4_generate_idl2cpp(ctx):
     pass
 
 def _generate_idl2cpp(ctx):
-
-
     full_outdir = ctx.bin_dir.path + "/"
     if ctx.label.workspace_root:
         full_outdir += ctx.label.workspace_root + "/"
     if ctx.label.package:
         full_outdir += ctx.label.package + "/"
+
     # full_outdir += ctx.label.name
     # print("IDL root apout dir {} ".format(full_outdir))
     # print("ctx.attr.idls[0] {} ".format(ctx.attr.idls[0]))
@@ -183,8 +180,9 @@ def _generate_idl2cpp(ctx):
         idl_file_path = idl_file.path.split("/idl/")[1].rpartition("/")[0]
         # print("idl file path: {} ".format(idl_file_path))
         # print("ctx.genfiles_dir.path: {} ".format(ctx.genfiles_dir.path))
-        
+
         file_name = idl_file.path[0:-len(idl_file.extension) - 1]
+
         # print("File name: {} ".format(file_name))
         file_base_name = idl_file.basename[0:-len(idl_file.extension) - 1]
         # print("File: {} ".format(file_base_name))
@@ -217,38 +215,38 @@ def _generate_idl2cpp(ctx):
         opendds_args.add(full_outdir)
 
         # ctx.actions.run_shell(
-            # outputs = [
-                # otschdr, 
-                # otsidl, 
-                # otshdr, 
-                # otssrc
-            # ],
-            # inputs=[idl_file], 
-            # arguments = [opendds_args],
-            # command = "opendds_idl",
-            # progress_message = "OpendDDS IDL Generating srs from {} \n in folder {}".format(idl_file,full_outdir), #"Packing " + ctx.label.package + ":" + ctx.label.name,
-            # use_default_shell_env=True, 
-            # env = ctx.attr.env,
-            # execution_requirements=None, 
-            # input_manifests=None
+        # outputs = [
+        # otschdr,
+        # otsidl,
+        # otshdr,
+        # otssrc
+        # ],
+        # inputs=[idl_file],
+        # arguments = [opendds_args],
+        # command = "opendds_idl",
+        # progress_message = "OpendDDS IDL Generating srs from {} \n in folder {}".format(idl_file,full_outdir), #"Packing " + ctx.label.package + ":" + ctx.label.name,
+        # use_default_shell_env=True,
+        # env = ctx.attr.env,
+        # execution_requirements=None,
+        # input_manifests=None
         # )
 
         ctx.actions.run(
             outputs = [
-                otschdr, 
-                otsidl, 
-                otshdr, 
-                otssrc
+                otschdr,
+                otsidl,
+                otshdr,
+                otssrc,
             ],
-            inputs=[idl_file],
-            unused_inputs_list=None,
+            inputs = [idl_file],
+            unused_inputs_list = None,
             executable = "opendds_idl",
             arguments = [opendds_args],
-            progress_message = "OpendDDS IDL Generating srs from {} \n in folder {}".format(idl_file,full_outdir), #"Packing " + ctx.label.package + ":" + ctx.label.name,
-            use_default_shell_env=True, 
+            progress_message = "OpendDDS IDL Generating srs from {} \n in folder {}".format(idl_file, full_outdir),  #"Packing " + ctx.label.package + ":" + ctx.label.name,
+            use_default_shell_env = True,
             env = ctx.attr.env,
-            execution_requirements=None, 
-            input_manifests=None
+            execution_requirements = None,
+            input_manifests = None,
         )
 
         hdrinl = ctx.actions.declare_file("{}/{}Client.inl".format(idl_file_path, file_base_name))
@@ -273,6 +271,8 @@ def _generate_idl2cpp(ctx):
         tao_idl_in_args.add("ignore")
         tao_idl_in_args.add("-ae")
         tao_idl_in_args.add("-GC")
+        tao_idl_in_args.add("-Sg")
+        tao_idl_in_args.add("-TS 4")
         tao_idl_in_args.add("-Wb,pre_include=ace/pre.h")
         tao_idl_in_args.add("-Wb,post_include=ace/post.h")
         tao_idl_in_args.add("-I{}".format(full_outdir))
@@ -295,25 +295,25 @@ def _generate_idl2cpp(ctx):
 
         ctx.actions.run(
             outputs = [
-                 hdrinl,
-                 clthdr,
-                 cltsrc,
-                 srvhdr,
-                 srvsrc
+                hdrinl,
+                clthdr,
+                cltsrc,
+                srvhdr,
+                srvsrc,
             ],
-            inputs=[idl_file],
-            unused_inputs_list=None,
+            inputs = [idl_file],
+            unused_inputs_list = None,
             executable = "tao_idl",
             arguments = [tao_idl_in_args],
-            progress_message = "TAO IDL: Generating srs  from {} in folder {}".format(idl_file,full_outdir),
-            use_default_shell_env=True, 
+            progress_message = "TAO IDL: Generating srs  from {} in folder {}".format(idl_file, full_outdir),
+            use_default_shell_env = True,
             env = ctx.attr.env,
-            execution_requirements=None, 
-            input_manifests=None
+            execution_requirements = None,
+            input_manifests = None,
         )
 
         typesupport_idl = "{}/{}TypeSupport.idl".format(full_outdir, file_base_name)
-        print("TypeSupport idl: {} ".format(typesupport_idl))
+        # print("TypeSupport idl: {} ".format(typesupport_idl))
 
         ts_hdr_inl = ctx.actions.declare_file("{}/{}TypeSupportClient.inl".format(idl_file_path, file_base_name))
         ts_clt_hdr = ctx.actions.declare_file("{}/{}TypeSupportClient.hpp".format(idl_file_path, file_base_name))
@@ -336,12 +336,15 @@ def _generate_idl2cpp(ctx):
         tao_idl_out_args.add("ignore")
         tao_idl_out_args.add("-ae")
         tao_idl_out_args.add("-GC")
+        tao_idl_out_args.add("-Sg")
+        tao_idl_out_args.add("-TS 4")
         tao_idl_out_args.add("-Wb,pre_include=ace/pre.h")
         tao_idl_out_args.add("-Wb,post_include=ace/post.h")
-        #  tao_idl_in_args.add("-I{}".format(ACE_ROOT))
-        #  tao_idl_in_args.add("-I{}".format(TAO_ROOT))
-        #  tao_idl_in_args.add("-I{}".format(DDS_ROOT))
-        tao_idl_out_args.add("-I{}/{}".format(ctx.label.package,idl_file_path)) # IDL source folder
+
+        #  tao_idl_out_args.add("-I{}".format(ACE_ROOT))
+        #  tao_idl_out_args.add("-I{}".format(TAO_ROOT))
+        #  tao_idl_out_args.add("-I{}".format(DDS_ROOT))
+        tao_idl_out_args.add("-I{}/{}".format(ctx.label.package, idl_file_path))  # IDL source folder
         tao_idl_out_args.add("-I{}".format(full_outdir))
         tao_idl_out_args.add("-ci")
         tao_idl_out_args.add("Client.inl")
@@ -362,27 +365,25 @@ def _generate_idl2cpp(ctx):
 
         ctx.actions.run(
             outputs = [
-                ts_hdr_inl, 
-                ts_clt_hdr, 
-                ts_clt_src, 
-                ts_srv_hdr, 
-                ts_srv_src
+                ts_hdr_inl,
+                ts_clt_hdr,
+                ts_clt_src,
+                ts_srv_hdr,
+                ts_srv_src,
             ],
             # inputs=[typesupport_idl],
-            inputs=[otsidl],
-            unused_inputs_list=None,
+            inputs = [otsidl],
+            unused_inputs_list = None,
             executable = "tao_idl",
             arguments = [tao_idl_out_args],
-            progress_message = "TAO IDL: Generating type support srs  from {} in folder {}".format(otsidl,full_outdir),
-            use_default_shell_env=True, 
+            progress_message = "TAO IDL: Generating type support srs  from {} in folder {}".format(otsidl, full_outdir),
+            use_default_shell_env = True,
             env = ctx.attr.env,
-            execution_requirements=None, 
-            input_manifests=None
+            execution_requirements = None,
+            input_manifests = None,
         )
 
-        return [DefaultInfo(files=depset(files))]
-
-
+        return [DefaultInfo(files = depset(files))]
 
 generate_idl2cpp = rule(
     attrs = {

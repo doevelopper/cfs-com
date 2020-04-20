@@ -180,16 +180,39 @@ cc_library(
         ],
     }),
 
-#    deps = [
-#	     "@acelib//:ace"
-#	     "@taolib//:tao"
-#    ],
+    #    deps = [
+    #	     "@acelib//:ace"
+    #	     "@taolib//:tao"
+    #    ],
 
     #deps = [
     ##"@opendds_package//src/main/resources/bazel:ace_tao_opendds",
     #"@opendds_package//:ace_tao_opendds",
     #],
     #deps = [":private"],
+)
+
+cc_library(
+    name = "opendds-demo-libs",
+    srcs = [
+        "cfs/com/demo/opendds/DataReaderListenerImpl.cpp",
+        "cfs/com/demo/opendds/MessengerSubscriber.cpp",
+        "cfs/com/demo/opendds/MessengerPublisher.cpp",
+    ],
+    hdrs = [
+        "cfs/com/demo/opendds/DataReaderListenerImpl.hpp",
+        "cfs/com/demo/opendds/MessengerSubscriber.hpp",
+        "cfs/com/demo/opendds/MessengerPublisher.hpp",
+    ],
+    copts = [
+#        "-isystem","bazel-out/k8-fastbuild/bin/src/main",
+        "-isystem","bazel-out/k8-fastbuild/bin/src/main/idl/cfs/com/demo/msg/",
+#        "-isystem","target/out/k8-fastbuild/bin/src/main/",
+    ],
+    deps = [
+        ":cfs-com-main",
+        "//src/main/idl:Messenger",
+    ],
 )
 
 #cc_library(
@@ -284,7 +307,6 @@ pkg_deb(
     version = "0.0.1",
     visibility = ["//visibility:public"],
 )
-
 
 load("@com_github_google_rules_install//installer:def.bzl", "installer")
 

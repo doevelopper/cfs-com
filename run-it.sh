@@ -20,7 +20,8 @@ function pause(){
 }
 
 
-function fancy_echo() {
+function fancy_echo() 
+{
    local fmt="$1"; shift
    printf "\\n>>> $fmt\\n" "$@"
 }
@@ -35,6 +36,17 @@ case "${unameOut}" in
 esac
 
 echo ${machine}
+
+KillChildProcesses() 
+{
+    ChildProcesses=$(jobs -p)
+    if [[ -n "${ChildProcesses}" ]]
+    then
+        # Note: ChildProcesses must be expanded to args here.
+        kill ${ChildProcesses} 2> /dev/null
+        wait 2> /dev/null
+    fi
+}
 
 starXvirtualFramebuffer ()
 {
@@ -80,12 +92,15 @@ then
     SOCK=cucumber.wire.sock
     echo "unix: ${SOCK}" > src/it/cfs/com/features/step_definitions/cucumber.wire
     "$1" --unix "${SOCK}" > /dev/null &
+	it_Process=$!
 
 else
     if [ -n "${DISPLAY:-}" ]; then
         "$1" --port 3902 2> /dev/null &
+		it_Process=$!
     else
         "$1" --port 3902 >/dev/null &
+		it_Process=$!
     fi
 fi
 
@@ -93,8 +108,21 @@ sleep 5
 
 # Run cucumber binary to run
 cucumber --format progress --backtrace --format html --color --out $2.Feature-Tests-Report.html --strict cfs/com/features
-
+cucumber_Process=$!
 wait %
+
+while true
+do
+    sleep 1
+
+    for ProcessID in "${it_Process}" "${cucumber_Process}"
+    do
+        if ! kill -0 $ProcessID 2> /dev/null
+        then
+            exit
+        fi
+    done
+done
 
 # Shutdown POR to kill process listening on cucumber test port. Used in  next test iteration
 lsof -ti tcp:3902 | ([[ $? == 0 ]] && xargs kill -9 || echo "Not Cucumber s PID to kill found" )

@@ -295,4 +295,3 @@ def qt_import(name, module):
         linkopts = [
             "-lQt%".format(module),
         ],
-
