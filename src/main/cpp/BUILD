@@ -207,6 +207,8 @@ cc_library(
     copts = [
 #        "-isystem","bazel-out/k8-fastbuild/bin/src/main",
         "-isystem","bazel-out/k8-fastbuild/bin/src/main/idl/cfs/com/demo/msg/",
+        "-isystem","/usr/local/include/",
+        "-isystem","usr/local/include/dds/",
 #        "-isystem","target/out/k8-fastbuild/bin/src/main/",
     ],
     deps = [
